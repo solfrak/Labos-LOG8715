@@ -8,6 +8,8 @@ public class RegisterSystems
         var toRegister = new List<ISystem>();
         
         // Add your systems here
+        toRegister.Add(new SpawnerSystem());
+        toRegister.Add(new MovementSystem());
 
         return toRegister;
     }
