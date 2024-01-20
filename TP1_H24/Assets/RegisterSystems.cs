@@ -9,6 +9,7 @@ public class RegisterSystems
         
         // Add your systems here
         toRegister.Add(new SpawnerSystem());
+        toRegister.Add(new ColisionSystem());
         toRegister.Add(new MovementSystem());
 
         return toRegister;

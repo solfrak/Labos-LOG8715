@@ -5,7 +5,7 @@ using UnityEngine;
 
 public struct PhysicComponent
 {
-    public int size { get; set;}
-    public Vector2 position { get; set;}
-    public Vector2 velocity { get; set;}
+    public int size;
+    public Vector2 position;
+    public Vector2 velocity;
 }

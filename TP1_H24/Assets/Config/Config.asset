@@ -18,11 +18,21 @@ MonoBehaviour:
   protectionDuration: 5
   protectionCooldown: 15
   circleInstancesToSpawn:
-  - initialSize: 3
-    initialPosition: {x: 1, y: 0}
-    initialVelocity: {x: 0.2, y: 0.3}
+  - initialSize: 2
+    initialPosition: {x: 0, y: 0}
+    initialVelocity: {x: -0.5, y: 0.2}
+  - initialSize: 6
+    initialPosition: {x: 6, y: 0}
+    initialVelocity: {x: -0.2, y: 0.2}
+  - initialSize: 4
+    initialPosition: {x: -2, y: 5}
+    initialVelocity: {x: 0.2, y: 0.2}
+  - initialSize: 1
+    initialPosition: {x: 2, y: 5}
+    initialVelocity: {x: 0.2, y: -0.3}
   systemsEnabled:
     keys:
     - SpawnerSystem
     - MovementSystem
-    values: 0101
+    - ColisionSystem
+    values: 010101
