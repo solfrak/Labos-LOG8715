@@ -9,12 +9,16 @@ public class MovementSystem : ISystem
 
     public void UpdateSystem()
     {
-        foreach(var entity in EntityManager.Instance.GetEntities())
+        List<IComponent> list = EntityManager.Instance.GetComponents<PhysicComponent>();
+        for(int i = 0; i < list.Count; i++)
         {
-            PhysicComponent phys = entity.GetComponent<PhysicComponent>();
-            phys.position += phys.velocity;
-            entity.UpdateComponent(phys);
-            ECSController.Instance.UpdateShapePosition(entity.id, entity.GetComponent<PhysicComponent>().position);
+            PhysicComponent physicComponent = (PhysicComponent)list[i];
+            physicComponent.position += physicComponent.velocity;
+
+            EntityManager.Instance.UpdateComponent(i, physicComponent);
+
+            ECSController.Instance.UpdateShapePosition(physicComponent.entityId, physicComponent.position);
         }
+        
     }
 }

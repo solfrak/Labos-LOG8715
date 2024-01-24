@@ -1,43 +1,95 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Analytics;
 
-public class EntityManager : MonoBehaviour
+public struct Entity
 {
-
+    public uint id;
+}
+public class EntityManager
+{
+    private EntityManager(){}
     private static EntityManager _instance;
-    private static uint counter = 0;
-    public static EntityManager Instance 
+    
+    public static EntityManager Instance
     {
         get
         {
-            if(_instance == null)
+            if (_instance == null)
             {
-                _instance = FindObjectOfType<EntityManager>();
-
-                if(_instance == null)
-                {
-                    GameObject obj = new GameObject("_EntityManager");
-                    _instance = obj.AddComponent<EntityManager>();
-                }
+                _instance = new EntityManager();
             }
             return _instance;
         }
     }
     private List<Entity> entities = new List<Entity>();
+    private Dictionary<Entity, Dictionary<Type, int>> componentIndexer = new Dictionary<Entity, Dictionary<Type, int>>();
+    private Dictionary<Type, List<IComponent>> components = new Dictionary<Type, List<IComponent>>();
+    
 
-    public void AddEntity(Entity entity)
+    public Entity CreateEntity()
     {
+        Entity entity = new Entity { id = (uint)entities.Count};
         entities.Add(entity);
+        componentIndexer[entity] = new Dictionary<Type, int>();
+        return entity;
     }
 
-    public List<Entity> GetEntities()
+    public void DestroyEntity(Entity entity)
     {
-        return entities;
+
+        //TODO remove all the components of the entity from the list
+        Dictionary<Type, int> entityComponents = componentIndexer[entity];
+        foreach(var pair in entityComponents)
+        {
+            //replace the data of the entity component by the last component from the list
+            int lastIndex = components[pair.Key].Count - 1;
+            components[pair.Key][pair.Value] = components[pair.Key][lastIndex];
+
+            components[pair.Key].RemoveAt(lastIndex);
+        }
+        
+
+
+        componentIndexer.Remove(entity);
+        entities.Remove(entity);
     }
 
-    public uint GetId()
+    public void AddComponent<T>(Entity entity, T component) where T : IComponent
     {
-        return counter++;
+        Type componentType = typeof(T);
+        if(!components.ContainsKey(componentType))
+        {
+            components[componentType] = new List<IComponent>();
+        }
+
+        components[componentType].Add(component);
+        int index = components[componentType].Count - 1;
+        componentIndexer[entity][componentType] = index;
     }
+    
+    public List<IComponent> GetComponents<T>() where T : IComponent
+    {
+        Type componentType = typeof(T);
+
+        if (components.ContainsKey(componentType))
+        {
+            // Cast the List<IComponent> to List<T>
+            var result = components[componentType];
+            return result;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public void UpdateComponent<T>(int index, T newComponent)
+    {
+        Type type = typeof(T);
+        components[type][index] = (IComponent)newComponent;
+    } 
 }

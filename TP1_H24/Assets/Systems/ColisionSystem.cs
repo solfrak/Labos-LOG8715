@@ -25,38 +25,39 @@ public class ColisionSystem : ISystem
     }
     public void UpdateSystem()
     {
-        foreach(var currentEntity in EntityManager.Instance.GetEntities())
-        {
-            PhysicComponent currentPhys = currentEntity.GetComponent<PhysicComponent>();
+        //TODO refactor with new system
+        // foreach(var currentEntity in Old_EntityManager.Instance.GetEntities())
+        // {
+        //     PhysicComponent currentPhys = currentEntity.GetComponent<PhysicComponent>();
 
-            if (currentPhys.position.x + (currentPhys.size / 2) >= sWidth / 2 || currentPhys.position.x - (currentPhys.size / 2) <= (-sWidth / 2))
-            {
-                currentPhys.velocity.x *= -1.0f;
-            }
-            if (currentPhys.position.y + (currentPhys.size / 2)>= sHeight / 2 || currentPhys.position.y - (currentPhys.size / 2) <= (-sHeight / 2))
-            {
-                currentPhys.velocity.y *= -1.0f;
-            }
+        //     if (currentPhys.position.x + (currentPhys.size / 2) >= sWidth / 2 || currentPhys.position.x - (currentPhys.size / 2) <= (-sWidth / 2))
+        //     {
+        //         currentPhys.velocity.x *= -1.0f;
+        //     }
+        //     if (currentPhys.position.y + (currentPhys.size / 2)>= sHeight / 2 || currentPhys.position.y - (currentPhys.size / 2) <= (-sHeight / 2))
+        //     {
+        //         currentPhys.velocity.y *= -1.0f;
+        //     }
 
-            foreach(var otherEntity in EntityManager.Instance.GetEntities())
-            {
-                if(currentEntity.id != otherEntity.id)
-                {
-                    PhysicComponent otherPhys = otherEntity.GetComponent<PhysicComponent>();
-                    CollisionResult result = CollisionUtility.CalculateCollision(currentPhys.position, currentPhys.velocity, currentPhys.size, otherPhys.position, otherPhys.velocity, otherPhys.size);
-                    if(result != null)
-                    {
-                        currentPhys.position = result.position1;
-                        currentPhys.velocity = result.velocity1;
-                        otherPhys.position = result.position2;
-                        otherPhys.velocity = result.velocity2;
-                        otherEntity.UpdateComponent(otherPhys);
-                    }
-                }
-            }
+        //     foreach(var otherEntity in Old_EntityManager.Instance.GetEntities())
+        //     {
+        //         if(currentEntity.id != otherEntity.id)
+        //         {
+        //             PhysicComponent otherPhys = otherEntity.GetComponent<PhysicComponent>();
+        //             CollisionResult result = CollisionUtility.CalculateCollision(currentPhys.position, currentPhys.velocity, currentPhys.size, otherPhys.position, otherPhys.velocity, otherPhys.size);
+        //             if(result != null)
+        //             {
+        //                 currentPhys.position = result.position1;
+        //                 currentPhys.velocity = result.velocity1;
+        //                 otherPhys.position = result.position2;
+        //                 otherPhys.velocity = result.velocity2;
+        //                 otherEntity.UpdateComponent(otherPhys);
+        //             }
+        //         }
+        //     }
 
-            currentEntity.UpdateComponent(currentPhys);
-        }
+        //     currentEntity.UpdateComponent(currentPhys);
+        // }
     }
 }
 

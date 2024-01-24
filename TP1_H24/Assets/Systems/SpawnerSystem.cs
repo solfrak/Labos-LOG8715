@@ -15,17 +15,19 @@ public class SpawnerSystem : ISystem
         {
             foreach (var circle in ECSController.Instance.Config.circleInstancesToSpawn)
             {
-                Entity circleEntity = new Entity();
-                PhysicComponent phys = new PhysicComponent();
-                phys.size = circle.initialSize;
-                phys.position = circle.initialPosition;
-                phys.velocity = circle.initialVelocity;
+                var entity = EntityManager.Instance.CreateEntity();
+                EntityManager.Instance.AddComponent(entity, new PhysicComponent{ entityId = entity.id, position = circle.initialPosition, size = circle.initialSize, velocity = circle.initialVelocity});
+                // Old_Entity circleEntity = new Old_Entity();
+                // PhysicComponent phys = new PhysicComponent();
+                // phys.size = circle.initialSize;
+                // phys.position = circle.initialPosition;
+                // phys.velocity = circle.initialVelocity;
 
-                circleEntity.AddComponent(phys);
-                circleEntity.id = EntityManager.Instance.GetId();
-                EntityManager.Instance.AddEntity(circleEntity);
-                ECSController.Instance.CreateShape(circleEntity.id, circleEntity.GetComponent<PhysicComponent>().size);
-                ECSController.Instance.UpdateShapePosition(circleEntity.id, circleEntity.GetComponent<PhysicComponent>().position);
+                // circleEntity.AddComponent(phys);
+                // circleEntity.id = Old_EntityManager.Instance.GetId();
+                // Old_EntityManager.Instance.AddEntity(circleEntity);
+                ECSController.Instance.CreateShape(entity.id, circle.initialSize);
+                ECSController.Instance.UpdateShapePosition(entity.id, circle.initialPosition);
             }
             isInitPhase = false;
 
