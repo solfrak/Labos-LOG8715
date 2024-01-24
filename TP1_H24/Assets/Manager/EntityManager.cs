@@ -71,14 +71,15 @@ public class EntityManager
         componentIndexer[entity][componentType] = index;
     }
     
-    public List<IComponent> GetComponents<T>() where T : IComponent
+    public IComponent GetComponents<T>(Entity entity) where T : IComponent
     {
         Type componentType = typeof(T);
 
         if (components.ContainsKey(componentType))
         {
             // Cast the List<IComponent> to List<T>
-            var result = components[componentType];
+            int index = componentIndexer[entity][componentType];
+            IComponent result = components[componentType][index];
             return result;
         }
         else
@@ -87,9 +88,15 @@ public class EntityManager
         }
     }
 
-    public void UpdateComponent<T>(int index, T newComponent)
+    public void UpdateComponent<T>(Entity entity, T newComponent)
     {
         Type type = typeof(T);
+        int index = componentIndexer[entity][type];
         components[type][index] = (IComponent)newComponent;
     } 
+
+    public List<Entity> GetEntities()
+    {
+        return entities;
+    }
 }

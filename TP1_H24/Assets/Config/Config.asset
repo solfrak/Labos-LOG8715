@@ -35,4 +35,4 @@ MonoBehaviour:
     - SpawnerSystem
     - MovementSystem
     - ColisionSystem
-    values: 010101
+    values: 010100
