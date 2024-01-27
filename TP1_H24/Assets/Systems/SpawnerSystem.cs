@@ -15,22 +15,26 @@ public class SpawnerSystem : ISystem
         {
             foreach (var circle in ECSController.Instance.Config.circleInstancesToSpawn)
             {
-                var entity = EntityManager.Instance.CreateEntity();
-                EntityManager.Instance.AddComponent(entity, new PhysicComponent{ entityId = entity.id, position = circle.initialPosition, size = circle.initialSize, velocity = circle.initialVelocity});
-                // Old_Entity circleEntity = new Old_Entity();
-                // PhysicComponent phys = new PhysicComponent();
-                // phys.size = circle.initialSize;
-                // phys.position = circle.initialPosition;
-                // phys.velocity = circle.initialVelocity;
+                var entity = BaseEntityManager.Instance.CreateEntity();
+                PhysicComponent physicComponent = new PhysicComponent { position = circle.initialPosition,  velocity = circle.initialVelocity, size = circle.initialSize, isStatic = false };
+                CollisionComponent collisionComponent = new CollisionComponent{initialSize = circle.initialSize};
+                if(isNormVec2Null(circle.initialVelocity))
+                {
+                    physicComponent.isStatic = true;
+                }
+                BaseEntityManager.Instance.AddComponent(entity, physicComponent);
+                BaseEntityManager.Instance.AddComponent(entity, collisionComponent);
 
-                // circleEntity.AddComponent(phys);
-                // circleEntity.id = Old_EntityManager.Instance.GetId();
-                // Old_EntityManager.Instance.AddEntity(circleEntity);
-                ECSController.Instance.CreateShape(entity.id, circle.initialSize);
-                ECSController.Instance.UpdateShapePosition(entity.id, circle.initialPosition);
+                ECSController.Instance.CreateShape(entity, circle.initialSize);
+                ECSController.Instance.UpdateShapePosition(entity, circle.initialPosition);
             }
             isInitPhase = false;
 
         }
+    }
+
+    private bool isNormVec2Null(Vector2 input)
+    {
+        return (input.x * input.x) + (input.y * input.y) == 0.0;
     }
 }

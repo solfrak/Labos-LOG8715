@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Il2Cpp;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 public class ColisionSystem : ISystem
 {
@@ -25,39 +28,97 @@ public class ColisionSystem : ISystem
     }
     public void UpdateSystem()
     {
-        //TODO refactor with new system
-        // foreach(var currentEntity in Old_EntityManager.Instance.GetEntities())
-        // {
-        //     PhysicComponent currentPhys = currentEntity.GetComponent<PhysicComponent>();
+        List<Tuple<uint, uint, PhysicComponent, PhysicComponent>> collisions = new List<Tuple<uint, uint, PhysicComponent, PhysicComponent>>();
+        DetectCollision(ref collisions);
+        UpdateAfterCollision(ref collisions);
+    }
 
-        //     if (currentPhys.position.x + (currentPhys.size / 2) >= sWidth / 2 || currentPhys.position.x - (currentPhys.size / 2) <= (-sWidth / 2))
-        //     {
-        //         currentPhys.velocity.x *= -1.0f;
-        //     }
-        //     if (currentPhys.position.y + (currentPhys.size / 2)>= sHeight / 2 || currentPhys.position.y - (currentPhys.size / 2) <= (-sHeight / 2))
-        //     {
-        //         currentPhys.velocity.y *= -1.0f;
-        //     }
+    private void DetectCollision(ref List<Tuple<uint, uint, PhysicComponent, PhysicComponent>> collisions)
+    {
 
-        //     foreach(var otherEntity in Old_EntityManager.Instance.GetEntities())
-        //     {
-        //         if(currentEntity.id != otherEntity.id)
-        //         {
-        //             PhysicComponent otherPhys = otherEntity.GetComponent<PhysicComponent>();
-        //             CollisionResult result = CollisionUtility.CalculateCollision(currentPhys.position, currentPhys.velocity, currentPhys.size, otherPhys.position, otherPhys.velocity, otherPhys.size);
-        //             if(result != null)
-        //             {
-        //                 currentPhys.position = result.position1;
-        //                 currentPhys.velocity = result.velocity1;
-        //                 otherPhys.position = result.position2;
-        //                 otherPhys.velocity = result.velocity2;
-        //                 otherEntity.UpdateComponent(otherPhys);
-        //             }
-        //         }
-        //     }
+        // var entities = EntityManager.Instance.GetEntities();
+        var entities = BaseEntityManager.Instance.GetEntities();
 
-        //     currentEntity.UpdateComponent(currentPhys);
-        // }
+        for (int i = 0; i < entities.Count; i++)
+        {
+            BaseEntityManager.Instance.UpdateComponent(entities[i], CalculateScreenCollision((PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(entities[i])));
+            for (int j = i; j < entities.Count; j++)
+            {
+                if (i != j)
+                {
+                    var firstEntity = entities[i];
+                    var secondEntity = entities[j];
+
+
+                    PhysicComponent firstPhys = (PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(firstEntity);
+                    PhysicComponent secondPhys = (PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(secondEntity);
+
+                    CollisionResult result = CollisionUtility.CalculateCollision(firstPhys.position, firstPhys.velocity, firstPhys.size, secondPhys.position, secondPhys.velocity, secondPhys.size);
+                    if (result != null)
+                    {
+                        firstPhys.velocity = result.velocity1;
+                        firstPhys.position = result.position1;
+                        secondPhys.velocity = result.velocity2;
+                        secondPhys.position = result.position2;
+                        Tuple<uint, uint, PhysicComponent, PhysicComponent> tuple = new(firstEntity, secondEntity, firstPhys, secondPhys);
+                        collisions.Add(tuple);
+                    }
+                }
+            }
+        }
+    }
+
+    private void UpdateAfterCollision(ref List<Tuple<uint, uint, PhysicComponent, PhysicComponent>> collisions)
+    {
+        foreach (var collision in collisions)
+        {
+            PhysicComponent pEntity1 = collision.Item3;
+            PhysicComponent pEntity2 = collision.Item4;
+
+            CollisionComponent cEntity1 = (CollisionComponent)BaseEntityManager.Instance.GetComponent<CollisionComponent>(collision.Item1);
+            CollisionComponent cEntity2 = (CollisionComponent)BaseEntityManager.Instance.GetComponent<CollisionComponent>(collision.Item2);
+
+            BaseEntityManager.Instance.UpdateComponent(collision.Item1, pEntity1);
+            BaseEntityManager.Instance.UpdateComponent(collision.Item2, pEntity2);
+
+            if(!pEntity1.isStatic && !pEntity2.isStatic)
+            {
+                UpdateCollisionCount(pEntity1, pEntity2, cEntity1, cEntity2, collision.Item1, collision.Item2);
+            }
+        }
+    }
+
+    private PhysicComponent CalculateScreenCollision(PhysicComponent input)
+    {
+        if (input.position.x + (input.size / 2) >= sWidth / 2 || input.position.x - (input.size / 2) <= (-sWidth / 2))
+        {
+            input.velocity.x *= -1.0f;
+        }
+        if (input.position.y + (input.size / 2) >= sHeight / 2 || input.position.y - (input.size / 2) <= (-sHeight / 2))
+        {
+            input.velocity.y *= -1.0f;
+        }
+
+        return input;
+
+    }
+
+    private void UpdateCollisionCount(PhysicComponent physicComponent1, PhysicComponent physicComponent2, CollisionComponent collisionComponent1, CollisionComponent collisionComponent2, uint entity1, uint entity2)
+    {
+
+        if(physicComponent1.size > physicComponent2.size)
+        {
+            collisionComponent1.lesserThanCollisionCount++;
+            collisionComponent2.greaterThanCollisionCount++;
+        }
+        else
+        {
+            collisionComponent2.lesserThanCollisionCount++;
+            collisionComponent1.greaterThanCollisionCount++;
+        }
+
+        BaseEntityManager.Instance.UpdateComponent(entity1, collisionComponent1);
+        BaseEntityManager.Instance.UpdateComponent(entity2, collisionComponent2);
     }
 }
 

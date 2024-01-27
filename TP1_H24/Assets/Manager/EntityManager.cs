@@ -1,102 +1,121 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
-using UnityEngine;
-using UnityEngine.Analytics;
+using System.Runtime.CompilerServices;
 
 public struct Entity
 {
     public uint id;
 }
-public class EntityManager
+
+public struct ComponentWrapper
 {
-    private EntityManager(){}
-    private static EntityManager _instance;
-    
-    public static EntityManager Instance
+    public IComponent component;
+    public uint entityId;
+}
+
+public interface IEntityManager
+{
+    uint CreateEntity();
+    void DestroyEntity(uint entity);
+    void AddComponent<T>(uint entity, T component) where T : IComponent;
+    IComponent GetComponent<T>(uint entity);
+
+    void UpdateComponent<T>(uint entity, T component) where T : IComponent;
+
+    List<uint> GetEntities();
+}
+
+
+public class BaseEntityManager : IEntityManager
+{
+
+    private static BaseEntityManager _instance;
+    public static BaseEntityManager Instance 
     {
         get
         {
-            if (_instance == null)
+            if(_instance == null)
             {
-                _instance = new EntityManager();
+                _instance = new BaseEntityManager();
             }
+
             return _instance;
         }
     }
-    private List<Entity> entities = new List<Entity>();
-    private Dictionary<Entity, Dictionary<Type, int>> componentIndexer = new Dictionary<Entity, Dictionary<Type, int>>();
-    private Dictionary<Type, List<IComponent>> components = new Dictionary<Type, List<IComponent>>();
-    
-
-    public Entity CreateEntity()
-    {
-        Entity entity = new Entity { id = (uint)entities.Count};
-        entities.Add(entity);
-        componentIndexer[entity] = new Dictionary<Type, int>();
-        return entity;
-    }
-
-    public void DestroyEntity(Entity entity)
-    {
-
-        //TODO remove all the components of the entity from the list
-        Dictionary<Type, int> entityComponents = componentIndexer[entity];
-        foreach(var pair in entityComponents)
-        {
-            //replace the data of the entity component by the last component from the list
-            int lastIndex = components[pair.Key].Count - 1;
-            components[pair.Key][pair.Value] = components[pair.Key][lastIndex];
-
-            components[pair.Key].RemoveAt(lastIndex);
-        }
-        
-
-
-        componentIndexer.Remove(entity);
-        entities.Remove(entity);
-    }
-
-    public void AddComponent<T>(Entity entity, T component) where T : IComponent
+    private List<uint> entities = new List<uint>();
+    private uint counter = 0;
+    private Dictionary<uint, Dictionary<Type, int>> componentIndexer = new Dictionary<uint, Dictionary<Type, int>>();
+    private Dictionary<Type, List<ComponentWrapper>> components = new Dictionary<Type, List<ComponentWrapper>>();
+    public void AddComponent<T>(uint entity, T component) where T : IComponent
     {
         Type componentType = typeof(T);
         if(!components.ContainsKey(componentType))
         {
-            components[componentType] = new List<IComponent>();
+            components[componentType] = new List<ComponentWrapper>();
         }
 
-        components[componentType].Add(component);
-        int index = components[componentType].Count - 1;
-        componentIndexer[entity][componentType] = index;
+        components[componentType].Add(new ComponentWrapper{component = component, entityId = entity});
+        componentIndexer[entity][componentType] = components[componentType].Count - 1;
     }
-    
-    public IComponent GetComponents<T>(Entity entity) where T : IComponent
+
+    public uint CreateEntity()
+    {
+        entities.Add(counter);
+        componentIndexer[counter] = new Dictionary<Type, int>();
+        return counter++;
+    }
+
+    public void DestroyEntity(uint entity)
+    {
+
+        Dictionary<Type, int> entityComponent = componentIndexer[entity];
+
+        foreach(var pair in entityComponent)
+        {
+            Type componentType = pair.Key;
+            int componentIndex = pair.Value;
+
+            //Place the last component from the list to the component to be removed
+            int lastComponentIndex = components[componentType].Count - 1;
+            components[componentType][componentIndex] = components[componentType][lastComponentIndex];
+
+            //Update the indexer of the moved component
+            uint movedComponentEntityId = components[componentType][componentIndex].entityId;
+            componentIndexer[movedComponentEntityId][componentType] = componentIndex;
+
+            //Remove the component from the list
+            components[componentType].RemoveAt(lastComponentIndex);
+            componentIndexer[entity].Remove(componentType);
+        }
+
+        componentIndexer.Remove(entity);
+
+    }
+
+    public IComponent GetComponent<T>(uint entity)
     {
         Type componentType = typeof(T);
-
-        if (components.ContainsKey(componentType))
-        {
-            // Cast the List<IComponent> to List<T>
-            int index = componentIndexer[entity][componentType];
-            IComponent result = components[componentType][index];
-            return result;
-        }
-        else
-        {
-            return null;
-        }
+        int index = componentIndexer[entity][componentType];
+        return components[componentType][index].component;
     }
 
-    public void UpdateComponent<T>(Entity entity, T newComponent)
+    public void UpdateComponent<T>(uint entity, T component) where T : IComponent
     {
-        Type type = typeof(T);
-        int index = componentIndexer[entity][type];
-        components[type][index] = (IComponent)newComponent;
-    } 
+        Type componentTYpe = typeof(T);
+        int index = componentIndexer[entity][componentTYpe];
 
-    public List<Entity> GetEntities()
+        ComponentWrapper updatedComponent = components[componentTYpe][index];
+        updatedComponent.component = component;
+
+        components[componentTYpe][index] = updatedComponent;
+    }
+
+    public List<uint> GetEntities()
     {
         return entities;
     }
 }
+
+

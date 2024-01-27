@@ -11,6 +11,7 @@ public class RegisterSystems
         toRegister.Add(new SpawnerSystem());
         toRegister.Add(new ColisionSystem());
         toRegister.Add(new MovementSystem());
+        toRegister.Add(new SizeSystem());
 
         return toRegister;
     }
