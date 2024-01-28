@@ -105,6 +105,10 @@ public class ColisionSystem : ISystem
 
     private void UpdateCollisionCount(PhysicComponent physicComponent1, PhysicComponent physicComponent2, CollisionComponent collisionComponent1, CollisionComponent collisionComponent2, uint entity1, uint entity2)
     {
+        if(physicComponent1.size == physicComponent2.size)
+        {
+            return;
+        }
 
         if(physicComponent1.size > physicComponent2.size)
         {
