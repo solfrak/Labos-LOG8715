@@ -71,8 +71,9 @@ public class BaseEntityManager : IEntityManager
     {
 
         Dictionary<Type, int> entityComponent = componentIndexer[entity];
+        
 
-        foreach(var pair in entityComponent)
+        foreach(var pair in entityComponent.ToList())
         {
             Type componentType = pair.Key;
             int componentIndex = pair.Value;
@@ -91,6 +92,7 @@ public class BaseEntityManager : IEntityManager
         }
 
         componentIndexer.Remove(entity);
+        entities.Remove(entity);
 
     }
 
