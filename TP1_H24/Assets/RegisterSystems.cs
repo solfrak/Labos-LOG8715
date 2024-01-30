@@ -14,6 +14,7 @@ public class RegisterSystems
         toRegister.Add(new SizeSystem());
         toRegister.Add(new DestroySystem());
         toRegister.Add(new ColorSystem());
+        toRegister.Add(new ProtectionSystem());
 
         return toRegister;
     }
