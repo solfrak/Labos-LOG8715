@@ -114,6 +114,8 @@ public class ColisionSystem : ISystem
     {
         if(physicComponent1.size == physicComponent2.size)
         {
+            collisionComponent1.CollisionCount++;
+            collisionComponent2.CollisionCount++;
             return;
         }
 
@@ -121,11 +123,16 @@ public class ColisionSystem : ISystem
         {
             collisionComponent1.augmentSizeCollision++;
             collisionComponent2.diminishSizeCollision++;
+            collisionComponent1.CollisionCount++;
+            collisionComponent2.CollisionCount++;
+
         }
         else
         {
             collisionComponent1.diminishSizeCollision++;
             collisionComponent2.augmentSizeCollision++;
+            collisionComponent1.CollisionCount++;
+            collisionComponent2.CollisionCount++;
         }
 
         BaseEntityManager.Instance.UpdateComponent(entity1, collisionComponent1);

@@ -21,7 +21,7 @@ public class ColorSystem : ISystem
             {
                 colorComponent.color = Color.red;
             }
-            if(collisionComponent.augmentSizeCollision != 0 || collisionComponent.diminishSizeCollision != 0)
+            if(collisionComponent.CollisionCount >= 0)
             {
                 colorComponent.color = Color.green;
             }
@@ -42,12 +42,12 @@ public class ColorSystem : ISystem
                 // Orange
                 colorComponent.color = new Color(255, 165, 0);
             }
-            else if(false)
+            else if (false)
             {
                 // When created by an explosion, turn pink
                 colorComponent.color = new Color(255, 192, 203);
             }
-            else (collisionComponent.augmentSizeCollision == 0 && collisionComponent.diminishSizeCollision == 0)
+            else if (collisionComponent.CollisionCount == 0)
             {
                 colorComponent.color = Color.blue;
             }
