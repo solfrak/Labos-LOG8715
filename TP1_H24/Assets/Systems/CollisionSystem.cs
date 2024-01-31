@@ -112,31 +112,63 @@ public class ColisionSystem : ISystem
 
     private void UpdateCollisionCount(PhysicComponent physicComponent1, PhysicComponent physicComponent2, CollisionComponent collisionComponent1, CollisionComponent collisionComponent2, uint entity1, uint entity2)
     {
-        if(physicComponent1.size == physicComponent2.size)
+        collisionComponent1.CollisionCount++;
+        collisionComponent2.CollisionCount++;
+
+        //if (physicComponent1.size == physicComponent2.size)
+        //{
+        //    return;
+        //}
+        //// bigger than two, 1 get bigger, 2 smaller
+        //if(physicComponent1.size > physicComponent2.size)
+        //{
+        //    collisionComponent1.augmentSizeCollision++;
+        //    collisionComponent2.diminishSizeCollision++;
+    
+
+        //}
+        //else
+        //{
+        //    collisionComponent1.diminishSizeCollision++;
+        //    collisionComponent2.augmentSizeCollision++;
+           
+        //}
+        //
+        if (physicComponent1.size == physicComponent2.size)
         {
-            collisionComponent1.CollisionCount++;
-            collisionComponent2.CollisionCount++;
+            // Les cercles ont la même taille, pas de changement
             return;
         }
+        else if (physicComponent1.size > physicComponent2.size)
 
-        if(physicComponent1.size > physicComponent2.size)
-        {
-            collisionComponent1.augmentSizeCollision++;
+            {
+                // Le cercle actuel est plus grand que l'autre cercle
+                if (!IsProtected(entity1))
+            {
+                // Augmenter la taille du cercle actuel
+                collisionComponent1.augmentSizeCollision++;
+            }
+            // Réduire la taille de l'autre cercle
             collisionComponent2.diminishSizeCollision++;
-            collisionComponent1.CollisionCount++;
-            collisionComponent2.CollisionCount++;
-
         }
         else
         {
-            collisionComponent1.diminishSizeCollision++;
-            collisionComponent2.augmentSizeCollision++;
-            collisionComponent1.CollisionCount++;
-            collisionComponent2.CollisionCount++;
+            // Le cercle actuel est plus petit que l'autre cercle
+            if (!IsProtected(entity1))
+            {
+                // Réduire la taille du cercle actuel
+                collisionComponent1.diminishSizeCollision++;
+            }
+            // Réduire la taille de l'autre cercle
+            collisionComponent2.diminishSizeCollision++;
         }
+    }
 
-        BaseEntityManager.Instance.UpdateComponent(entity1, collisionComponent1);
-        BaseEntityManager.Instance.UpdateComponent(entity2, collisionComponent2);
+    bool IsProtected(uint entity)
+    {
+        ProtectionStat protectStat = (ProtectionStat)BaseEntityManager.Instance.GetComponent<ProtectionStat>(entity);
+
+        return (protectStat.ProtectionState == ProtectionStat.State.ACTIVE);
     }
 }
 
