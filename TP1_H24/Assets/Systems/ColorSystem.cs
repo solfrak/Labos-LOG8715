@@ -18,7 +18,7 @@ public class ColorSystem : ISystem
             PhysicComponent physicComponent = (PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(entity);
             if(!physicComponent.isStatic)
             {
-                if(collisionComponent.augmentSizeCollision == 0 && collisionComponent.diminishSizeCollision == 0)
+                if(collisionComponent.CollisionCount == 0)
                 {
                     colorComponent.color = Color.blue;
 
