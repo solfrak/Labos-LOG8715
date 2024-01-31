@@ -21,12 +21,33 @@ public class ExplosionSystem : ISystem
         for(int i = 0; i < entities.Count; i++)
         {
             PhysicComponent physicComponent = (PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(entities[i]);
-            if(physicComponent.size >= ExplosionSize)
+            ;
+            if(physicComponent.size >= ExplosionSize || ClickedOnCircle(physicComponent))
             {
                 SpawnNewCircle(physicComponent);
                 DestroyEntity(entities[i]);
             }
         }
+    }
+
+    bool ClickedOnCircle(PhysicComponent physicComponent)
+    {
+        Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        var mousePos = new Vector2(worldPos.x, worldPos.y);
+        var clicked= Input.GetMouseButton(0);
+
+        if (!clicked) {
+            return false;
+        }
+
+        Vector2 distance = mousePos - physicComponent.position;
+
+            Debug.Log($"Distance: {distance.magnitude}");
+
+        if (distance.magnitude < physicComponent.size/2) {
+            return true;
+        }
+        return false;
     }
 
     Vector2 getVector(int index)
@@ -46,7 +67,7 @@ public class ExplosionSystem : ISystem
     {
         int size = (int)Math.Ceiling(physicComponent.size / 4.0);
 
-        double norm = Math.Sqrt(physicComponent.velocity.x* physicComponent.velocity.x + physicComponent.velocity.y* physicComponent.velocity.y);
+        double norm = Math.Sqrt(physicComponent.velocity.x* physicComponent.velocity.x + physicComponent.velocity.y * physicComponent.velocity.y);
 
         //Calculate position and velocity for each circle to spawn
         for (int i = 0; i < 4; i++)
