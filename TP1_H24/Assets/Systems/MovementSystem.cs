@@ -14,7 +14,7 @@ public class MovementSystem : ISystem
         foreach(var entity in list)
         {
             PhysicComponent physicComponent = (PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(entity);
-            physicComponent.position += physicComponent.velocity;
+            physicComponent.position += physicComponent.velocity * Time.deltaTime;
 
             BaseEntityManager.Instance.UpdateComponent(entity, physicComponent);
 

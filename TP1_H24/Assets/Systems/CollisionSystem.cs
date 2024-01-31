@@ -29,19 +29,31 @@ public class ColisionSystem : ISystem
     public void UpdateSystem()
     {
         List<Tuple<uint, uint, PhysicComponent, PhysicComponent>> collisions = new List<Tuple<uint, uint, PhysicComponent, PhysicComponent>>();
+        ResetCollisions();
         DetectCollision(ref collisions);
         UpdateAfterCollision(ref collisions);
     }
 
-    private void DetectCollision(ref List<Tuple<uint, uint, PhysicComponent, PhysicComponent>> collisions)
+    private void ResetCollisions()
     {
-
-        // var entities = EntityManager.Instance.GetEntities();
         var entities = BaseEntityManager.Instance.GetEntities();
 
         for (int i = 0; i < entities.Count; i++)
         {
-            BaseEntityManager.Instance.UpdateComponent(entities[i], CalculateScreenCollision((PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(entities[i])));
+            CollisionComponent collisionComponent = (CollisionComponent)BaseEntityManager.Instance.GetComponent<CollisionComponent>(entities[i]);
+            collisionComponent.CollisionCount = 0;
+        }
+    }
+
+    private void DetectCollision(ref List<Tuple<uint, uint, PhysicComponent, PhysicComponent>> collisions)
+    {
+        var entities = BaseEntityManager.Instance.GetEntities();
+
+        for (int i = 0; i < entities.Count; i++)
+        {
+            PhysicComponent physicComponent = (PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(entities[i]);
+            CollisionComponent collisionComponent = (CollisionComponent)BaseEntityManager.Instance.GetComponent<CollisionComponent>(entities[i]);
+            BaseEntityManager.Instance.UpdateComponent(entities[i], CalculateScreenCollision(physicComponent, collisionComponent));
             for (int j = i; j < entities.Count; j++)
             {
                 if (i != j)
@@ -88,23 +100,27 @@ public class ColisionSystem : ISystem
         }
     }
 
-    private PhysicComponent CalculateScreenCollision(PhysicComponent input)
+    private PhysicComponent CalculateScreenCollision(PhysicComponent input, CollisionComponent collisionComponent)
     {
         if(input.position.x + input.size / 2 >= sWidth / 2)
         {
             input.velocity.x = MathF.Abs(input.velocity.x) * -1.0f;
+            collisionComponent.CollisionCount++;
         }
         else if(input.position.x - input.size / 2 <= -sWidth / 2)
         {
             input.velocity.x = MathF.Abs(input.velocity.x);
+            collisionComponent.CollisionCount++;
         }
         if (input.position.y + (input.size / 2) >= sHeight / 2)
         {
-            input.velocity.y = MathF.Abs(input.velocity.y) - 1.0f;
+            input.velocity.y = MathF.Abs(input.velocity.y) * -1.0f;
+            collisionComponent.CollisionCount++;
         }
         else if (input.position.y - (input.size / 2) <= -sHeight / 2)
         {
             input.velocity.y = MathF.Abs(input.velocity.y);
+            collisionComponent.CollisionCount++;
         }
 
         return input;
