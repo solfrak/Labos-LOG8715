@@ -16,17 +16,40 @@ public class ColorSystem : ISystem
             CollisionComponent collisionComponent = (CollisionComponent)BaseEntityManager.Instance.GetComponent<CollisionComponent>(entity);
             ColorComponent colorComponent = (ColorComponent)BaseEntityManager.Instance.GetComponent<ColorComponent>(entity);
             PhysicComponent physicComponent = (PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(entity);
-            if(!physicComponent.isStatic)
+            ProtectionStat protectionComponent = (ProtectionStat) BaseEntityManager.Instance.GetComponent<ProtectionStat>(entity);
+            if (physicComponent.isStatic)
             {
-                if(collisionComponent.augmentSizeCollision == 0 && collisionComponent.diminishSizeCollision == 0)
-                {
-                    colorComponent.color = Color.blue;
-
-                }
-                else
-                {
-                    colorComponent.color = Color.green;
-                }
+                colorComponent.color = Color.red;
+            }
+            if(collisionComponent.augmentSizeCollision != 0 || collisionComponent.diminishSizeCollision != 0)
+            {
+                colorComponent.color = Color.green;
+            }
+            else if(protectionComponent.ProtectionState == ProtectionStat.State.ACTIVE)
+            {
+                colorComponent.color = Color.white;
+            }
+            else if (protectionComponent.ProtectionState == ProtectionStat.State.READY)
+            {
+                colorComponent.color = Color.cyan;
+            }
+            else if (protectionComponent.ProtectionState == ProtectionStat.State.COOLDOWN)
+            {
+                colorComponent.color = Color.yellow;
+            }
+            else if (physicComponent.size + 1 == ECSController.Instance.Config.explosionSize)
+            {
+                // Orange
+                colorComponent.color = new Color(255, 165, 0);
+            }
+            else if(false)
+            {
+                // When created by an explosion, turn pink
+                colorComponent.color = new Color(255, 192, 203);
+            }
+            else (collisionComponent.augmentSizeCollision == 0 && collisionComponent.diminishSizeCollision == 0)
+            {
+                colorComponent.color = Color.blue;
             }
             ECSController.Instance.UpdateShapeColor(entity, colorComponent.color);
             BaseEntityManager.Instance.UpdateComponent(entity, colorComponent);
