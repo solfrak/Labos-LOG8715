@@ -15,7 +15,6 @@ public class ColisionSystem : ISystem
     {
         Name = "ColisionSystem";
         Vector2 camSize = GetPlayableScreenSize();
-        Debug.Log(camSize);
         sWidth = camSize.x;
         sHeight = camSize.y;
     }
@@ -97,7 +96,6 @@ public class ColisionSystem : ISystem
         }
         else if(input.position.x - input.size / 2.0f <= -sWidth / 2.0f)
         {
-            Debug.Log(input.position.x - input.size / 2);
             input.velocity.x = MathF.Abs(input.velocity.x);
         }
         if (input.position.y + (input.size / 2.0f) >= sHeight / 2.0f)
@@ -126,7 +124,7 @@ public class ColisionSystem : ISystem
         {
             collisionComponent1.diminishSizeCollision++;
             collisionComponent2.augmentSizeCollision++;
-
+        }
         BaseEntityManager.Instance.UpdateComponent(entity1, collisionComponent1);
         BaseEntityManager.Instance.UpdateComponent(entity2, collisionComponent2);
     }
