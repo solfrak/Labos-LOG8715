@@ -90,17 +90,24 @@ public class ColisionSystem : ISystem
 
     private PhysicComponent CalculateScreenCollision(PhysicComponent input)
     {
-        if (input.position.x + (input.size / 2) >= sWidth / 2 || input.position.x - (input.size / 2) <= (-sWidth / 2))
+        if(input.position.x + input.size / 2 >= sWidth / 2)
         {
-            input.velocity.x *= -1.0f;
+            input.velocity.x = MathF.Abs(input.velocity.x) * -1.0f;
         }
-        if (input.position.y + (input.size / 2) >= sHeight / 2 || input.position.y - (input.size / 2) <= (-sHeight / 2))
+        else if(input.position.x - input.size / 2 <= -sWidth / 2)
         {
-            input.velocity.y *= -1.0f;
+            input.velocity.x = MathF.Abs(input.velocity.x);
+        }
+        if (input.position.y + (input.size / 2) >= sHeight / 2)
+        {
+            input.velocity.y = MathF.Abs(input.velocity.y) - 1.0f;
+        }
+        else if (input.position.y - (input.size / 2) <= -sHeight / 2)
+        {
+            input.velocity.y = MathF.Abs(input.velocity.y);
         }
 
         return input;
-
     }
 
     private void UpdateCollisionCount(PhysicComponent physicComponent1, PhysicComponent physicComponent2, CollisionComponent collisionComponent1, CollisionComponent collisionComponent2, uint entity1, uint entity2)
