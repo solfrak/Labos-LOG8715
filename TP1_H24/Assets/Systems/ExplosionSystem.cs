@@ -21,12 +21,31 @@ public class ExplosionSystem : ISystem
         for(int i = 0; i < entities.Count; i++)
         {
             PhysicComponent physicComponent = (PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(entities[i]);
+            ClickedOnCircle(physicComponent);
             if(physicComponent.size >= ExplosionSize)
             {
                 SpawnNewCircle(physicComponent);
                 DestroyEntity(entities[i]);
             }
         }
+    }
+
+    bool ClickedOnCircle(PhysicComponent physicComponent)
+    {
+        var mousePos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+        var clicked = Input.GetMouseButtonDown(0);
+        Debug.Log($"{mousePos}, {clicked}");
+
+        if (!clicked) {
+            return false;
+        }
+
+        Vector2 distance = mousePos - physicComponent.position;
+
+        if (distance.magnitude < physicComponent.size) {
+            return true;
+        }
+        return false;
     }
 
     Vector2 getVector(int index)
