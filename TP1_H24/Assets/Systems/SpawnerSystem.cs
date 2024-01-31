@@ -15,7 +15,7 @@ public class SpawnerSystem : ISystem
         {
             foreach (var circle in ECSController.Instance.Config.circleInstancesToSpawn)
             {
-                Utils.SpawnCirlce(circle.initialPosition, circle.initialVelocity, circle.initialSize);
+                Utils.SpawnCircle(circle.initialPosition, circle.initialVelocity, circle.initialSize);
             }
             isInitPhase = false;
 

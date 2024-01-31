@@ -76,9 +76,7 @@ public class ExplosionSystem : ISystem
             Vector2 velocity = getVector(i) * (float)norm;
             Vector2 position = physicComponent.position + getVector(i) * size;
 
-            Utils.SpawnCirlce(position, velocity, size);
-
+            Utils.SpawnCircle(position, velocity, size, true);
         }
-
     }
 }

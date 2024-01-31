@@ -4,7 +4,7 @@ using UnityEngine;
 
 public struct ProtectionStat : IComponent
 {
-    public enum State { READY, ACTIVE, COOLDOWN }
+    public enum State { READY, ACTIVE, COOLDOWN, UNPROTECTABLE }
     public float ElapsedTimeProtected;
     public float ElapsedCoolDown;
     public int ProtectedCollisionCount;
