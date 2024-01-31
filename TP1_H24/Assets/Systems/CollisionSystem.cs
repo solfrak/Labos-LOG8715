@@ -29,31 +29,19 @@ public class ColisionSystem : ISystem
     public void UpdateSystem()
     {
         List<Tuple<uint, uint, PhysicComponent, PhysicComponent>> collisions = new List<Tuple<uint, uint, PhysicComponent, PhysicComponent>>();
-        ResetCollisions();
         DetectCollision(ref collisions);
         UpdateAfterCollision(ref collisions);
     }
 
-    private void ResetCollisions()
-    {
-        var entities = BaseEntityManager.Instance.GetEntities();
-
-        for (int i = 0; i < entities.Count; i++)
-        {
-            CollisionComponent collisionComponent = (CollisionComponent)BaseEntityManager.Instance.GetComponent<CollisionComponent>(entities[i]);
-            collisionComponent.CollisionCount = 0;
-        }
-    }
-
     private void DetectCollision(ref List<Tuple<uint, uint, PhysicComponent, PhysicComponent>> collisions)
     {
+
+        // var entities = EntityManager.Instance.GetEntities();
         var entities = BaseEntityManager.Instance.GetEntities();
 
         for (int i = 0; i < entities.Count; i++)
         {
-            PhysicComponent physicComponent = (PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(entities[i]);
-            CollisionComponent collisionComponent = (CollisionComponent)BaseEntityManager.Instance.GetComponent<CollisionComponent>(entities[i]);
-            BaseEntityManager.Instance.UpdateComponent(entities[i], CalculateScreenCollision(physicComponent, collisionComponent));
+            BaseEntityManager.Instance.UpdateComponent(entities[i], CalculateScreenCollision((PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(entities[i])));
             for (int j = i; j < entities.Count; j++)
             {
                 if (i != j)
@@ -100,27 +88,23 @@ public class ColisionSystem : ISystem
         }
     }
 
-    private PhysicComponent CalculateScreenCollision(PhysicComponent input, CollisionComponent collisionComponent)
+    private PhysicComponent CalculateScreenCollision(PhysicComponent input)
     {
         if(input.position.x + input.size / 2 >= sWidth / 2)
         {
             input.velocity.x = MathF.Abs(input.velocity.x) * -1.0f;
-            collisionComponent.CollisionCount++;
         }
         else if(input.position.x - input.size / 2 <= -sWidth / 2)
         {
             input.velocity.x = MathF.Abs(input.velocity.x);
-            collisionComponent.CollisionCount++;
         }
         if (input.position.y + (input.size / 2) >= sHeight / 2)
         {
-            input.velocity.y = MathF.Abs(input.velocity.y) * -1.0f;
-            collisionComponent.CollisionCount++;
+            input.velocity.y = MathF.Abs(input.velocity.y) - 1.0f;
         }
         else if (input.position.y - (input.size / 2) <= -sHeight / 2)
         {
             input.velocity.y = MathF.Abs(input.velocity.y);
-            collisionComponent.CollisionCount++;
         }
 
         return input;
@@ -130,54 +114,28 @@ public class ColisionSystem : ISystem
     {
         collisionComponent1.CollisionCount++;
         collisionComponent2.CollisionCount++;
+        //  Le cercle protégé ne peut pas changer de taille.
+        //  -Les cercles plus petits qui entrent en collision avec le cercle protégé ne
+        //  changent pas de taille.
+        //  -Les cercles plus grands qui entrent en collision avec le cercle protégé
+        //  diminuent leur taille de 1
 
-        //if (physicComponent1.size == physicComponent2.size)
-        //{
-        //    return;
-        //}
-        //// bigger than two, 1 get bigger, 2 smaller
-        //if(physicComponent1.size > physicComponent2.size)
-        //{
-        //    collisionComponent1.augmentSizeCollision++;
-        //    collisionComponent2.diminishSizeCollision++;
-    
-
-        //}
-        //else
-        //{
-        //    collisionComponent1.diminishSizeCollision++;
-        //    collisionComponent2.augmentSizeCollision++;
-           
-        //}
-        //
-        if (physicComponent1.size == physicComponent2.size)
+        if (physicComponent1.size != physicComponent2.size)
         {
-            // Les cercles ont la même taille, pas de changement
-            return;
-        }
-        else if (physicComponent1.size > physicComponent2.size)
-
+            if (physicComponent1.size > physicComponent2.size)
             {
-                // Le cercle actuel est plus grand que l'autre cercle
-                if (!IsProtected(entity1))
-            {
-                // Augmenter la taille du cercle actuel
                 collisionComponent1.augmentSizeCollision++;
+                collisionComponent2.diminishSizeCollision++;
             }
-            // Réduire la taille de l'autre cercle
-            collisionComponent2.diminishSizeCollision++;
-        }
-        else
-        {
-            // Le cercle actuel est plus petit que l'autre cercle
-            if (!IsProtected(entity1))
+            else
             {
-                // Réduire la taille du cercle actuel
                 collisionComponent1.diminishSizeCollision++;
+                collisionComponent2.augmentSizeCollision++;
             }
-            // Réduire la taille de l'autre cercle
-            collisionComponent2.diminishSizeCollision++;
         }
+
+        BaseEntityManager.Instance.UpdateComponent(entity1, collisionComponent1);
+        BaseEntityManager.Instance.UpdateComponent(entity2, collisionComponent2);
     }
 
     bool IsProtected(uint entity)
