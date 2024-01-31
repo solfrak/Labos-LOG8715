@@ -13,27 +13,28 @@ MonoBehaviour:
   m_Name: Config
   m_EditorClassIdentifier: 
   explosionSize: 10
-  protectionSize: 2
+  protectionSize: 5
   protectionCollisionCount: 3
   protectionDuration: 5
   protectionCooldown: 15
   circleInstancesToSpawn:
   - initialSize: 2
-    initialPosition: {x: 0, y: 0}
-    initialVelocity: {x: -0.5, y: 0.2}
-  - initialSize: 6
-    initialPosition: {x: 6, y: 0}
-    initialVelocity: {x: -0.2, y: 0.2}
-  - initialSize: 4
-    initialPosition: {x: -2, y: 5}
+    initialPosition: {x: 0, y: -3}
     initialVelocity: {x: 0, y: 0}
-  - initialSize: 1
-    initialPosition: {x: 2, y: 5}
-    initialVelocity: {x: 0.2, y: -0.3}
+  - initialSize: 9
+    initialPosition: {x: 4, y: 6}
+    initialVelocity: {x: -3, y: 0}
+  - initialSize: 4
+    initialPosition: {x: -5, y: 6}
+    initialVelocity: {x: 3, y: 0}
   systemsEnabled:
     keys:
     - SpawnerSystem
     - MovementSystem
     - ColisionSystem
     - SizeSystem
-    values: 01010101
+    - DestroySystem
+    - ColorSystem
+    - ProtectionSystem
+    - ExplosionSystem
+    values: 0101010101010101

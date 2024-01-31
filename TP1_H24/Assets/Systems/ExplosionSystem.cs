@@ -21,10 +21,10 @@ public class ExplosionSystem : ISystem
         for(int i = 0; i < entities.Count; i++)
         {
             PhysicComponent physicComponent = (PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(entities[i]);
-            ;
+
             if(physicComponent.size >= ExplosionSize || ClickedOnCircle(physicComponent))
             {
-                SpawnNewCircle(physicComponent);
+                SpawnExplosionCircles(physicComponent);
                 DestroyEntity(entities[i]);
             }
         }
@@ -33,26 +33,21 @@ public class ExplosionSystem : ISystem
     bool ClickedOnCircle(PhysicComponent physicComponent)
     {
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        var mousePos = new Vector2(worldPos.x, worldPos.y);
-        var clicked= Input.GetMouseButton(0);
+        Vector2 mousePos = new Vector2(worldPos.x, worldPos.y);
+        bool clicked= Input.GetMouseButton(0);
 
         if (!clicked) {
             return false;
         }
 
-        Vector2 distance = mousePos - physicComponent.position;
+        Vector2 distanceToCenter = mousePos - physicComponent.position;
 
-            Debug.Log($"Distance: {distance.magnitude}");
-
-        if (distance.magnitude < physicComponent.size/2) {
-            return true;
-        }
-        return false;
+        return distanceToCenter.magnitude < physicComponent.size / 2.0f;
     }
 
     Vector2 getVector(int index)
     {
-         double angle =  index* (float)(Math.PI / 2);
+        double angle =  index* (float)(Math.PI / 2);
         int x = (int)Math.Round(Math.Cos(angle + Math.PI/4));
         int y = (int)Math.Round(Math.Sin(angle+ Math.PI/4));
         return new Vector2(x, y);
@@ -63,7 +58,7 @@ public class ExplosionSystem : ISystem
         ECSController.Instance.DestroyShape(entity);
     }
 
-    private void SpawnNewCircle(PhysicComponent physicComponent)
+    private void SpawnExplosionCircles(PhysicComponent physicComponent)
     {
         int size = (int)Math.Ceiling(physicComponent.size / 4.0);
 

@@ -70,10 +70,10 @@ public class BaseEntityManager : IEntityManager
     public void DestroyEntity(uint entity)
     {
 
-        Dictionary<Type, int> entityComponent = componentIndexer[entity];
+        Dictionary<Type, int> entityComponents = componentIndexer[entity];
         
 
-        foreach(var pair in entityComponent.ToList())
+        foreach(var pair in entityComponents.ToList())
         {
             Type componentType = pair.Key;
             int componentIndex = pair.Value;
@@ -93,7 +93,6 @@ public class BaseEntityManager : IEntityManager
 
         componentIndexer.Remove(entity);
         entities.Remove(entity);
-
     }
 
     public IComponent GetComponent<T>(uint entity)

@@ -22,7 +22,7 @@ public class Utils
         if (isCreatedFromExplosion)
         {
             // Becomes pink when created from an explosion
-            colorComponent.color = new Color(255, 192, 203);
+            colorComponent.color = new Color(255, 100, 100);
         }
         BaseEntityManager.Instance.AddComponent(entity, physicComponent);
         BaseEntityManager.Instance.AddComponent(entity, collisionComponent);

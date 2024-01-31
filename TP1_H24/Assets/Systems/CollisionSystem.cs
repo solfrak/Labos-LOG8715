@@ -14,7 +14,8 @@ public class ColisionSystem : ISystem
     public ColisionSystem()
     {
         Name = "ColisionSystem";
-        var camSize = GetPlayableScreenSize();
+        Vector2 camSize = GetPlayableScreenSize();
+        Debug.Log(camSize);
         sWidth = camSize.x;
         sHeight = camSize.y;
     }
@@ -102,22 +103,23 @@ public class ColisionSystem : ISystem
 
     private PhysicComponent CalculateScreenCollision(PhysicComponent input, CollisionComponent collisionComponent)
     {
-        if(input.position.x + input.size / 2 >= sWidth / 2)
+        if(input.position.x + input.size / 2.0f >= sWidth / 2.0f)
         {
             input.velocity.x = MathF.Abs(input.velocity.x) * -1.0f;
             collisionComponent.CollisionCount++;
         }
-        else if(input.position.x - input.size / 2 <= -sWidth / 2)
+        else if(input.position.x - input.size / 2.0f <= -sWidth / 2.0f)
         {
+            Debug.Log(input.position.x - input.size / 2);
             input.velocity.x = MathF.Abs(input.velocity.x);
             collisionComponent.CollisionCount++;
         }
-        if (input.position.y + (input.size / 2) >= sHeight / 2)
+        if (input.position.y + (input.size / 2.0f) >= sHeight / 2.0f)
         {
             input.velocity.y = MathF.Abs(input.velocity.y) * -1.0f;
             collisionComponent.CollisionCount++;
         }
-        else if (input.position.y - (input.size / 2) <= -sHeight / 2)
+        else if (input.position.y - (input.size / 2.0f) <= -sHeight / 2.0f)
         {
             input.velocity.y = MathF.Abs(input.velocity.y);
             collisionComponent.CollisionCount++;
@@ -141,7 +143,6 @@ public class ColisionSystem : ISystem
             collisionComponent2.diminishSizeCollision++;
             collisionComponent1.CollisionCount++;
             collisionComponent2.CollisionCount++;
-
         }
         else
         {
