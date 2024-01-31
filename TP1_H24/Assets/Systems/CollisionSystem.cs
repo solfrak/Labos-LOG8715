@@ -30,31 +30,19 @@ public class ColisionSystem : ISystem
     public void UpdateSystem()
     {
         List<Tuple<uint, uint, PhysicComponent, PhysicComponent>> collisions = new List<Tuple<uint, uint, PhysicComponent, PhysicComponent>>();
-        ResetCollisions();
         DetectCollision(ref collisions);
         UpdateAfterCollision(ref collisions);
     }
 
-    private void ResetCollisions()
-    {
-        var entities = BaseEntityManager.Instance.GetEntities();
-
-        for (int i = 0; i < entities.Count; i++)
-        {
-            CollisionComponent collisionComponent = (CollisionComponent)BaseEntityManager.Instance.GetComponent<CollisionComponent>(entities[i]);
-            collisionComponent.CollisionCount = 0;
-        }
-    }
-
     private void DetectCollision(ref List<Tuple<uint, uint, PhysicComponent, PhysicComponent>> collisions)
     {
+
+        // var entities = EntityManager.Instance.GetEntities();
         var entities = BaseEntityManager.Instance.GetEntities();
 
         for (int i = 0; i < entities.Count; i++)
         {
-            PhysicComponent physicComponent = (PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(entities[i]);
-            CollisionComponent collisionComponent = (CollisionComponent)BaseEntityManager.Instance.GetComponent<CollisionComponent>(entities[i]);
-            BaseEntityManager.Instance.UpdateComponent(entities[i], CalculateScreenCollision(physicComponent, collisionComponent));
+            BaseEntityManager.Instance.UpdateComponent(entities[i], CalculateScreenCollision((PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(entities[i])));
             for (int j = i; j < entities.Count; j++)
             {
                 if (i != j)
@@ -101,28 +89,24 @@ public class ColisionSystem : ISystem
         }
     }
 
-    private PhysicComponent CalculateScreenCollision(PhysicComponent input, CollisionComponent collisionComponent)
+    private PhysicComponent CalculateScreenCollision(PhysicComponent input)
     {
         if(input.position.x + input.size / 2.0f >= sWidth / 2.0f)
         {
             input.velocity.x = MathF.Abs(input.velocity.x) * -1.0f;
-            collisionComponent.CollisionCount++;
         }
         else if(input.position.x - input.size / 2.0f <= -sWidth / 2.0f)
         {
             Debug.Log(input.position.x - input.size / 2);
             input.velocity.x = MathF.Abs(input.velocity.x);
-            collisionComponent.CollisionCount++;
         }
         if (input.position.y + (input.size / 2.0f) >= sHeight / 2.0f)
         {
-            input.velocity.y = MathF.Abs(input.velocity.y) * -1.0f;
-            collisionComponent.CollisionCount++;
+            input.velocity.y = MathF.Abs(input.velocity.y) - 1.0f;
         }
         else if (input.position.y - (input.size / 2.0f) <= -sHeight / 2.0f)
         {
             input.velocity.y = MathF.Abs(input.velocity.y);
-            collisionComponent.CollisionCount++;
         }
 
         return input;
@@ -130,30 +114,28 @@ public class ColisionSystem : ISystem
 
     private void UpdateCollisionCount(PhysicComponent physicComponent1, PhysicComponent physicComponent2, CollisionComponent collisionComponent1, CollisionComponent collisionComponent2, uint entity1, uint entity2)
     {
-        if(physicComponent1.size == physicComponent2.size)
-        {
-            collisionComponent1.CollisionCount++;
-            collisionComponent2.CollisionCount++;
-            return;
-        }
+        collisionComponent1.CollisionCount++;
+        collisionComponent2.CollisionCount++;
 
-        if(physicComponent1.size > physicComponent2.size)
+        if (physicComponent1.size > physicComponent2.size)
         {
             collisionComponent1.augmentSizeCollision++;
             collisionComponent2.diminishSizeCollision++;
-            collisionComponent1.CollisionCount++;
-            collisionComponent2.CollisionCount++;
         }
         else
         {
             collisionComponent1.diminishSizeCollision++;
             collisionComponent2.augmentSizeCollision++;
-            collisionComponent1.CollisionCount++;
-            collisionComponent2.CollisionCount++;
-        }
 
         BaseEntityManager.Instance.UpdateComponent(entity1, collisionComponent1);
         BaseEntityManager.Instance.UpdateComponent(entity2, collisionComponent2);
+    }
+
+    bool IsProtected(uint entity)
+    {
+        ProtectionStat protectStat = (ProtectionStat)BaseEntityManager.Instance.GetComponent<ProtectionStat>(entity);
+
+        return (protectStat.ProtectionState == ProtectionStat.State.ACTIVE);
     }
 }
 
