@@ -8,15 +8,12 @@ public class Utils
     {
         //Add the all the required component to a new entity
         var entity = BaseEntityManager.Instance.CreateEntity();
-        PhysicComponent physicComponent = new PhysicComponent { position = position,  velocity = velocity, size = size, isStatic = false };
-        CollisionComponent collisionComponent = new CollisionComponent{initialSize = size};
-        ProtectionStat protectionStat = new ProtectionStat { ProtectionState = ProtectionStat.State.READY };
+        PhysicComponent physicComponent = new PhysicComponent { position = position, velocity = velocity, size = size, isStatic = false };
+        CollisionComponent collisionComponent = new CollisionComponent { initialSize = size };
+        ProtectionComponent protectionComponent = new ProtectionComponent { ProtectionState = ProtectionComponent.State.READY };
+        DestroyComponent destroyComponent = new DestroyComponent { toDestroy = false };
 
-        if (isNormVec2Null(velocity))
-        {
-            physicComponent.isStatic = true;
-        }
-
+        physicComponent.isStatic = isNormVec2Null(velocity);
 
         ColorComponent colorComponent = new ColorComponent{ color = physicComponent.isStatic ? Color.red : Color.blue};
         if (isCreatedFromExplosion)
@@ -24,10 +21,12 @@ public class Utils
             // Becomes pink when created from an explosion
             colorComponent.color = new Color(255, 100, 100);
         }
+
         BaseEntityManager.Instance.AddComponent(entity, physicComponent);
         BaseEntityManager.Instance.AddComponent(entity, collisionComponent);
         BaseEntityManager.Instance.AddComponent(entity, colorComponent);
-        BaseEntityManager.Instance.AddComponent(entity, protectionStat);
+        BaseEntityManager.Instance.AddComponent(entity, protectionComponent);
+        BaseEntityManager.Instance.AddComponent(entity, destroyComponent);
 
         ECSController.Instance.CreateShape(entity, physicComponent.size);
         ECSController.Instance.UpdateShapePosition(entity, physicComponent.position);

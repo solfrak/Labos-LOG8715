@@ -12,10 +12,10 @@ public class RegisterSystems
         toRegister.Add(new ColisionSystem());
         toRegister.Add(new MovementSystem());
         toRegister.Add(new SizeSystem());
-        toRegister.Add(new DestroySystem());
-        toRegister.Add(new ColorSystem());
         toRegister.Add(new ProtectionSystem());
+        toRegister.Add(new ColorSystem());
         toRegister.Add(new ExplosionSystem());
+        toRegister.Add(new DestroySystem());
 
         return toRegister;
     }

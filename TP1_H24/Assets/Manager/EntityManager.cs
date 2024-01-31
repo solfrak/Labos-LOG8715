@@ -20,7 +20,7 @@ public interface IEntityManager
     uint CreateEntity();
     void DestroyEntity(uint entity);
     void AddComponent<T>(uint entity, T component) where T : IComponent;
-    IComponent GetComponent<T>(uint entity);
+    T GetComponent<T>(uint entity) where T : IComponent;
 
     void UpdateComponent<T>(uint entity, T component) where T : IComponent;
 
@@ -69,7 +69,6 @@ public class BaseEntityManager : IEntityManager
 
     public void DestroyEntity(uint entity)
     {
-
         Dictionary<Type, int> entityComponents = componentIndexer[entity];
         
 
@@ -95,11 +94,11 @@ public class BaseEntityManager : IEntityManager
         entities.Remove(entity);
     }
 
-    public IComponent GetComponent<T>(uint entity)
+    public T GetComponent<T>(uint entity) where T:IComponent
     {
         Type componentType = typeof(T);
         int index = componentIndexer[entity][componentType];
-        return components[componentType][index].component;
+        return (T) components[componentType][index].component;
     }
 
     public void UpdateComponent<T>(uint entity, T component) where T : IComponent

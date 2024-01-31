@@ -20,7 +20,7 @@ public class ExplosionSystem : ISystem
 
         for(int i = 0; i < entities.Count; i++)
         {
-            PhysicComponent physicComponent = (PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(entities[i]);
+            PhysicComponent physicComponent = BaseEntityManager.Instance.GetComponent<PhysicComponent>(entities[i]);
 
             if(physicComponent.size >= ExplosionSize || ClickedOnCircle(physicComponent))
             {
@@ -32,17 +32,18 @@ public class ExplosionSystem : ISystem
 
     bool ClickedOnCircle(PhysicComponent physicComponent)
     {
-        Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 mousePos = new Vector2(worldPos.x, worldPos.y);
-        bool clicked= Input.GetMouseButton(0);
-
-        if (!clicked) {
+        bool clicked= Input.GetMouseButtonDown(0);
+        if (!clicked)
+        {
             return false;
         }
 
-        Vector2 distanceToCenter = mousePos - physicComponent.position;
+        Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 mousePos = new Vector2(worldPos.x, worldPos.y);
 
-        return distanceToCenter.magnitude < physicComponent.size / 2.0f;
+        Vector2 distanceToCircleCenter = mousePos - physicComponent.position;
+
+        return distanceToCircleCenter.magnitude < physicComponent.size / 2.0f;
     }
 
     Vector2 getVector(int index)

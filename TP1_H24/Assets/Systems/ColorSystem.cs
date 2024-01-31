@@ -13,10 +13,10 @@ public class ColorSystem : ISystem
         var entities = BaseEntityManager.Instance.GetEntities();
         foreach(var entity in entities)
         {
-            CollisionComponent collisionComponent = (CollisionComponent)BaseEntityManager.Instance.GetComponent<CollisionComponent>(entity);
-            ColorComponent colorComponent = (ColorComponent)BaseEntityManager.Instance.GetComponent<ColorComponent>(entity);
-            PhysicComponent physicComponent = (PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(entity);
-            ProtectionStat protectionComponent = (ProtectionStat) BaseEntityManager.Instance.GetComponent<ProtectionStat>(entity);
+            CollisionComponent collisionComponent = BaseEntityManager.Instance.GetComponent<CollisionComponent>(entity);
+            ColorComponent colorComponent = BaseEntityManager.Instance.GetComponent<ColorComponent>(entity);
+            PhysicComponent physicComponent = BaseEntityManager.Instance.GetComponent<PhysicComponent>(entity);
+            ProtectionComponent protectionComponent = BaseEntityManager.Instance.GetComponent<ProtectionComponent>(entity);
             if (physicComponent.isStatic)
             {
                 colorComponent.color = Color.red;
@@ -25,15 +25,15 @@ public class ColorSystem : ISystem
             {
                 colorComponent.color = Color.green;
             }
-            else if(protectionComponent.ProtectionState == ProtectionStat.State.ACTIVE)
+            else if(protectionComponent.ProtectionState == ProtectionComponent.State.ACTIVE)
             {
                 colorComponent.color = Color.white;
             }
-            else if (protectionComponent.ProtectionState == ProtectionStat.State.READY)
+            else if (protectionComponent.ProtectionState == ProtectionComponent.State.READY)
             {
                 colorComponent.color = Color.cyan;
             }
-            else if (protectionComponent.ProtectionState == ProtectionStat.State.COOLDOWN)
+            else if (protectionComponent.ProtectionState == ProtectionComponent.State.COOLDOWN)
             {
                 colorComponent.color = Color.yellow;
             }

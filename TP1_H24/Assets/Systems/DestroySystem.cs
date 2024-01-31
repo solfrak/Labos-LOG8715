@@ -14,7 +14,7 @@ public class DestroySystem : ISystem
         List<uint> elementToDestroy = new List<uint>();
         foreach(var entity in BaseEntityManager.Instance.GetEntities())
         {
-            PhysicComponent physicComponent = (PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(entity);
+            PhysicComponent physicComponent = BaseEntityManager.Instance.GetComponent<PhysicComponent>(entity);
 
             if(physicComponent.size <= 0)
             {

@@ -12,8 +12,8 @@ public class SizeSystem : ISystem
     {
         foreach(var entity in BaseEntityManager.Instance.GetEntities())
         {
-            PhysicComponent physicComponent = (PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(entity);
-            CollisionComponent coll = (CollisionComponent)BaseEntityManager.Instance.GetComponent<CollisionComponent>(entity);
+            PhysicComponent physicComponent = BaseEntityManager.Instance.GetComponent<PhysicComponent>(entity);
+            CollisionComponent coll = BaseEntityManager.Instance.GetComponent<CollisionComponent>(entity);
             int size = CalculateSize(coll.augmentSizeCollision, coll.diminishSizeCollision, coll.initialSize);
 
             physicComponent.size = size;

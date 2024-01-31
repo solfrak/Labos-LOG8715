@@ -27,19 +27,19 @@ public class ProtectionSystem : ISystem
 
         foreach(var entity in entities)
         {
-            ProtectionStat protectionStat = (ProtectionStat)BaseEntityManager.Instance.GetComponent<ProtectionStat>(entity);
+            ProtectionComponent protectionStat = (ProtectionComponent)BaseEntityManager.Instance.GetComponent<ProtectionComponent>(entity);
             PhysicComponent physicComponent = (PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(entity);
 
 
             switch (protectionStat.ProtectionState)
             {
-                case ProtectionStat.State.ACTIVE:
+                case ProtectionComponent.State.ACTIVE:
                     HandleActive(ref protectionStat);
                     break;
-                case ProtectionStat.State.COOLDOWN:
+                case ProtectionComponent.State.COOLDOWN:
                     HandleCooldown(ref protectionStat);
                     break;
-                case ProtectionStat.State.READY:
+                case ProtectionComponent.State.READY:
                     HandleReady(ref physicComponent, ref protectionStat);
                     break;
                 default:
@@ -50,34 +50,34 @@ public class ProtectionSystem : ISystem
         }
     }
     
-    private void HandleActive(ref ProtectionStat protectionStat)
+    private void HandleActive(ref ProtectionComponent protectionStat)
     {
         if(protectionStat.ElapsedTimeProtected >= ProtectionDuration || protectionStat.ProtectedCollisionCount >= ProtectionCollisionCount)
         {
             protectionStat.ElapsedTimeProtected = 0.0f;
-            protectionStat.ProtectionState = ProtectionStat.State.COOLDOWN;
+            protectionStat.ProtectionState = ProtectionComponent.State.COOLDOWN;
             return;
         }
 
         protectionStat.ElapsedTimeProtected += Time.deltaTime;
     }
 
-    private void HandleCooldown(ref ProtectionStat protectionStat)
+    private void HandleCooldown(ref ProtectionComponent protectionStat)
     {
         if(protectionStat.ElapsedCoolDown >= ProtectionCooldown)
         {
             protectionStat.ElapsedCoolDown = 0.0f;
-            protectionStat.ProtectionState = ProtectionStat.State.READY;
+            protectionStat.ProtectionState = ProtectionComponent.State.READY;
             return;
         }
         protectionStat.ElapsedCoolDown += Time.deltaTime;
     }
 
-    private void HandleReady(ref PhysicComponent physicComponent, ref ProtectionStat protectionStat)
+    private void HandleReady(ref PhysicComponent physicComponent, ref ProtectionComponent protectionStat)
     {
         if(physicComponent.size <= ProtectionSize)
         {
-            protectionStat.ProtectionState = ProtectionStat.State.ACTIVE;
+            protectionStat.ProtectionState = ProtectionComponent.State.ACTIVE;
         }
     }
 }
