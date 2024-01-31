@@ -15,8 +15,16 @@ public class DestroySystem : ISystem
         foreach(var entity in BaseEntityManager.Instance.GetEntities())
         {
             PhysicComponent physicComponent = BaseEntityManager.Instance.GetComponent<PhysicComponent>(entity);
+            DestroyComponent destroyComponent = BaseEntityManager.Instance.GetComponent<DestroyComponent>(entity);
 
-            if(physicComponent.size <= 0)
+            if (destroyComponent.toDestroy)
+            {
+                ECSController.Instance.DestroyShape(entity);
+                elementToDestroy.Add(entity);
+                continue;
+            }
+
+            if (physicComponent.size <= 0)
             {
                 ECSController.Instance.DestroyShape(entity);
                 elementToDestroy.Add(entity);

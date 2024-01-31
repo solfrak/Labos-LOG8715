@@ -53,7 +53,7 @@ public class ColisionSystem : ISystem
         {
             PhysicComponent physicComponent = BaseEntityManager.Instance.GetComponent<PhysicComponent>(entities[i]);
             CollisionComponent collisionComponent = BaseEntityManager.Instance.GetComponent<CollisionComponent>(entities[i]);
-            BaseEntityManager.Instance.UpdateComponent(entities[i], CalculateScreenCollision(physicComponent, collisionComponent));
+            BaseEntityManager.Instance.UpdateComponent(entities[i], CalculateScreenCollision(physicComponent, ref collisionComponent));
             for (int j = i; j < entities.Count; j++)
             {
                 if (i != j)
@@ -99,7 +99,7 @@ public class ColisionSystem : ISystem
         }
     }
 
-    private PhysicComponent CalculateScreenCollision(PhysicComponent input, CollisionComponent collisionComponent)
+    private PhysicComponent CalculateScreenCollision(PhysicComponent input, ref CollisionComponent collisionComponent)
     {
         if(input.position.x + input.size / 2.0f >= sWidth / 2.0f)
         {
@@ -121,7 +121,6 @@ public class ColisionSystem : ISystem
             input.velocity.y = MathF.Abs(input.velocity.y);
             collisionComponent.CollisionCount++;
         }
-
         return input;
     }
 

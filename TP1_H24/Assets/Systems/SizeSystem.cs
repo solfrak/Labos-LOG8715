@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class SizeSystem : ISystem
 {
+    public const int MIN_SIZE = 0;
     public string Name {get; set;}
 
     public SizeSystem() => Name = "SizeSystem";
@@ -19,6 +20,13 @@ public class SizeSystem : ISystem
             physicComponent.size = size;
             BaseEntityManager.Instance.UpdateComponent(entity, physicComponent);
             ECSController.Instance.UpdateShapeSize(entity, size);
+
+            if (size <= MIN_SIZE)
+            {
+                DestroyComponent destroyComponent = BaseEntityManager.Instance.GetComponent<DestroyComponent>(entity);
+                destroyComponent.toDestroy = true;
+                BaseEntityManager.Instance.UpdateComponent(entity, destroyComponent);
+            }
         }
     }
 
