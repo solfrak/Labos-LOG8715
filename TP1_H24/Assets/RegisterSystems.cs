@@ -15,6 +15,7 @@ public class RegisterSystems
         toRegister.Add(new DestroySystem());
         toRegister.Add(new ColorSystem());
         toRegister.Add(new ProtectionSystem());
+        toRegister.Add(new ExplosionSystem());
 
         return toRegister;
     }
