@@ -17,7 +17,7 @@ public class TimeTravellerSystem : ISystem
 
 
     private Queue<Tuple<IState, float>> StateQueue = new Queue<Tuple<IState, float>>();
-    private float ElapsedCooldown;
+    private float RemainingCooldown;
     private float ElapsedTime = 0.0f;
     private float AbilityCooldown = 3.0f;
     public void UpdateSystem()
@@ -38,6 +38,7 @@ public class TimeTravellerSystem : ISystem
                 var previousEntities = CopyEntitesList();
 
                 InstantiateDestroyedEntity(currentEntities, previousEntities);
+                DestroyInstantiatedEntity(currentEntities, previousEntities);
                 StateQueue.Clear();
                 return;
             }
@@ -48,10 +49,14 @@ public class TimeTravellerSystem : ISystem
 
     private bool IsAbilityTrigger()
     {
-        if(Input.GetKey(KeyCode.Space) && ElapsedCooldown <= 0.0f)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            ElapsedCooldown = AbilityCooldown;
-            return true;
+            if(RemainingCooldown <= 0.0f)
+            {
+                RemainingCooldown = AbilityCooldown;
+                return true;
+            }
+            Debug.Log($"TimeTraveller remaing cooldown: {RemainingCooldown}");
         }
         
         return false;
@@ -59,9 +64,9 @@ public class TimeTravellerSystem : ISystem
 
     private void HandleCoolDown()
     {
-        if(ElapsedCooldown != 0.0f)
+        if(RemainingCooldown != 0.0f)
         {
-            ElapsedCooldown -= Time.deltaTime;
+            RemainingCooldown -= Time.deltaTime;
         }
     }
 
@@ -83,6 +88,17 @@ public class TimeTravellerSystem : ISystem
             {
                 PhysicComponent physicComponent = (PhysicComponent)EntityManager.GetComponent<PhysicComponent>(entity);
                 ECSController.Instance.CreateShape(entity, physicComponent.size);
+            }
+        }
+    }
+
+    private void DestroyInstantiatedEntity(List<uint> currentEntities, List<uint> previousEntities)
+    {
+        foreach(var entity in currentEntities)
+        {
+            if(!previousEntities.Contains(entity))
+            {
+                ECSController.Instance.DestroyShape(entity);
             }
         }
     }
