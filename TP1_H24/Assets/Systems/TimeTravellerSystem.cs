@@ -23,8 +23,8 @@ public class TimeTravellerSystem : ISystem
         float currentTime = ElapsedTime;
         ElapsedTime += Time.deltaTime;
 
-        StateQueue.Enqueue(new Tuple<IState, float>(BaseEntityManager.Instance.GetState(), currentTime));
-        HandleCoolDown();
+        var currentState = BaseEntityManager.Instance.GetState();
+        StateQueue.Enqueue(new Tuple<IState, float>(currentState, currentTime));
 
         if(Time.realtimeSinceStartup >= AbilityCooldown)
         {
@@ -42,7 +42,6 @@ public class TimeTravellerSystem : ISystem
             HandleCoolDown();
             DequeueUntilAbilityCooldown(currentTime);
         }
-
     }
 
     private bool IsAbilityTrigger()
