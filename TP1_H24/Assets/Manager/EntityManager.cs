@@ -15,6 +15,8 @@ public struct ComponentWrapper
     public uint entityId;
 }
 
+public interface IState{}
+
 public interface IEntityManager
 {
     uint CreateEntity();
@@ -23,11 +25,20 @@ public interface IEntityManager
     T GetComponent<T>(uint entity) where T : IComponent;
 
     void UpdateComponent<T>(uint entity, T component) where T : IComponent;
-
     List<uint> GetEntities();
+    
+    void UpdateEntityState(IState state);
+    IState GetState();
+
 }
 
-
+public struct BaseEntityState : IState
+{
+    public List<uint> entities;
+    public uint counter;
+    public Dictionary<uint, Dictionary<Type, int>> componentIndexer;
+    public Dictionary<Type, List<ComponentWrapper>> components;
+}
 public class BaseEntityManager : IEntityManager
 {
 
@@ -115,6 +126,56 @@ public class BaseEntityManager : IEntityManager
     public List<uint> GetEntities()
     {
         return entities;
+    }
+
+    public void UpdateEntityState(IState state)
+    {
+        BaseEntityState bState = (BaseEntityState)state;
+        entities = bState.entities;
+        counter = bState.counter;
+        componentIndexer = bState.componentIndexer;
+        components = bState.components;
+    }
+
+    public IState GetState()
+    {
+        List<uint> copyEntities = new List<uint>();
+        foreach(var entity in entities)
+        {
+            copyEntities.Add(entity);
+        }
+
+        Dictionary<uint, Dictionary<Type, int>> copyIndexer = new Dictionary<uint, Dictionary<Type, int>>();
+        foreach(var entry in componentIndexer)
+        {
+            var entity = entry.Key;
+            copyIndexer[entity] = new Dictionary<Type, int>();
+            foreach(var types in componentIndexer[entity])
+            {
+                copyIndexer[entity][types.Key] = types.Value;
+            }
+        }
+
+        Dictionary<Type, List<ComponentWrapper>> copyComponents = new Dictionary<Type, List<ComponentWrapper>>();
+        foreach(var entry in components)
+        {
+            var type = entry.Key;
+            copyComponents[type] = new List<ComponentWrapper>();
+            foreach(var element in entry.Value)
+            {
+                copyComponents[type].Add(new ComponentWrapper{ component = element.component, entityId = element.entityId});
+            }
+        }
+
+        BaseEntityState state = new BaseEntityState {
+            entities = copyEntities,
+            counter = counter,
+            componentIndexer = copyIndexer,
+            components = copyComponents
+        };
+
+        return state;
+
     }
 }
 

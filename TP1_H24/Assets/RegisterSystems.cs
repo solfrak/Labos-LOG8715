@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 public class RegisterSystems
 {
@@ -16,6 +16,7 @@ public class RegisterSystems
         toRegister.Add(new ColorSystem());
         toRegister.Add(new ExplosionSystem());
         toRegister.Add(new DestroySystem());
+        toRegister.Add(new TimeTravellerSystem());
 
         return toRegister;
     }

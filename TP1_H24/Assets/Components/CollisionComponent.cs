@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CollisionComponent : IComponent
+public struct CollisionComponent : IComponent
 {
     public int augmentSizeCollision;
     public int diminishSizeCollision;
