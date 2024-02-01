@@ -6,16 +6,20 @@ public class DestroySystem : ISystem
 {
     public string Name {get; set;}
 
-    public DestroySystem() => Name = "DestroySystem";
+    public DestroySystem(IEntityManager entityManager) {
+        Name = "DestroySystem";
+        EntityManager = entityManager;
+    }
+    private IEntityManager EntityManager;
 
     public void UpdateSystem()
     {
 
         List<uint> elementToDestroy = new List<uint>();
-        foreach(var entity in BaseEntityManager.Instance.GetEntities())
+        foreach(var entity in EntityManager.GetEntities())
         {
-            PhysicComponent physicComponent = BaseEntityManager.Instance.GetComponent<PhysicComponent>(entity);
-            DestroyComponent destroyComponent = BaseEntityManager.Instance.GetComponent<DestroyComponent>(entity);
+            PhysicComponent physicComponent = EntityManager.GetComponent<PhysicComponent>(entity);
+            DestroyComponent destroyComponent = EntityManager.GetComponent<DestroyComponent>(entity);
 
             if (destroyComponent.toDestroy)
             {
@@ -33,7 +37,7 @@ public class DestroySystem : ISystem
 
         foreach(var entity in elementToDestroy)
         {
-            BaseEntityManager.Instance.DestroyEntity(entity);
+            EntityManager.DestroyEntity(entity);
         }
     }
 }

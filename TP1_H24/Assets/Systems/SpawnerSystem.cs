@@ -5,8 +5,14 @@ using UnityEngine;
 public class SpawnerSystem : ISystem
 {
     public string Name { get; set;}
-    public SpawnerSystem() => Name = "SpawnerSystem";
+    public SpawnerSystem(IEntityManager entityManager)
+    {
+        Name = "SpawnerSystem";
+        EntityManager = entityManager;
 
+    }
+
+    private IEntityManager EntityManager;
     private bool isInitPhase = true;
 
     public void UpdateSystem()

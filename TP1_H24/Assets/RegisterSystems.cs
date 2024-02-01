@@ -8,15 +8,15 @@ public class RegisterSystems
         var toRegister = new List<ISystem>();
         
         // Add your systems here
-        toRegister.Add(new SpawnerSystem());
-        toRegister.Add(new ColisionSystem());
-        toRegister.Add(new MovementSystem());
-        toRegister.Add(new SizeSystem());
-        toRegister.Add(new ProtectionSystem());
-        toRegister.Add(new ColorSystem());
-        toRegister.Add(new ExplosionSystem());
-        toRegister.Add(new DestroySystem());
-        toRegister.Add(new TimeTravellerSystem());
+        toRegister.Add(new SpawnerSystem(BaseEntityManager.Instance));
+        toRegister.Add(new ColisionSystem(BaseEntityManager.Instance));
+        toRegister.Add(new MovementSystem(BaseEntityManager.Instance));
+        toRegister.Add(new SizeSystem(BaseEntityManager.Instance));
+        toRegister.Add(new ProtectionSystem(BaseEntityManager.Instance));
+        toRegister.Add(new ColorSystem(BaseEntityManager.Instance));
+        toRegister.Add(new ExplosionSystem(BaseEntityManager.Instance));
+        toRegister.Add(new DestroySystem(BaseEntityManager.Instance));
+        toRegister.Add(new TimeTravellerSystem(BaseEntityManager.Instance));
 
         return toRegister;
     }

@@ -7,25 +7,30 @@ public class SizeSystem : ISystem
     public const int MIN_SIZE = 0;
     public string Name {get; set;}
 
-    public SizeSystem() => Name = "SizeSystem";
+    public SizeSystem(IEntityManager entityManager)
+    {
+        Name = "SizeSystem";
+        EntityManager = entityManager;
+    }
+    private IEntityManager EntityManager;
 
     public void UpdateSystem()
     {
-        foreach(var entity in BaseEntityManager.Instance.GetEntities())
+        foreach(var entity in EntityManager.GetEntities())
         {
-            PhysicComponent physicComponent = BaseEntityManager.Instance.GetComponent<PhysicComponent>(entity);
-            CollisionComponent coll = BaseEntityManager.Instance.GetComponent<CollisionComponent>(entity);
+            PhysicComponent physicComponent = EntityManager.GetComponent<PhysicComponent>(entity);
+            CollisionComponent coll = EntityManager.GetComponent<CollisionComponent>(entity);
             int size = CalculateSize(coll.augmentSizeCollision, coll.diminishSizeCollision, coll.initialSize);
 
             physicComponent.size = size;
-            BaseEntityManager.Instance.UpdateComponent(entity, physicComponent);
+            EntityManager.UpdateComponent(entity, physicComponent);
             ECSController.Instance.UpdateShapeSize(entity, size);
 
             if (size <= MIN_SIZE)
             {
-                DestroyComponent destroyComponent = BaseEntityManager.Instance.GetComponent<DestroyComponent>(entity);
+                DestroyComponent destroyComponent = EntityManager.GetComponent<DestroyComponent>(entity);
                 destroyComponent.toDestroy = true;
-                BaseEntityManager.Instance.UpdateComponent(entity, destroyComponent);
+                EntityManager.UpdateComponent(entity, destroyComponent);
             }
         }
     }

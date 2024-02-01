@@ -11,13 +11,15 @@ public class ColisionSystem : ISystem
 
     private float sWidth;
     private float sHeight;
-    public ColisionSystem()
+    public ColisionSystem(IEntityManager entityManager)
     {
         Name = "ColisionSystem";
+        EntityManager = entityManager;
         Vector2 camSize = GetPlayableScreenSize();
         sWidth = camSize.x;
         sHeight = camSize.y;
     }
+    private IEntityManager EntityManager;
 
     private Vector2 GetPlayableScreenSize()
     {
@@ -36,24 +38,24 @@ public class ColisionSystem : ISystem
 
     private void ResetCollisions()
     {
-        var entities = BaseEntityManager.Instance.GetEntities();
+        var entities = EntityManager.GetEntities();
 
         for (int i = 0; i < entities.Count; i++)
         {
-            CollisionComponent collisionComponent = BaseEntityManager.Instance.GetComponent<CollisionComponent>(entities[i]);
+            CollisionComponent collisionComponent = EntityManager.GetComponent<CollisionComponent>(entities[i]);
             collisionComponent.CollisionCount = 0;
         }
     }
 
     private void DetectCollision(ref List<Tuple<uint, uint, PhysicComponent, PhysicComponent>> collisions)
     {
-        var entities = BaseEntityManager.Instance.GetEntities();
+        var entities = EntityManager.GetEntities();
 
         for (int i = 0; i < entities.Count; i++)
         {
-            PhysicComponent physicComponent = BaseEntityManager.Instance.GetComponent<PhysicComponent>(entities[i]);
-            CollisionComponent collisionComponent = BaseEntityManager.Instance.GetComponent<CollisionComponent>(entities[i]);
-            BaseEntityManager.Instance.UpdateComponent(entities[i], CalculateScreenCollision(physicComponent, ref collisionComponent));
+            PhysicComponent physicComponent = EntityManager.GetComponent<PhysicComponent>(entities[i]);
+            CollisionComponent collisionComponent = EntityManager.GetComponent<CollisionComponent>(entities[i]);
+            EntityManager.UpdateComponent(entities[i], CalculateScreenCollision(physicComponent, ref collisionComponent));
             for (int j = i; j < entities.Count; j++)
             {
                 if (i != j)
@@ -61,8 +63,8 @@ public class ColisionSystem : ISystem
                     var firstEntity = entities[i];
                     var secondEntity = entities[j];
 
-                    PhysicComponent firstPhys = BaseEntityManager.Instance.GetComponent<PhysicComponent>(firstEntity);
-                    PhysicComponent secondPhys = BaseEntityManager.Instance.GetComponent<PhysicComponent>(secondEntity);
+                    PhysicComponent firstPhys = EntityManager.GetComponent<PhysicComponent>(firstEntity);
+                    PhysicComponent secondPhys = EntityManager.GetComponent<PhysicComponent>(secondEntity);
 
                     CollisionResult result = CollisionUtility.CalculateCollision(firstPhys.position, firstPhys.velocity, firstPhys.size, secondPhys.position, secondPhys.velocity, secondPhys.size);
                     if (result != null)
@@ -86,11 +88,11 @@ public class ColisionSystem : ISystem
             PhysicComponent pEntity1 = collision.Item3;
             PhysicComponent pEntity2 = collision.Item4;
 
-            CollisionComponent cEntity1 = BaseEntityManager.Instance.GetComponent<CollisionComponent>(collision.Item1);
-            CollisionComponent cEntity2 = BaseEntityManager.Instance.GetComponent<CollisionComponent>(collision.Item2);
+            CollisionComponent cEntity1 = EntityManager.GetComponent<CollisionComponent>(collision.Item1);
+            CollisionComponent cEntity2 = EntityManager.GetComponent<CollisionComponent>(collision.Item2);
 
-            BaseEntityManager.Instance.UpdateComponent(collision.Item1, pEntity1);
-            BaseEntityManager.Instance.UpdateComponent(collision.Item2, pEntity2);
+            EntityManager.UpdateComponent(collision.Item1, pEntity1);
+            EntityManager.UpdateComponent(collision.Item2, pEntity2);
 
             if(!pEntity1.isStatic && !pEntity2.isStatic)
             {
@@ -139,13 +141,13 @@ public class ColisionSystem : ISystem
             collisionComponent1.diminishSizeCollision++;
             collisionComponent2.augmentSizeCollision++;
         }
-        BaseEntityManager.Instance.UpdateComponent(entity1, collisionComponent1);
-        BaseEntityManager.Instance.UpdateComponent(entity2, collisionComponent2);
+        EntityManager.UpdateComponent(entity1, collisionComponent1);
+        EntityManager.UpdateComponent(entity2, collisionComponent2);
     }
 
     bool IsProtected(uint entity)
     {
-        ProtectionComponent protectStat = BaseEntityManager.Instance.GetComponent<ProtectionComponent>(entity);
+        ProtectionComponent protectStat = EntityManager.GetComponent<ProtectionComponent>(entity);
 
         return (protectStat.ProtectionState == ProtectionComponent.State.ACTIVE);
     }

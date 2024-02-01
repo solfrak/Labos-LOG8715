@@ -6,17 +6,22 @@ public class ColorSystem : ISystem
 {
     public string Name {get; set;}
 
-    public ColorSystem() => Name = "ColorSystem";
+    public ColorSystem(IEntityManager entityManager)
+    {
+        Name = "ColorSystem";
+        EntityManager = entityManager;
+    }
+    private IEntityManager EntityManager;
 
     public void UpdateSystem()
     {
-        var entities = BaseEntityManager.Instance.GetEntities();
+        var entities = EntityManager.GetEntities();
         foreach(var entity in entities)
         {
-            CollisionComponent collisionComponent = BaseEntityManager.Instance.GetComponent<CollisionComponent>(entity);
-            ColorComponent colorComponent = BaseEntityManager.Instance.GetComponent<ColorComponent>(entity);
-            PhysicComponent physicComponent = BaseEntityManager.Instance.GetComponent<PhysicComponent>(entity);
-            ProtectionComponent protectionComponent = BaseEntityManager.Instance.GetComponent<ProtectionComponent>(entity);
+            CollisionComponent collisionComponent = EntityManager.GetComponent<CollisionComponent>(entity);
+            ColorComponent colorComponent = EntityManager.GetComponent<ColorComponent>(entity);
+            PhysicComponent physicComponent = EntityManager.GetComponent<PhysicComponent>(entity);
+            ProtectionComponent protectionComponent = EntityManager.GetComponent<ProtectionComponent>(entity);
             if (physicComponent.isStatic)
             {
                 colorComponent.color = Color.red;
@@ -47,7 +52,7 @@ public class ColorSystem : ISystem
                 colorComponent.color = Color.blue;
             }
             ECSController.Instance.UpdateShapeColor(entity, colorComponent.color);
-            BaseEntityManager.Instance.UpdateComponent(entity, colorComponent);
+            EntityManager.UpdateComponent(entity, colorComponent);
         }
     }
 }

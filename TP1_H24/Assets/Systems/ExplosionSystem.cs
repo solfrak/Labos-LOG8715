@@ -10,11 +10,14 @@ public class ExplosionSystem : ISystem
     private int explosionSize;
     private const int PLAYER_EXPLOSION_THRESHOLD = 4;
 
-    public ExplosionSystem()
+    public ExplosionSystem(IEntityManager entityManager)
     {
         Name = "ExplosionSystem";
+        EntityManager = entityManager;
         explosionSize = ECSController.Instance.Config.explosionSize;
     }
+
+    private IEntityManager EntityManager;
     public void UpdateSystem()
     {
         CircleSizeExplosion();
@@ -23,25 +26,25 @@ public class ExplosionSystem : ISystem
 
     private void CircleSizeExplosion()
     {
-        var entities = BaseEntityManager.Instance.GetEntities();
+        var entities = EntityManager.GetEntities();
 
         for (int i = 0; i < entities.Count; i++)
         {
-            PhysicComponent physicComponent = BaseEntityManager.Instance.GetComponent<PhysicComponent>(entities[i]);
+            PhysicComponent physicComponent = EntityManager.GetComponent<PhysicComponent>(entities[i]);
 
             if (physicComponent.size >= explosionSize)
             {
                 SpawnExplosionCircles(physicComponent);
-                DestroyComponent destroyComponent = BaseEntityManager.Instance.GetComponent<DestroyComponent>(entities[i]);
+                DestroyComponent destroyComponent = EntityManager.GetComponent<DestroyComponent>(entities[i]);
                 destroyComponent.toDestroy = true;
-                BaseEntityManager.Instance.UpdateComponent(entities[i], destroyComponent);
+                EntityManager.UpdateComponent(entities[i], destroyComponent);
             }
         }
     }
 
     private void PlayerExplosionCheck()
     {
-        var entities = BaseEntityManager.Instance.GetEntities();
+        var entities = EntityManager.GetEntities();
         if (!Input.GetMouseButtonDown(0))
             return;
 
@@ -50,7 +53,7 @@ public class ExplosionSystem : ISystem
 
         for (int i = 0; i < entities.Count; i++)
         {
-            PhysicComponent physicComponent = BaseEntityManager.Instance.GetComponent<PhysicComponent>(entities[i]);
+            PhysicComponent physicComponent = EntityManager.GetComponent<PhysicComponent>(entities[i]);
 
             if (physicComponent.isStatic)
                 continue;
@@ -61,9 +64,9 @@ public class ExplosionSystem : ISystem
                 {
                     SpawnExplosionCircles(physicComponent);
                 }
-                DestroyComponent destroyComponent = BaseEntityManager.Instance.GetComponent<DestroyComponent>(entities[i]);
+                DestroyComponent destroyComponent = EntityManager.GetComponent<DestroyComponent>(entities[i]);
                 destroyComponent.toDestroy = true;
-                BaseEntityManager.Instance.UpdateComponent(entities[i], destroyComponent);
+                EntityManager.UpdateComponent(entities[i], destroyComponent);
             }
         }
     }

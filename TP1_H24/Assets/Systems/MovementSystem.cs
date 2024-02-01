@@ -5,18 +5,24 @@ using UnityEngine;
 public class MovementSystem : ISystem
 {
     public string Name { get; set;}
-    public MovementSystem() => Name = "MovementSystem";
+    public MovementSystem(IEntityManager entityManager)
+    {
+        Name = "MovementSystem";
+        EntityManager = entityManager;
+
+    }
+    private IEntityManager EntityManager;
 
     public void UpdateSystem()
     {
-        List<uint> list = BaseEntityManager.Instance.GetEntities();
+        List<uint> list = EntityManager.GetEntities();
 
         foreach(var entity in list)
         {
-            PhysicComponent physicComponent = BaseEntityManager.Instance.GetComponent<PhysicComponent>(entity);
+            PhysicComponent physicComponent = EntityManager.GetComponent<PhysicComponent>(entity);
             physicComponent.position += physicComponent.velocity * Time.deltaTime;
 
-            BaseEntityManager.Instance.UpdateComponent(entity, physicComponent);
+            EntityManager.UpdateComponent(entity, physicComponent);
 
             ECSController.Instance.UpdateShapePosition(entity, physicComponent.position);
         }

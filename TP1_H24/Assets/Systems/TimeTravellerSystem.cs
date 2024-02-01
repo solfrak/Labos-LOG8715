@@ -8,10 +8,12 @@ public class TimeTravellerSystem : ISystem
 {
     public string Name { get; set;}
     
-    public TimeTravellerSystem()
+    public TimeTravellerSystem(IEntityManager entityManager)
     {
         Name = "TimeTravellerSystem";
+        EntityManager = entityManager;
     } 
+    private IEntityManager EntityManager;
 
 
     private Queue<Tuple<IState, float>> StateQueue = new Queue<Tuple<IState, float>>();
@@ -23,7 +25,7 @@ public class TimeTravellerSystem : ISystem
         float currentTime = ElapsedTime;
         ElapsedTime += Time.deltaTime;
 
-        var currentState = BaseEntityManager.Instance.GetState();
+        var currentState = EntityManager.GetState();
         StateQueue.Enqueue(new Tuple<IState, float>(currentState, currentTime));
 
         if(Time.realtimeSinceStartup >= AbilityCooldown)
@@ -32,7 +34,7 @@ public class TimeTravellerSystem : ISystem
             if(IsAbilityTrigger())
             {
                 var currentEntities = CopyEntitesList();
-                BaseEntityManager.Instance.UpdateEntityState(StateQueue.Dequeue().Item1);
+                EntityManager.UpdateEntityState(StateQueue.Dequeue().Item1);
                 var previousEntities = CopyEntitesList();
 
                 InstantiateDestroyedEntity(currentEntities, previousEntities);
@@ -79,7 +81,7 @@ public class TimeTravellerSystem : ISystem
         {
             if(!currentEntities.Contains(entity))
             {
-                PhysicComponent physicComponent = (PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(entity);
+                PhysicComponent physicComponent = (PhysicComponent)EntityManager.GetComponent<PhysicComponent>(entity);
                 ECSController.Instance.CreateShape(entity, physicComponent.size);
             }
         }
@@ -88,7 +90,7 @@ public class TimeTravellerSystem : ISystem
     private List<uint> CopyEntitesList()
     {
         List<uint> copy = new List<uint>();
-        foreach(var entity in BaseEntityManager.Instance.GetEntities())
+        foreach(var entity in EntityManager.GetEntities())
         {
             copy.Add(entity);
         }

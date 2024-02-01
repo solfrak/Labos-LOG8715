@@ -12,23 +12,25 @@ public class ProtectionSystem : ISystem
     private float ProtectionCooldown;
     private float ProtectionCollisionCount;
     private enum ProtectionState {READY, ACTIVE, COOLDOWN}
-    public ProtectionSystem() 
+    public ProtectionSystem(IEntityManager entityManager) 
     {
         Name = "ProtectionSystem";
+        EntityManager = entityManager;
         ProtectionSize = ECSController.Instance.Config.protectionSize;
         ProtectionDuration = ECSController.Instance.Config.protectionDuration;
         ProtectionCooldown = ECSController.Instance.Config.protectionCooldown;
         ProtectionCollisionCount = ECSController.Instance.Config.protectionCollisionCount;
     }
+    private IEntityManager EntityManager;
 
     public void UpdateSystem()
     {
-        List<uint> entities = BaseEntityManager.Instance.GetEntities();
+        List<uint> entities = EntityManager.GetEntities();
 
         foreach(var entity in entities)
         {
-            ProtectionComponent protectionStat = (ProtectionComponent)BaseEntityManager.Instance.GetComponent<ProtectionComponent>(entity);
-            PhysicComponent physicComponent = (PhysicComponent)BaseEntityManager.Instance.GetComponent<PhysicComponent>(entity);
+            ProtectionComponent protectionStat = (ProtectionComponent)EntityManager.GetComponent<ProtectionComponent>(entity);
+            PhysicComponent physicComponent = (PhysicComponent)EntityManager.GetComponent<PhysicComponent>(entity);
 
 
             switch (protectionStat.ProtectionState)
@@ -46,7 +48,7 @@ public class ProtectionSystem : ISystem
                     break;
             }
 
-            BaseEntityManager.Instance.UpdateComponent(entity, protectionStat);
+            EntityManager.UpdateComponent(entity, protectionStat);
         }
     }
     
