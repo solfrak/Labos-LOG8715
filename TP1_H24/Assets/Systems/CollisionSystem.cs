@@ -96,7 +96,7 @@ public class ColisionSystem : ISystem
 
             if(!pEntity1.isStatic && !pEntity2.isStatic)
             {
-                UpdateCollisionCount(pEntity1, pEntity2, cEntity1, cEntity2, collision.Item1, collision.Item2);
+                UpdateCollisionCount(pEntity1, pEntity2, ref cEntity1, ref cEntity2, collision.Item1, collision.Item2);
             }
         }
     }
@@ -126,30 +126,38 @@ public class ColisionSystem : ISystem
         return input;
     }
 
-    private void UpdateCollisionCount(PhysicComponent physicComponent1, PhysicComponent physicComponent2, CollisionComponent collisionComponent1, CollisionComponent collisionComponent2, uint entity1, uint entity2)
+    private void UpdateCollisionCount(PhysicComponent physicComponent1, PhysicComponent physicComponent2, ref CollisionComponent collisionComponent1,ref CollisionComponent collisionComponent2, uint entity1, uint entity2)
     {
         collisionComponent1.CollisionCount++;
         collisionComponent2.CollisionCount++;
 
         if (physicComponent1.size > physicComponent2.size)
         {
-            collisionComponent1.augmentSizeCollision++;
-            collisionComponent2.diminishSizeCollision++;
+            //collisionComponent1.initialSize++;
+            tryProtected(entity1,ref collisionComponent1, 1);
+            tryProtected(entity2,ref collisionComponent2, -1);
+            //collisionComponent2.initialSize--;
         }
-        else
+        else if (physicComponent1.size < physicComponent2.size)
         {
-            collisionComponent1.diminishSizeCollision++;
-            collisionComponent2.augmentSizeCollision++;
+            tryProtected(entity1, ref collisionComponent1, -1);
+            tryProtected(entity2, ref collisionComponent2, 1);
+            //collisionComponent1.initialSize--;
+            //collisionComponent2.initialSize++;
         }
-        EntityManager.UpdateComponent(entity1, collisionComponent1);
-        EntityManager.UpdateComponent(entity2, collisionComponent2);
+
+        EntityManager.UpdateComponent(entity1,  collisionComponent1);
+        EntityManager.UpdateComponent(entity2,  collisionComponent2);
     }
 
-    bool IsProtected(uint entity)
+    void tryProtected(uint entity,ref CollisionComponent collisionComponent, int change)
     {
         ProtectionComponent protectStat = EntityManager.GetComponent<ProtectionComponent>(entity);
-
-        return (protectStat.ProtectionState == ProtectionComponent.State.ACTIVE);
+         if(protectStat.ProtectionState == ProtectionComponent.State.ACTIVE)
+         {
+           return;
+         }
+        collisionComponent.changeSizeCollision += change;
     }
 }
 

@@ -4,8 +4,7 @@ using UnityEngine;
 
 public struct CollisionComponent : IComponent
 {
-    public int augmentSizeCollision;
-    public int diminishSizeCollision;
+    public int changeSizeCollision;
     public int initialSize;
     public int CollisionCount;
 }

@@ -20,7 +20,7 @@ public class SizeSystem : ISystem
         {
             PhysicComponent physicComponent = EntityManager.GetComponent<PhysicComponent>(entity);
             CollisionComponent coll = EntityManager.GetComponent<CollisionComponent>(entity);
-            int size = CalculateSize(coll.augmentSizeCollision, coll.diminishSizeCollision, coll.initialSize);
+            int size = CalculateSize(coll.changeSizeCollision, coll.initialSize);
 
             physicComponent.size = size;
             EntityManager.UpdateComponent(entity, physicComponent);
@@ -35,11 +35,9 @@ public class SizeSystem : ISystem
         }
     }
 
-    private int CalculateSize(int greaterCount, int lesserCount, int initialSize)
+    private int CalculateSize(int change, int initialSize)
     {
-        int diff = greaterCount - lesserCount;
-
-        initialSize += diff;
+        initialSize += change;
         return initialSize;
     }
 
