@@ -16,7 +16,18 @@ public class ColorSystem : ISystem
     public void UpdateSystem()
     {
         var entities = EntityManager.GetEntities();
-        foreach(var entity in entities)
+        Update(entities);
+    }
+
+    public void UpdateLeftSide()
+    {
+        var entities = Utils.GetLeftSideEntities(EntityManager);
+        Update(entities);
+    }
+
+    private void Update(List<uint> entities)
+    {
+        foreach (var entity in entities)
         {
             CollisionComponent collisionComponent = EntityManager.GetComponent<CollisionComponent>(entity);
             ColorComponent colorComponent = EntityManager.GetComponent<ColorComponent>(entity);
@@ -26,11 +37,11 @@ public class ColorSystem : ISystem
             {
                 colorComponent.color = Color.red;
             }
-            else if(collisionComponent.CollisionCount > 0)
+            else if (collisionComponent.CollisionCount > 0)
             {
                 colorComponent.color = Color.green;
             }
-            else if(protectionComponent.ProtectionState == ProtectionComponent.State.ACTIVE)
+            else if (protectionComponent.ProtectionState == ProtectionComponent.State.ACTIVE)
             {
                 colorComponent.color = Color.white;
             }

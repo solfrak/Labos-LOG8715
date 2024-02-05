@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor.Il2Cpp;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
@@ -31,15 +32,45 @@ public class ColisionSystem : ISystem
     public void UpdateSystem()
     {
         List<Tuple<uint, uint, PhysicComponent, PhysicComponent>> collisions = new List<Tuple<uint, uint, PhysicComponent, PhysicComponent>>();
-        ResetCollisions();
-        DetectCollision(ref collisions);
+        var entities = EntityManager.GetEntities();
+        ResetCollisions(entities);
+        DetectCollision(ref collisions, entities);
         UpdateAfterCollision(ref collisions);
     }
 
-    private void ResetCollisions()
+    public void UpdateLeftSide()
     {
-        var entities = EntityManager.GetEntities();
+        List<Tuple<uint, uint, PhysicComponent, PhysicComponent>> collisions = new List<Tuple<uint, uint, PhysicComponent, PhysicComponent>>();
+        var leftEntities = Utils.GetLeftSideEntities(EntityManager);
+        var rightEntities = GetPotentialCollisionEntities(leftEntities);
+        foreach(var entity in rightEntities)
+        {
+            leftEntities.Add(entity);
+        }
+        ResetCollisions(leftEntities);
+        DetectCollision(ref collisions, leftEntities);
+        UpdateAfterCollision(ref collisions);
+    }
+    
+    private List<uint> GetPotentialCollisionEntities(List<uint> leftEntities)
+    {
+        var entities = EntityManager.GetEntities().Where(x => !leftEntities.Contains(x));
+        List<uint> potentials = new List<uint>();
 
+        foreach(var entity in entities)
+        {
+            PhysicComponent physicComponent = EntityManager.GetComponent<PhysicComponent>(entity);
+            if(physicComponent.position.x >= 0.0f && physicComponent.position.x - physicComponent.size < 0.0f)
+            {
+                potentials.Add(entity);
+            }
+        }
+
+        return potentials;
+    }
+
+    private void ResetCollisions(List<uint> entities)
+    {
         for (int i = 0; i < entities.Count; i++)
         {
             CollisionComponent collisionComponent = EntityManager.GetComponent<CollisionComponent>(entities[i]);
@@ -47,15 +78,13 @@ public class ColisionSystem : ISystem
         }
     }
 
-    private void DetectCollision(ref List<Tuple<uint, uint, PhysicComponent, PhysicComponent>> collisions)
+    private void DetectCollision(ref List<Tuple<uint, uint, PhysicComponent, PhysicComponent>> collisions, List<uint> entities)
     {
-        var entities = EntityManager.GetEntities();
-
         for (int i = 0; i < entities.Count; i++)
         {
             PhysicComponent physicComponent = EntityManager.GetComponent<PhysicComponent>(entities[i]);
             CollisionComponent collisionComponent = EntityManager.GetComponent<CollisionComponent>(entities[i]);
-            EntityManager.UpdateComponent(entities[i], CalculateScreenCollision(physicComponent, ref collisionComponent));
+            EntityManager.UpdateComponent(entities[i], CalculateScreenCollision(ref physicComponent, ref collisionComponent));
             for (int j = i; j < entities.Count; j++)
             {
                 if (i != j)
@@ -101,7 +130,7 @@ public class ColisionSystem : ISystem
         }
     }
 
-    private PhysicComponent CalculateScreenCollision(PhysicComponent input, ref CollisionComponent collisionComponent)
+    private PhysicComponent CalculateScreenCollision(ref PhysicComponent input, ref CollisionComponent collisionComponent)
     {
         if(input.position.x + input.size / 2.0f >= sWidth / 2.0f)
         {

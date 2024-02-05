@@ -17,6 +17,7 @@ public class RegisterSystems
         toRegister.Add(new ExplosionSystem(BaseEntityManager.Instance));
         toRegister.Add(new DestroySystem(BaseEntityManager.Instance));
         toRegister.Add(new TimeTravellerSystem(BaseEntityManager.Instance));
+        toRegister.Add(new TimeMultiplierSystem(BaseEntityManager.Instance));
 
         return toRegister;
     }

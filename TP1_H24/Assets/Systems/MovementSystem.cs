@@ -15,9 +15,19 @@ public class MovementSystem : ISystem
 
     public void UpdateSystem()
     {
-        List<uint> list = EntityManager.GetEntities();
+        List<uint> entities = EntityManager.GetEntities();
+        Move(entities);
+    }
 
-        foreach(var entity in list)
+    public void UpdateLeftSide()
+    {
+        List<uint> leftEntities = Utils.GetLeftSideEntities(EntityManager);
+        Move(leftEntities);
+    }
+
+    private void Move(List<uint> entities)
+    {
+        foreach (var entity in entities)
         {
             PhysicComponent physicComponent = EntityManager.GetComponent<PhysicComponent>(entity);
             physicComponent.position += physicComponent.velocity * Time.deltaTime;
@@ -26,6 +36,5 @@ public class MovementSystem : ISystem
 
             ECSController.Instance.UpdateShapePosition(entity, physicComponent.position);
         }
-        
     }
 }

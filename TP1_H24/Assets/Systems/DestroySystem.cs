@@ -14,9 +14,20 @@ public class DestroySystem : ISystem
 
     public void UpdateSystem()
     {
+        var entities = EntityManager.GetEntities();
+        Update(entities);
+    }
 
+    public void UpdateLeftSide()
+    {
+        var entities = Utils.GetLeftSideEntities(EntityManager);
+        Update(entities);
+    }
+
+    private void Update(List<uint> entities)
+    {
         List<uint> elementToDestroy = new List<uint>();
-        foreach(var entity in EntityManager.GetEntities())
+        foreach (var entity in entities)
         {
             PhysicComponent physicComponent = EntityManager.GetComponent<PhysicComponent>(entity);
             DestroyComponent destroyComponent = EntityManager.GetComponent<DestroyComponent>(entity);
@@ -35,7 +46,7 @@ public class DestroySystem : ISystem
             }
         }
 
-        foreach(var entity in elementToDestroy)
+        foreach (var entity in elementToDestroy)
         {
             EntityManager.DestroyEntity(entity);
         }

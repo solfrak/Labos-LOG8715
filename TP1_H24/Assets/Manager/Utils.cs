@@ -37,4 +37,22 @@ public class Utils
     {
         return (input.x * input.x) + (input.y * input.y) == 0.0;
     }
+
+    public static List<uint> GetLeftSideEntities(IEntityManager entityManager)
+    {
+        List<uint> leftEntities = new List<uint>();
+
+        foreach(var entity in entityManager.GetEntities())
+        {
+            PhysicComponent physicComponent = entityManager.GetComponent<PhysicComponent>(entity);
+
+            if(physicComponent.position.x < 0.0f)
+            {
+                leftEntities.Add(entity);
+            }
+        }
+
+        return leftEntities;
+
+    }
 } 

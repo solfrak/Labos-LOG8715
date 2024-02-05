@@ -1,5 +1,6 @@
 
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 
@@ -20,13 +21,19 @@ public class ExplosionSystem : ISystem
     private IEntityManager EntityManager;
     public void UpdateSystem()
     {
-        CircleSizeExplosion();
+        var entities = EntityManager.GetEntities();
+        CircleSizeExplosion(entities);
         PlayerExplosionCheck();
     }
 
-    private void CircleSizeExplosion()
+    public void UpdateLeftSide()
     {
-        var entities = EntityManager.GetEntities();
+        var entities = Utils.GetLeftSideEntities(EntityManager);
+        CircleSizeExplosion(entities);
+    }
+
+    private void CircleSizeExplosion(List<uint> entities)
+    {
 
         for (int i = 0; i < entities.Count; i++)
         {

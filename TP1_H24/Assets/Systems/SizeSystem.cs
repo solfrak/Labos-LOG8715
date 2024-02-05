@@ -16,7 +16,19 @@ public class SizeSystem : ISystem
 
     public void UpdateSystem()
     {
-        foreach(var entity in EntityManager.GetEntities())
+        var entities = EntityManager.GetEntities();
+        Update(entities);
+    }
+
+    public void UpdateLeftSide()
+    {
+        var entities = Utils.GetLeftSideEntities(EntityManager);
+        Update(entities);
+    }
+
+    private void Update(List<uint> entities)
+    {
+        foreach (var entity in entities)
         {
             PhysicComponent physicComponent = EntityManager.GetComponent<PhysicComponent>(entity);
             CollisionComponent coll = EntityManager.GetComponent<CollisionComponent>(entity);

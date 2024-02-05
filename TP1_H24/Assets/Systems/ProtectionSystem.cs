@@ -26,8 +26,18 @@ public class ProtectionSystem : ISystem
     public void UpdateSystem()
     {
         List<uint> entities = EntityManager.GetEntities();
+        Update(entities);
+    }
 
-        foreach(var entity in entities)
+    public void UpdateLeftSide()
+    {
+        var entities = Utils.GetLeftSideEntities(EntityManager);
+        Update(entities);
+    }
+
+    private void Update(List<uint> entities)
+    {
+        foreach (var entity in entities)
         {
             ProtectionComponent protectionStat = (ProtectionComponent)EntityManager.GetComponent<ProtectionComponent>(entity);
             PhysicComponent physicComponent = (PhysicComponent)EntityManager.GetComponent<PhysicComponent>(entity);
@@ -51,7 +61,7 @@ public class ProtectionSystem : ISystem
             EntityManager.UpdateComponent(entity, protectionStat);
         }
     }
-    
+
     private void HandleActive(ref ProtectionComponent protectionStat)
     {
         if(protectionStat.ElapsedTimeProtected >= ProtectionDuration || protectionStat.ProtectedCollisionCount >= ProtectionCollisionCount)
