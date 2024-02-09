@@ -99,9 +99,8 @@ public class ExplosionSystem : ISystem
         //Calculate position and velocity for each circle to spawn
         for (int i = 0; i < 4; i++)
         {
-            // If velocity is 0.0, the circle is considered static
+            // If velocity is 0.0, the circle is considered static by the Spawner
             Vector2 velocity = GetSpawnDirection(i) * Mathf.Max(0.01f, physicComponent.velocity.sqrMagnitude);
-            Debug.Log(velocity);
             Vector2 position = physicComponent.position + GetSpawnDirection(i) * size;
 
             Utils.SpawnCircle(position, velocity, size, true);

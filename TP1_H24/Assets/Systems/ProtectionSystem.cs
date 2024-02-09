@@ -7,19 +7,20 @@ using UnityEngine;
 public class ProtectionSystem : ISystem
 {
     public string Name {get; set;}
-    private int ProtectionSize;
+    private int MaxProtectionSize;
     private float ProtectionDuration;
     private float ProtectionCooldown;
-    private float ProtectionCollisionCount;
+    private float ProtectionTriggerCollisionCount;
     private enum ProtectionState {READY, ACTIVE, COOLDOWN}
     public ProtectionSystem(IEntityManager entityManager) 
     {
         Name = "ProtectionSystem";
         EntityManager = entityManager;
-        ProtectionSize = ECSController.Instance.Config.protectionSize;
+        MaxProtectionSize = ECSController.Instance.Config.protectionSize;
         ProtectionDuration = ECSController.Instance.Config.protectionDuration;
         ProtectionCooldown = ECSController.Instance.Config.protectionCooldown;
-        ProtectionCollisionCount = ECSController.Instance.Config.protectionCollisionCount;
+        // Number of collisions for a circlet to be protected
+        ProtectionTriggerCollisionCount = ECSController.Instance.Config.protectionCollisionCount;
     }
     private IEntityManager EntityManager;
 
@@ -39,57 +40,74 @@ public class ProtectionSystem : ISystem
     {
         foreach (var entity in entities)
         {
-            ProtectionComponent protectionStat = (ProtectionComponent)EntityManager.GetComponent<ProtectionComponent>(entity);
-            PhysicComponent physicComponent = (PhysicComponent)EntityManager.GetComponent<PhysicComponent>(entity);
+            ProtectionComponent protectionComponent = EntityManager.GetComponent<ProtectionComponent>(entity);
+            PhysicComponent physicComponent = EntityManager.GetComponent<PhysicComponent>(entity);
 
 
-            switch (protectionStat.ProtectionState)
+            if (physicComponent.size > MaxProtectionSize)
+            {
+                protectionComponent.ProtectionState = ProtectionComponent.State.UNPROTECTABLE;
+                protectionComponent.ElapsedCoolDown = 0.0f;
+                protectionComponent.ElapsedTimeProtected = 0.0f;
+            }
+
+            switch (protectionComponent.ProtectionState)
             {
                 case ProtectionComponent.State.ACTIVE:
-                    HandleActive(ref protectionStat);
+                    HandleActive(ref protectionComponent);
                     break;
                 case ProtectionComponent.State.COOLDOWN:
-                    HandleCooldown(ref protectionStat);
+                    HandleCooldown(ref protectionComponent);
                     break;
                 case ProtectionComponent.State.READY:
-                    HandleReady(ref physicComponent, ref protectionStat);
+                    HandleReady(ref physicComponent, ref protectionComponent);
+                    break;
+                case ProtectionComponent.State.UNPROTECTABLE:
+                    HandleUnprotectable(ref physicComponent, ref protectionComponent);
                     break;
                 default:
                     break;
             }
 
-            EntityManager.UpdateComponent(entity, protectionStat);
+            EntityManager.UpdateComponent(entity, protectionComponent);
         }
     }
 
-    private void HandleActive(ref ProtectionComponent protectionStat)
+    private void HandleActive(ref ProtectionComponent protectionComponent)
     {
-        if(protectionStat.ElapsedTimeProtected >= ProtectionDuration || protectionStat.ProtectedCollisionCount >= ProtectionCollisionCount)
-        {
-            protectionStat.ElapsedTimeProtected = 0.0f;
-            protectionStat.ProtectionState = ProtectionComponent.State.COOLDOWN;
-            return;
-        }
+        protectionComponent.ElapsedTimeProtected += Time.deltaTime;
 
-        protectionStat.ElapsedTimeProtected += Time.deltaTime;
+        if(protectionComponent.ElapsedTimeProtected >= ProtectionDuration)
+        {
+            protectionComponent.ElapsedTimeProtected = 0.0f;
+            protectionComponent.ProtectionState = ProtectionComponent.State.COOLDOWN;
+        }
     }
 
-    private void HandleCooldown(ref ProtectionComponent protectionStat)
+    private void HandleCooldown(ref ProtectionComponent protectionComponent)
     {
-        if(protectionStat.ElapsedCoolDown >= ProtectionCooldown)
+        protectionComponent.ElapsedCoolDown += Time.deltaTime;
+
+        if(protectionComponent.ElapsedCoolDown >= ProtectionCooldown)
         {
-            protectionStat.ElapsedCoolDown = 0.0f;
-            protectionStat.ProtectionState = ProtectionComponent.State.READY;
-            return;
+            protectionComponent.ElapsedCoolDown = 0.0f;
+            protectionComponent.ProtectionState = ProtectionComponent.State.READY;
         }
-        protectionStat.ElapsedCoolDown += Time.deltaTime;
     }
 
-    private void HandleReady(ref PhysicComponent physicComponent, ref ProtectionComponent protectionStat)
+    private void HandleReady(ref PhysicComponent physicComponent, ref ProtectionComponent protectionComponent)
     {
-        if(physicComponent.size <= ProtectionSize)
+        if(protectionComponent.ProtectionTriggerCollisionCount >= ProtectionTriggerCollisionCount)
         {
-            protectionStat.ProtectionState = ProtectionComponent.State.ACTIVE;
+            protectionComponent.ProtectionState = ProtectionComponent.State.ACTIVE;
+            protectionComponent.ProtectionTriggerCollisionCount = 0;
+        }
+    }
+    private void HandleUnprotectable(ref PhysicComponent physicComponent, ref ProtectionComponent protectionComponent)
+    {
+        if (physicComponent.size <= MaxProtectionSize)
+        {
+            protectionComponent.ProtectionState = ProtectionComponent.State.READY;
         }
     }
 }
