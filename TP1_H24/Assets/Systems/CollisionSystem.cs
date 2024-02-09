@@ -75,6 +75,7 @@ public class ColisionSystem : ISystem
         {
             CollisionComponent collisionComponent = EntityManager.GetComponent<CollisionComponent>(entities[i]);
             collisionComponent.CollisionCount = 0;
+            EntityManager.UpdateComponent(entities[i], collisionComponent);
         }
     }
 
@@ -85,6 +86,7 @@ public class ColisionSystem : ISystem
             PhysicComponent physicComponent = EntityManager.GetComponent<PhysicComponent>(entities[i]);
             CollisionComponent collisionComponent = EntityManager.GetComponent<CollisionComponent>(entities[i]);
             EntityManager.UpdateComponent(entities[i], CalculateScreenCollision(ref physicComponent, ref collisionComponent));
+            EntityManager.UpdateComponent(entities[i], collisionComponent);
             for (int j = i; j < entities.Count; j++)
             {
                 if (i != j)

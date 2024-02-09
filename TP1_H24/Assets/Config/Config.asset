@@ -19,22 +19,30 @@ MonoBehaviour:
   protectionCooldown: 15
   circleInstancesToSpawn:
   - initialSize: 2
-    initialPosition: {x: 0, y: -3}
+    initialPosition: {x: 0, y: 0}
     initialVelocity: {x: 0, y: 0}
   - initialSize: 9
-    initialPosition: {x: 4, y: 6}
-    initialVelocity: {x: -3, y: 0}
-  - initialSize: 4
-    initialPosition: {x: -5, y: 6}
-    initialVelocity: {x: 3, y: 0}
+    initialPosition: {x: 6, y: 6}
+    initialVelocity: {x: -5, y: 0}
+  - initialSize: 3
+    initialPosition: {x: -7, y: 6}
+    initialVelocity: {x: 5, y: 0}
+  - initialSize: 3
+    initialPosition: {x: 5, y: -3}
+    initialVelocity: {x: 5, y: 1}
+  - initialSize: 3
+    initialPosition: {x: -5, y: -7}
+    initialVelocity: {x: 5, y: -3}
   systemsEnabled:
     keys:
     - SpawnerSystem
-    - MovementSystem
     - ColisionSystem
+    - MovementSystem
     - SizeSystem
-    - DestroySystem
-    - ColorSystem
     - ProtectionSystem
+    - ColorSystem
     - ExplosionSystem
-    values: 0101010101010101
+    - TimeTravellerSystem
+    - TimeMultiplierSystem
+    - DestroySystem
+    values: 01010101010101010101

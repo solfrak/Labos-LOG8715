@@ -94,13 +94,14 @@ public class ExplosionSystem : ISystem
 
     private void SpawnExplosionCircles(PhysicComponent physicComponent)
     {
-        int size = (int)Math.Ceiling(physicComponent.size / 4.0);
+        int size = Math.Max(1, (int)Math.Round(physicComponent.size / 4.0));
 
         //Calculate position and velocity for each circle to spawn
         for (int i = 0; i < 4; i++)
         {
-            //Change those value
-            Vector2 velocity = GetSpawnDirection(i) * physicComponent.velocity.sqrMagnitude;
+            // If velocity is 0.0, the circle is considered static
+            Vector2 velocity = GetSpawnDirection(i) * Mathf.Max(0.01f, physicComponent.velocity.sqrMagnitude);
+            Debug.Log(velocity);
             Vector2 position = physicComponent.position + GetSpawnDirection(i) * size;
 
             Utils.SpawnCircle(position, velocity, size, true);

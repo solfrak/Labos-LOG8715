@@ -15,9 +15,9 @@ public class RegisterSystems
         toRegister.Add(new ProtectionSystem(BaseEntityManager.Instance));
         toRegister.Add(new ColorSystem(BaseEntityManager.Instance));
         toRegister.Add(new ExplosionSystem(BaseEntityManager.Instance));
-        toRegister.Add(new DestroySystem(BaseEntityManager.Instance));
         toRegister.Add(new TimeTravellerSystem(BaseEntityManager.Instance));
         toRegister.Add(new TimeMultiplierSystem(BaseEntityManager.Instance));
+        toRegister.Add(new DestroySystem(BaseEntityManager.Instance));
 
         return toRegister;
     }

@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class ColorSystem : ISystem
 {
+    // pink
+    public static Color EXPLOSION_SPAWNED_COLOR = new Color(1.0f, 0.3f, 1.0f);
+    // orange
+    public static Color NEAR_EXPLOSION_COLOR = new Color(1.0f, 0.56f, 0.11f);
     public string Name {get; set;}
 
     public ColorSystem(IEntityManager entityManager)
@@ -33,6 +37,7 @@ public class ColorSystem : ISystem
             ColorComponent colorComponent = EntityManager.GetComponent<ColorComponent>(entity);
             PhysicComponent physicComponent = EntityManager.GetComponent<PhysicComponent>(entity);
             ProtectionComponent protectionComponent = EntityManager.GetComponent<ProtectionComponent>(entity);
+
             if (physicComponent.isStatic)
             {
                 colorComponent.color = Color.red;
@@ -56,7 +61,7 @@ public class ColorSystem : ISystem
             else if (physicComponent.size + 1 == ECSController.Instance.Config.explosionSize)
             {
                 // Orange
-                colorComponent.color = new Color(255, 165, 0);
+                colorComponent.color = NEAR_EXPLOSION_COLOR;
             }
             else if (collisionComponent.CollisionCount == 0)
             {
