@@ -94,7 +94,7 @@ public class ExplosionSystem : ISystem
 
     private void SpawnExplosionCircles(PhysicComponent physicComponent)
     {
-        int size = Math.Max(1, (int)Math.Round(physicComponent.size / 4.0));
+        int size = Math.Max(1, (int)Math.Floor(physicComponent.size / 4.0));
 
         //Calculate position and velocity for each circle to spawn
         for (int i = 0; i < 4; i++)
