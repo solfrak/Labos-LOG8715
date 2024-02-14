@@ -1,20 +1,21 @@
 using UnityEngine;
 public struct UnoptimisedStruct1
 {
-    public float velocity;
-    public bool canJump;
-    public int baseHP;
-    public int nbAllies;
-    public Vector3 position;
-    public int currentHp;
-    public float[] distancesFromObjectives;
-    public byte colorAlpha;
-    public double range;
-    public UnoptimizedStruct2 mainFriend;
-    public bool isVisible;
-    public UnoptimizedStruct2[] otherFriends;
-    public bool isStanding;
-    public float size;
+    public UnoptimizedStruct2 mainFriend; // 48
+    public Vector3 position;// 12
+    public double range;// 8
+    public UnoptimizedStruct2[] otherFriends;//8
+    public float[] distancesFromObjectives;// 8
+    public float velocity;// 4
+    public float size;// 4
+    public int baseHP;// 4
+    public int currentHp;// 4
+    public int nbAllies;// 4
+    public bool isVisible;// 1
+    public bool canJump;// 1
+    public bool isStanding;// 1
+    public byte colorAlpha;// 1
+    // sum: 108
     
     public UnoptimisedStruct1(float velocity, bool canJump, int baseHP, int nbAllies, Vector3 position, int currentHp, float[] distancesFromObjectives, byte colorAlpha, double range, UnoptimizedStruct2 mainFriend, bool isVisible, UnoptimizedStruct2[] otherFriends, bool isStanding, float size)
     {
@@ -46,16 +47,17 @@ public enum FriendState
 
 public struct UnoptimizedStruct2 
 {
-    public bool isAlive;
-    public float height;
-    public FriendState currentState;
-    public float velocity;
-    public int currentObjective;
-    public double maxSight;
-    public bool canJump;
-    public float acceleration;
-    public Vector3 position;
-    public float maxVelocity;
+    public Vector3 position;// 12
+    public double maxSight;// 8
+    public FriendState currentState;// 4
+    public float height;// 4
+    public float velocity;// 4
+    public float acceleration;// 4
+    public float maxVelocity;// 4
+    public int currentObjective;// 4
+    public bool isAlive;// 1
+    public bool canJump;// 1
+    // sum: 46+2 = 48
     
     public UnoptimizedStruct2(bool isAlive, float height, FriendState currentState, float velocity, int currentObjective, double maxSight, bool canJump, float acceleration, Vector3 position, float maxVelocity)
     {
