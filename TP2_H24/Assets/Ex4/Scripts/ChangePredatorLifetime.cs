@@ -1,32 +1,53 @@
-﻿using UnityEngine;
-
+﻿using Unity.Collections;
+using UnityEngine;
+using Unity.Jobs;
+using Unity.Entities.UniversalDelegates;
 public class ChangePredatorLifetime : MonoBehaviour
 {
     private Lifetime _lifetime;
-    
+    NativeArray<Vector3> firstPosition;
+    NativeArray<Vector3> secondPosition;
+
     public void Start()
     {
         _lifetime = GetComponent<Lifetime>();
+        firstPosition = new NativeArray<Vector3>(Ex4Spawner.PreyTransforms.Length, Allocator.Persistent);
+        secondPosition = new NativeArray<Vector3>(Ex4Spawner.PredatorTransforms.Length, Allocator.Persistent);
+
     }
 
     public void Update()
     {
         _lifetime.decreasingFactor = 1.0f;
-        foreach(var predator in Ex4Spawner.PredatorTransforms)
+        for (int i = 0; i < Ex4Spawner.PredatorTransforms.Length; i++)
         {
-            if (Vector3.Distance(predator.position, transform.position) < Ex4Config.TouchingDistance)
-            {
-                _lifetime.reproduced = true;
-                break;
-            }
+            secondPosition[i] = Ex4Spawner.PredatorTransforms[i].position;
         }
-        
-        foreach(var prey in Ex4Spawner.PreyTransforms)
+
+        for (int i = 0; i < Ex4Spawner.PreyTransforms.Length;i++)
         {
-            if (Vector3.Distance(prey.position, transform.position) < Ex4Config.TouchingDistance)
-            {
-                _lifetime.decreasingFactor /= 2;
-            }
+            firstPosition[i] = Ex4Spawner.PreyTransforms[i].position;
         }
+  
+        ReproduceJob reproduceJob = new ReproduceJob
+        {
+            reproduce = _lifetime.reproduced,
+            firstPosition = secondPosition,
+            stuffPosition = transform.position,
+        };
+
+
+        LifeTimeJob changeLifetime = new LifeTimeJob
+        {
+            decreasingFactor = _lifetime.decreasingFactor,
+            firstPosition = firstPosition,
+            stuffPosition = transform.position,
+            factor = 0.5f,
+        };
+        JobHandle jobHandleReproduce = reproduceJob.Schedule();
+        JobHandle jobHandle = changeLifetime.Schedule();
+        jobHandleReproduce.Complete();
+        jobHandle.Complete();
+
     }
 }

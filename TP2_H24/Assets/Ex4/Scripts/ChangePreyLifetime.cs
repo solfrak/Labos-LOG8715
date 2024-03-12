@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-
+using Unity.Jobs;
 public class ChangePreyLifetime : MonoBehaviour
 {
     private Lifetime _lifetime;

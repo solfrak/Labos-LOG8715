@@ -1,24 +1,34 @@
-﻿using UnityEngine;
-
+﻿using Unity.Collections;
+using UnityEngine;
+using Unity.Jobs;
 public class ChangePlantLifetime : MonoBehaviour
 {
     private Lifetime _lifetime;
-    
+    NativeArray<Vector3> firstPosition;
     public void Start()
     {
         _lifetime = GetComponent<Lifetime>();
+        firstPosition = new NativeArray<Vector3>(Ex4Spawner.PreyTransforms.Length, Allocator.Persistent);
     }
 
     public void Update()
     {
         _lifetime.decreasingFactor = 1.0f;
-        foreach(var prey in Ex4Spawner.PreyTransforms)
+        for (int i = 0 ; i < Ex4Spawner.PreyTransforms.Length;i++)
         {
-            if (Vector3.Distance(prey.position, transform.position) < Ex4Config.TouchingDistance)
-            {
-                _lifetime.decreasingFactor *= 2f;
-                break;
-            }
+            firstPosition[i] = Ex4Spawner.PreyTransforms[i].position;
         }
+
+        LifeTimeJob changeLifetime = new LifeTimeJob
+        {
+            decreasingFactor = _lifetime.decreasingFactor,
+            firstPosition = firstPosition,
+            stuffPosition = transform.position,
+            factor = 2f,
+        };
+    
+         JobHandle jobHandle = changeLifetime.Schedule();
+        
+        jobHandle.Complete();
     }
 }
