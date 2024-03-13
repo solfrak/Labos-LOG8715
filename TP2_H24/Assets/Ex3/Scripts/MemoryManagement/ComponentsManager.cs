@@ -1,14 +1,14 @@
-﻿#define BAD_PERF // TODO CHANGEZ MOI. Mettre en commentaire pour utiliser votre propre structure
+﻿//#define BAD_PERF // TODO CHANGEZ MOI. Mettre en commentaire pour utiliser votre propre structure
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 #if BAD_PERF
 using InnerType = System.Collections.Generic.Dictionary<uint, IComponent>;
 using AllComponents = System.Collections.Generic.Dictionary<uint, System.Collections.Generic.Dictionary<uint, IComponent>>;
 #else
-using InnerType = ...; // TODO CHANGEZ MOI, UTILISEZ VOTRE PROPRE TYPE ICI
-using AllComponents = ...; // TODO CHANGEZ MOI, UTILISEZ VOTRE PROPRE TYPE ICI
+using AllComponents = System.Collections.Generic.Dictionary<uint, System.Collections.Generic.List<IComponent>>; // TODO CHANGEZ MOI, UTILISEZ VOTRE PROPRE TYPE ICI
 #endif
 
 // Appeler GetHashCode sur un Type est couteux. Cette classe sert a precalculer le hashcode
@@ -39,6 +39,7 @@ public class Singleton<V> where V : new()
 internal class ComponentsManager : Singleton<ComponentsManager>
 {
     private AllComponents _allComponents = new AllComponents();
+    private List<ArchetypeCustom> archetypes = new List<ArchetypeCustom>();
 
     public const int maxEntities = 2000;
 
@@ -49,17 +50,9 @@ internal class ComponentsManager : Singleton<ComponentsManager>
         foreach (var type in allComponents)
         {
             toPrint += $"{type}: \n";
-#if !BAD_PERF
-            foreach (var component in type)
-#else
             foreach (var component in type.Value)
-#endif
             {
-#if BAD_PERF
-                toPrint += $"\t{component.Key}: {component.Value}\n";
-#else
                 toPrint += $"\t{component}: {component}\n";
-#endif
             }
             toPrint += "\n";
         }
@@ -69,27 +62,62 @@ internal class ComponentsManager : Singleton<ComponentsManager>
     // CRUD
     public void SetComponent<T>(EntityComponent entityID, IComponent component) where T : IComponent
     {
-        if (!_allComponents.ContainsKey(TypeRegistry<T>.typeID))
+        uint type = TypeRegistry<T>.typeID;
+        if (!_allComponents.ContainsKey(type))
         {
-            _allComponents[TypeRegistry<T>.typeID] = new InnerType();
+            _allComponents[type] = new List<IComponent>(maxEntities);
         }
-        _allComponents[TypeRegistry<T>.typeID][entityID] = component;
+        _allComponents[type][(int)entityID.id] = component;
+
+        UpdateArchetype(entityID, type);
+    }
+
+    public void UpdateArchetype(EntityComponent entity, uint sign, bool isRemove = false)
+    {
+        uint newSignature = 0;
+        foreach (var archetype in archetypes)
+        {
+            if (archetype.HasEntity(entity))
+            {
+                uint old_sign = archetype.GetSignature();
+                archetype.RemoveEntity(entity);
+                newSignature = isRemove ? old_sign + sign : old_sign - sign;
+            }
+
+            if(archetype.GetSignature() == newSignature)
+            {
+                archetype.AddEntity(entity);
+                return;
+            }
+        }
+
+        foreach (var archetype in archetypes)
+        {
+            if (archetype.GetSignature() == newSignature)
+            {
+                archetype.AddEntity(entity);
+                return;
+            }
+        }
     }
     public void RemoveComponent<T>(EntityComponent entityID) where T : IComponent
     {
-        _allComponents[TypeRegistry<T>.typeID].Remove(entityID);
+        uint type = TypeRegistry<T>.typeID;
+        _allComponents[type][(int)entityID.id] = null;
+
+        UpdateArchetype(entityID, type, true);
     }
     public T GetComponent<T>(EntityComponent entityID) where T : IComponent
     {
-        return (T)_allComponents[TypeRegistry<T>.typeID][entityID];
+        return (T)_allComponents[TypeRegistry<T>.typeID][(int)entityID.id];
     }
     public bool TryGetComponent<T>(EntityComponent entityID, out T component) where T : IComponent
     {
         if (_allComponents.ContainsKey(TypeRegistry<T>.typeID))
         {
-            if (_allComponents[TypeRegistry<T>.typeID].ContainsKey(entityID))
+            if (_allComponents[TypeRegistry<T>.typeID][(int)entityID.id] != null)
             {
-                component = (T)_allComponents[TypeRegistry<T>.typeID][entityID];
+                component = (T)_allComponents[TypeRegistry<T>.typeID][(int)entityID.id];
                 return true;
             }
         }
@@ -99,14 +127,14 @@ internal class ComponentsManager : Singleton<ComponentsManager>
 
     public bool EntityContains<T>(EntityComponent entity) where T : IComponent
     {
-        return _allComponents[TypeRegistry<T>.typeID].ContainsKey(entity);
+        return _allComponents[TypeRegistry<T>.typeID][(int)entity.id] != null;
     }
 
     public void ClearComponents<T>() where T : IComponent
     {
         if (!_allComponents.ContainsKey(TypeRegistry<T>.typeID))
         {
-            _allComponents.Add(TypeRegistry<T>.typeID, new InnerType());
+            _allComponents.Add(TypeRegistry<T>.typeID, new List<IComponent>(maxEntities));
         }
         else
         {
@@ -116,62 +144,67 @@ internal class ComponentsManager : Singleton<ComponentsManager>
 
     public void ForEach<T1>(Action<EntityComponent, T1> lambda) where T1 : IComponent
     {
-        var allEntities = _allComponents[TypeRegistry<EntityComponent>.typeID].Values;
-        foreach (EntityComponent entity in allEntities)
+        foreach(var archetype in archetypes)
         {
-            if (!_allComponents[TypeRegistry<T1>.typeID].ContainsKey(entity))
+            if(archetype.HasAll<T1>())
             {
-                continue;
+                foreach(var entity in archetype.GetEntities())
+                {
+                    var c1 = GetComponent<T1>(entity);
+                    lambda(entity, c1);
+                }
             }
-            lambda(entity, (T1)_allComponents[TypeRegistry<T1>.typeID][entity]);
         }
     }
 
     public void ForEach<T1, T2>(Action<EntityComponent, T1, T2> lambda) where T1 : IComponent where T2 : IComponent
     {
-        var allEntities = _allComponents[TypeRegistry<EntityComponent>.typeID].Values;
-        foreach (EntityComponent entity in allEntities)
+        foreach(var archetype in archetypes)
         {
-            if (!_allComponents[TypeRegistry<T1>.typeID].ContainsKey(entity) ||
-                !_allComponents[TypeRegistry<T2>.typeID].ContainsKey(entity)
-                )
+            if(archetype.HasAll<T1, T2>())
             {
-                continue;
+                foreach(var entity in archetype.GetEntities())
+                {
+                    var c1 = GetComponent<T1>(entity);
+                    var c2 = GetComponent<T2>(entity);
+                    lambda(entity, c1, c2);
+                }
             }
-            lambda(entity, (T1)_allComponents[TypeRegistry<T1>.typeID][entity], (T2)_allComponents[TypeRegistry<T2>.typeID][entity]);
         }
     }
 
     public void ForEach<T1, T2, T3>(Action<EntityComponent, T1, T2, T3> lambda) where T1 : IComponent where T2 : IComponent where T3 : IComponent
     {
-        var allEntities = _allComponents[TypeRegistry<EntityComponent>.typeID].Values;
-        foreach (EntityComponent entity in allEntities)
+        foreach(var archetype in archetypes)
         {
-            if (!_allComponents[TypeRegistry<T1>.typeID].ContainsKey(entity) ||
-                !_allComponents[TypeRegistry<T2>.typeID].ContainsKey(entity) ||
-                !_allComponents[TypeRegistry<T3>.typeID].ContainsKey(entity)
-                )
+            if(archetype.HasAll<T1, T2, T3>())
             {
-                continue;
+                foreach(var entity in archetype.GetEntities())
+                {
+                    var c1 = GetComponent<T1>(entity);
+                    var c2 = GetComponent<T2>(entity);
+                    var c3 = GetComponent<T3>(entity);
+                    lambda(entity, c1, c2, c3);
+                }
             }
-            lambda(entity, (T1)_allComponents[TypeRegistry<T1>.typeID][entity], (T2)_allComponents[TypeRegistry<T2>.typeID][entity], (T3)_allComponents[TypeRegistry<T3>.typeID][entity]);
         }
     }
 
     public void ForEach<T1, T2, T3, T4>(Action<EntityComponent, T1, T2, T3, T4> lambda) where T1 : IComponent where T2 : IComponent where T3 : IComponent where T4 : IComponent
     {
-        var allEntities = _allComponents[TypeRegistry<EntityComponent>.typeID].Values;
-        foreach (EntityComponent entity in allEntities)
+        foreach(var archetype in archetypes)
         {
-            if (!_allComponents[TypeRegistry<T1>.typeID].ContainsKey(entity) ||
-                !_allComponents[TypeRegistry<T2>.typeID].ContainsKey(entity) ||
-                !_allComponents[TypeRegistry<T3>.typeID].ContainsKey(entity) ||
-                !_allComponents[TypeRegistry<T4>.typeID].ContainsKey(entity)
-                )
+            if(archetype.HasAll<T1, T2, T3, T4>())
             {
-                continue;
+                foreach(var entity in archetype.GetEntities())
+                {
+                    var c1 = GetComponent<T1>(entity);
+                    var c2 = GetComponent<T2>(entity);
+                    var c3 = GetComponent<T3>(entity);
+                    var c4 = GetComponent<T4>(entity);
+                    lambda(entity, c1, c2, c3, c4);
+                }
             }
-            lambda(entity, (T1)_allComponents[TypeRegistry<T1>.typeID][entity], (T2)_allComponents[TypeRegistry<T2>.typeID][entity], (T3)_allComponents[TypeRegistry<T3>.typeID][entity], (T4)_allComponents[TypeRegistry<T4>.typeID][entity]);
         }
     }
 
