@@ -41,9 +41,11 @@ public class Singleton<V> where V : new()
 internal class ComponentsManager : Singleton<ComponentsManager>
 {
     private AllComponents _allComponents = new AllComponents();
-    private List<ArchetypeCustom> _archetypes = new List<ArchetypeCustom>();
-    private Dictionary<EntityComponent, int> _archetypeIndexer = new Dictionary<EntityComponent, int>();
-    // private HashSet<ArchetypeCustom> archetypeCustoms = new HashSet<ArchetypeCustom>();
+    // private List<ArchetypeCustom> _archetypes = new List<ArchetypeCustom>();
+    // private HashSet<ArchetypeCustom> _archetypes = new HashSet<ArchetypeCustom>();
+    private Dictionary<uint, ArchetypeCustom> _archetypes = new Dictionary<uint, ArchetypeCustom>();
+    private Dictionary<EntityComponent, uint> _archetypeIndexer = new Dictionary<EntityComponent, uint>();
+
 
     public const int maxEntities = 2000;
 
@@ -85,78 +87,116 @@ internal class ComponentsManager : Singleton<ComponentsManager>
         Profiler.BeginSample("UpdateArchetype");
         //TODO If the archetype exist, remove entity from old archetype and add entity to new archetype
         //TODO If the archetyep does not exist? What can we do
-        uint newSignature = 0;
-        HashSet<uint> components = new HashSet<uint>();
 
-        int last_index = 0;
         bool removeArchetype = false;
 
+        uint old_signature = 0;
+        uint new_signature = 0;
         /*
          * TODO instead of doing a for loop to find where the archetype of the entity is, use a map to know directly the archetype
          * Use a set instead of a list to hold the Archetypes. Use the Signature as the hash. Doing it this way, we could skip all
          * the for loop and just add and remove the entity to the appropriate archetype.
          */
 
-        for(int i = 0; i < _archetypes.Count; i++)
+        if (_archetypeIndexer.ContainsKey(entity))
         {
-            var archetype = _archetypes[i];
-            if(archetype.HasEntity(entity))
+            //We know what archetype the entity currently belong
+            //Remove the entity from the currenty archetype
+            old_signature = _archetypeIndexer[entity];
+            _archetypes[old_signature].RemoveEntity(entity);
+            if(_archetypes[old_signature].Count() == 0)
             {
-                last_index = i;
-                uint old_sign = archetype.GetSignature();
-                components = archetype.GetComponentType();
-                archetype.RemoveEntity(entity);
-                if(archetype.Count() == 0)
-                {
-                    removeArchetype = true;
-                }
-                newSignature = isRemove ? old_sign - sign : old_sign + sign;
+                removeArchetype = true;
             }
 
-            if(archetype.GetSignature() == newSignature)
+
+            //Add the entity to the new archetype
+            new_signature = isRemove ? old_signature - sign : old_signature + sign;
+            if(_archetypes.ContainsKey(new_signature))
             {
-                archetype.AddEntity(entity);
-                goto cleanup;
+                //We already have the new Archetype
+                _archetypeIndexer[entity] = new_signature;
+                _archetypes[new_signature].AddEntity(entity);
+            }
+            else
+            {
+                //Create the new archetype
+                goto createArchetype;
+            }
+        }
+        else 
+        {
+            //We don't know what archetype the entity currently belong
+            //Must be a new entity then
+            new_signature = sign;
+            if(_archetypes.ContainsKey(new_signature))
+            {
+                _archetypeIndexer[entity] = new_signature;
+                _archetypes[new_signature].AddEntity(entity);
+            }
+            else
+            {
+                //Create the new archetype
+                goto createArchetype;
             }
         }
 
+        goto cleanup;
 
-        //We missed the new archetype in the first pass
-        for(int i = 0; i < last_index; i++)
+    createArchetype:
+        ArchetypeCustom archetypeCustom = new ArchetypeCustom(new_signature);
+        var list = new HashSet<uint>();
+        if (_archetypes.ContainsKey(old_signature))
         {
-            var archetype = _archetypes[i];
-
-            if(archetype.GetSignature() == newSignature)
-            {
-                archetype.AddEntity(entity);
-                goto cleanup;
-            }
+            ArchetypeCustom old_archetype = _archetypes[old_signature];
+            list = old_archetype.GetComponentType();
         }
+
+        if (isRemove)
+        {
+            list.Remove(sign);
+        }
+        else
+        {
+            list.Add(sign);
+        }
+
+        archetypeCustom.SetComponentType(list);
+        _archetypeIndexer[entity] = new_signature;
+        archetypeCustom.AddEntity(entity);
+        _archetypes.Add(new_signature, archetypeCustom);
+
+    cleanup:
+        if (removeArchetype)
+        {
+            _archetypes.Remove(old_signature);
+        }
+
 
         //No archetype exist yet
-        if(newSignature == 0)
-        {
-            newSignature = sign;
-        }
-        ArchetypeCustom archetypeCustom = new ArchetypeCustom(newSignature);
-        archetypeCustom.AddEntity(entity);
-        if(isRemove)
-        {
-            components.Remove(sign);
-        }
+        // if (newSignature == 0)
+        // {
+        //     newSignature = sign;
+        // }
+        // ArchetypeCustom archetypeCustom = new ArchetypeCustom(newSignature);
+        // archetypeCustom.AddEntity(entity);
+        // if(isRemove)
+        // {
+        //     components.Remove(sign);
+        // }
 
-        else {
-            components.Add(sign);
-        }
+        // else {
+        //     components.Add(sign);
+        // }
 
-        archetypeCustom.SetComponentType(components);
-        _archetypes.Add(archetypeCustom);
+        // archetypeCustom.SetComponentType(components);
+        // _archetypes.Add(archetypeCustom);
 
-        cleanup:
-            if(removeArchetype)
-            {
-                _archetypes.RemoveAt(last_index);
-            }
+        // cleanup:
+        //     if(removeArchetype)
+        //     {
+        //         //TODO remove unused archetype
+        //     }
 
 
         Profiler.EndSample();
@@ -207,13 +247,13 @@ internal class ComponentsManager : Singleton<ComponentsManager>
         //     }
         // }
         Profiler.BeginSample("ClearComponent");
-        List<ArchetypeCustom> archetypeCustoms = new List<ArchetypeCustom>(_archetypes);
+        var archetypeCustoms = new Dictionary<uint, ArchetypeCustom>(_archetypes);
 
         foreach(var archetype in archetypeCustoms)
         {
-            if(archetype.HasAll<T>())
+            if(archetype.Value.HasAll<T>())
             {
-                foreach(var entity in archetype.GetEntities())
+                foreach(var entity in archetype.Value.GetEntities())
                 {
                     RemoveComponent<T>(entity);
                 }
@@ -224,8 +264,8 @@ internal class ComponentsManager : Singleton<ComponentsManager>
 
     public void ForEach<T1>(Action<EntityComponent, T1> lambda) where T1 : IComponent
     {
-        var archetypes = new List<ArchetypeCustom>(_archetypes);
-        foreach(var archetype in archetypes)
+        var archetypes = new Dictionary<uint, ArchetypeCustom>(_archetypes); 
+        foreach(var archetype in archetypes.Values)
         {
             if(archetype.HasAll<T1>())
             {
@@ -240,8 +280,8 @@ internal class ComponentsManager : Singleton<ComponentsManager>
 
     public void ForEach<T1, T2>(Action<EntityComponent, T1, T2> lambda) where T1 : IComponent where T2 : IComponent
     {
-        var archetypes = new List<ArchetypeCustom>(_archetypes);
-        foreach(var archetype in archetypes)
+        var archetypes = new Dictionary<uint, ArchetypeCustom>(_archetypes); 
+        foreach(var archetype in archetypes.Values)
         {
             if(archetype.HasAll<T1, T2>())
             {
@@ -257,8 +297,8 @@ internal class ComponentsManager : Singleton<ComponentsManager>
 
     public void ForEach<T1, T2, T3>(Action<EntityComponent, T1, T2, T3> lambda) where T1 : IComponent where T2 : IComponent where T3 : IComponent
     {
-        var archetypes = new List<ArchetypeCustom>(_archetypes);
-        foreach(var archetype in archetypes)
+        var archetypes = new Dictionary<uint, ArchetypeCustom>(_archetypes); 
+        foreach(var archetype in archetypes.Values)
         {
             if(archetype.HasAll<T1, T2, T3>())
             {
@@ -275,8 +315,8 @@ internal class ComponentsManager : Singleton<ComponentsManager>
 
     public void ForEach<T1, T2, T3, T4>(Action<EntityComponent, T1, T2, T3, T4> lambda) where T1 : IComponent where T2 : IComponent where T3 : IComponent where T4 : IComponent
     {
-        var archetypes = new List<ArchetypeCustom>(_archetypes);
-        foreach(var archetype in archetypes)
+        var archetypes = new Dictionary<uint, ArchetypeCustom>(_archetypes); 
+        foreach(var archetype in archetypes.Values)
         {
             if(archetype.HasAll<T1, T2, T3, T4>())
             {

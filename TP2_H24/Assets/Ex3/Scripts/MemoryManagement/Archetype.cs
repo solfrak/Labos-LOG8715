@@ -1,8 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ArchetypeCustom
+public class ArchetypeCustom : IEquatable<ArchetypeCustom>
 {
     private List<EntityComponent> _entities = new List<EntityComponent>();
     private HashSet<uint> _componentType = new HashSet<uint>();
@@ -99,5 +100,13 @@ public class ArchetypeCustom
         else return false;
     }
 
+    public bool Equals(ArchetypeCustom other)
+    {
+        return other != null && _signature == other._signature;
+    }
 
+    public override int GetHashCode()
+    {
+        return _signature.GetHashCode();
+    }
 }
