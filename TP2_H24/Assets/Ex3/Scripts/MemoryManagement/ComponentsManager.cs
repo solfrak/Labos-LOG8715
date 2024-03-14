@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 #if BAD_PERF
@@ -39,7 +40,8 @@ public class Singleton<V> where V : new()
 internal class ComponentsManager : Singleton<ComponentsManager>
 {
     private AllComponents _allComponents = new AllComponents();
-    private List<ArchetypeCustom> archetypes = new List<ArchetypeCustom>();
+    private List<ArchetypeCustom> _archetypes = new List<ArchetypeCustom>();
+    // private HashSet<ArchetypeCustom> archetypeCustoms = new HashSet<ArchetypeCustom>();
 
     public const int maxEntities = 2000;
 
@@ -63,42 +65,89 @@ internal class ComponentsManager : Singleton<ComponentsManager>
     public void SetComponent<T>(EntityComponent entityID, IComponent component) where T : IComponent
     {
         uint type = TypeRegistry<T>.typeID;
-        if (!_allComponents.ContainsKey(type))
+        if (!_allComponents.ContainsKey(type) || _allComponents[type].Count == 0)
         {
-            _allComponents[type] = new List<IComponent>(maxEntities);
+            _allComponents[type] = new List<IComponent>(Enumerable.Repeat<IComponent>(null, maxEntities));
+        }
+        if(_allComponents[type][(int)entityID.id] == null)
+        {
+            UpdateArchetype(entityID, type);
         }
         _allComponents[type][(int)entityID.id] = component;
 
-        UpdateArchetype(entityID, type);
     }
 
     public void UpdateArchetype(EntityComponent entity, uint sign, bool isRemove = false)
     {
+        //TODO If the archetype exist, remove entity from old archetype and add entity to new archetype
+        //TODO If the archetyep does not exist? What can we do
         uint newSignature = 0;
-        foreach (var archetype in archetypes)
+        HashSet<uint> components = new HashSet<uint>();
+
+        int last_index = 0;
+        bool removeArchetype = false;
+        for(int i = 0; i < _archetypes.Count; i++)
         {
-            if (archetype.HasEntity(entity))
+            var archetype = _archetypes[i];
+            if(archetype.HasEntity(entity))
             {
+                last_index = i;
                 uint old_sign = archetype.GetSignature();
+                components = archetype.GetComponentType();
                 archetype.RemoveEntity(entity);
-                newSignature = isRemove ? old_sign + sign : old_sign - sign;
+                if(archetype.Count() == 0)
+                {
+                    removeArchetype = true;
+                }
+                newSignature = isRemove ? old_sign - sign : old_sign + sign;
             }
 
             if(archetype.GetSignature() == newSignature)
             {
                 archetype.AddEntity(entity);
-                return;
+                goto cleanup;
             }
         }
 
-        foreach (var archetype in archetypes)
+
+        //We missed the new archetype in the first pass
+        for(int i = 0; i < last_index; i++)
         {
-            if (archetype.GetSignature() == newSignature)
+            var archetype = _archetypes[i];
+
+            if(archetype.GetSignature() == newSignature)
             {
                 archetype.AddEntity(entity);
-                return;
+                goto cleanup;
             }
         }
+
+        //No archetype exist yet
+        if(newSignature == 0)
+        {
+            newSignature = sign;
+        }
+        ArchetypeCustom archetypeCustom = new ArchetypeCustom(newSignature);
+        archetypeCustom.AddEntity(entity);
+        if(isRemove)
+        {
+            components.Remove(sign);
+        }
+
+        else {
+            components.Add(sign);
+        }
+
+        archetypeCustom.SetComponentType(components);
+        _archetypes.Add(archetypeCustom);
+
+        cleanup:
+            if(removeArchetype)
+            {
+                _archetypes.RemoveAt(last_index);
+            }
+
+
     }
     public void RemoveComponent<T>(EntityComponent entityID) where T : IComponent
     {
@@ -109,7 +158,8 @@ internal class ComponentsManager : Singleton<ComponentsManager>
     }
     public T GetComponent<T>(EntityComponent entityID) where T : IComponent
     {
-        return (T)_allComponents[TypeRegistry<T>.typeID][(int)entityID.id];
+        uint type = TypeRegistry<T>.typeID;
+        return (T)_allComponents[type][(int)entityID.id];
     }
     public bool TryGetComponent<T>(EntityComponent entityID, out T component) where T : IComponent
     {
@@ -132,18 +182,36 @@ internal class ComponentsManager : Singleton<ComponentsManager>
 
     public void ClearComponents<T>() where T : IComponent
     {
-        if (!_allComponents.ContainsKey(TypeRegistry<T>.typeID))
+        // if (!_allComponents.ContainsKey(TypeRegistry<T>.typeID))
+        // {
+        //     _allComponents.Add(TypeRegistry<T>.typeID, new List<IComponent>(Enumerable.Repeat<IComponent>(null, maxEntities)));
+        // }
+        // else
+        // {
+        //     uint type = TypeRegistry<T>.typeID;
+        //     for(int i = 0; i < maxEntities; i++)
+        //     {
+        //         _allComponents[type][i] = null;
+        //     }
+        // }
+
+        List<ArchetypeCustom> archetypeCustoms = new List<ArchetypeCustom>(_archetypes);
+
+        foreach(var archetype in archetypeCustoms)
         {
-            _allComponents.Add(TypeRegistry<T>.typeID, new List<IComponent>(maxEntities));
-        }
-        else
-        {
-            _allComponents[TypeRegistry<T>.typeID].Clear();
+            if(archetype.HasAll<T>())
+            {
+                foreach(var entity in archetype.GetEntities())
+                {
+                    RemoveComponent<T>(entity);
+                }
+            }
         }
     }
 
     public void ForEach<T1>(Action<EntityComponent, T1> lambda) where T1 : IComponent
     {
+        var archetypes = new List<ArchetypeCustom>(_archetypes);
         foreach(var archetype in archetypes)
         {
             if(archetype.HasAll<T1>())
@@ -159,6 +227,7 @@ internal class ComponentsManager : Singleton<ComponentsManager>
 
     public void ForEach<T1, T2>(Action<EntityComponent, T1, T2> lambda) where T1 : IComponent where T2 : IComponent
     {
+        var archetypes = new List<ArchetypeCustom>(_archetypes);
         foreach(var archetype in archetypes)
         {
             if(archetype.HasAll<T1, T2>())
@@ -175,6 +244,7 @@ internal class ComponentsManager : Singleton<ComponentsManager>
 
     public void ForEach<T1, T2, T3>(Action<EntityComponent, T1, T2, T3> lambda) where T1 : IComponent where T2 : IComponent where T3 : IComponent
     {
+        var archetypes = new List<ArchetypeCustom>(_archetypes);
         foreach(var archetype in archetypes)
         {
             if(archetype.HasAll<T1, T2, T3>())
@@ -192,6 +262,7 @@ internal class ComponentsManager : Singleton<ComponentsManager>
 
     public void ForEach<T1, T2, T3, T4>(Action<EntityComponent, T1, T2, T3, T4> lambda) where T1 : IComponent where T2 : IComponent where T3 : IComponent where T4 : IComponent
     {
+        var archetypes = new List<ArchetypeCustom>(_archetypes);
         foreach(var archetype in archetypes)
         {
             if(archetype.HasAll<T1, T2, T3, T4>())

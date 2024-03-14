@@ -4,17 +4,32 @@ using UnityEngine;
 
 public class ArchetypeCustom
 {
-    private List<EntityComponent> _entities;
-    private List<uint> _componentType;
+    private List<EntityComponent> _entities = new List<EntityComponent>();
+    private HashSet<uint> _componentType = new HashSet<uint>();
     private uint _signature = 0;
    
     public ArchetypeCustom(uint signature)
     {
         _signature = signature;
     }
+
+    public int Count()
+    {
+        return _entities.Count;
+    }
     public List<EntityComponent> GetEntities()
     {
-        return _entities;
+        return new List<EntityComponent>(_entities);
+    }
+
+    public void SetComponentType(HashSet<uint> components)
+    {
+        _componentType = components;
+    }
+
+    public HashSet<uint> GetComponentType()
+    {
+        return new HashSet<uint>(_componentType);
     }
 
     public uint GetSignature()
