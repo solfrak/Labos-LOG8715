@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 #if BAD_PERF
 using InnerType = System.Collections.Generic.Dictionary<uint, IComponent>;
@@ -41,6 +42,7 @@ internal class ComponentsManager : Singleton<ComponentsManager>
 {
     private AllComponents _allComponents = new AllComponents();
     private List<ArchetypeCustom> _archetypes = new List<ArchetypeCustom>();
+    private Dictionary<EntityComponent, int> _archetypeIndexer = new Dictionary<EntityComponent, int>();
     // private HashSet<ArchetypeCustom> archetypeCustoms = new HashSet<ArchetypeCustom>();
 
     public const int maxEntities = 2000;
@@ -64,6 +66,7 @@ internal class ComponentsManager : Singleton<ComponentsManager>
     // CRUD
     public void SetComponent<T>(EntityComponent entityID, IComponent component) where T : IComponent
     {
+        Profiler.BeginSample("SetComponent");
         uint type = TypeRegistry<T>.typeID;
         if (!_allComponents.ContainsKey(type) || _allComponents[type].Count == 0)
         {
@@ -74,11 +77,12 @@ internal class ComponentsManager : Singleton<ComponentsManager>
             UpdateArchetype(entityID, type);
         }
         _allComponents[type][(int)entityID.id] = component;
-
+        Profiler.EndSample();
     }
 
     public void UpdateArchetype(EntityComponent entity, uint sign, bool isRemove = false)
     {
+        Profiler.BeginSample("UpdateArchetype");
         //TODO If the archetype exist, remove entity from old archetype and add entity to new archetype
         //TODO If the archetyep does not exist? What can we do
         uint newSignature = 0;
@@ -86,6 +90,13 @@ internal class ComponentsManager : Singleton<ComponentsManager>
 
         int last_index = 0;
         bool removeArchetype = false;
+
+        /*
+         * TODO instead of doing a for loop to find where the archetype of the entity is, use a map to know directly the archetype
+         * Use a set instead of a list to hold the Archetypes. Use the Signature as the hash. Doing it this way, we could skip all
+         * the for loop and just add and remove the entity to the appropriate archetype.
+         */
+
         for(int i = 0; i < _archetypes.Count; i++)
         {
             var archetype = _archetypes[i];
@@ -148,6 +159,7 @@ internal class ComponentsManager : Singleton<ComponentsManager>
             }
 
 
+        Profiler.EndSample();
     }
     public void RemoveComponent<T>(EntityComponent entityID) where T : IComponent
     {
@@ -194,7 +206,7 @@ internal class ComponentsManager : Singleton<ComponentsManager>
         //         _allComponents[type][i] = null;
         //     }
         // }
-
+        Profiler.BeginSample("ClearComponent");
         List<ArchetypeCustom> archetypeCustoms = new List<ArchetypeCustom>(_archetypes);
 
         foreach(var archetype in archetypeCustoms)
@@ -207,6 +219,7 @@ internal class ComponentsManager : Singleton<ComponentsManager>
                 }
             }
         }
+        Profiler.EndSample();
     }
 
     public void ForEach<T1>(Action<EntityComponent, T1> lambda) where T1 : IComponent
