@@ -2,7 +2,6 @@
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
-using UnityEditorInternal.VR;
 using UnityEngine;
 
 struct JobReproduce : IJobParallelFor

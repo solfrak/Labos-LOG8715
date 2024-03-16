@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.UIElements;
 using Unity.Collections;
 using Unity.Jobs;
+using UnityEngine.Profiling;
 
 public class Ex4Spawner : MonoBehaviour
 {
@@ -52,6 +53,7 @@ public class Ex4Spawner : MonoBehaviour
         predatorPositions = new NativeArray<Vector3>(PredatorTransforms.Length, Allocator.Persistent);
         preyPositions = new NativeArray<Vector3>(PreyTransforms.Length, Allocator.Persistent);
 
+        //TODO make those 3 for loop parallel
         for (int i = 0; i < PlantTransforms.Length; i++)
         {
             plantPositions[i] = PlantTransforms[i].position;
@@ -111,12 +113,19 @@ public class Ex4Spawner : MonoBehaviour
 
         preyReproduced = new NativeArray<bool>(PreyLifetimes.Length, Allocator.Persistent);
         predatorReproduced = new NativeArray<bool>(PredatorLifetimes.Length, Allocator.Persistent);
+        Profiler.BeginSample("GetPosition");
         GetPositions();
+        Profiler.EndSample();
         //MovePredatorToPrey().Complete();
         //MovePreyToPlant().Complete();
 
+        Profiler.BeginSample("MoveJobs");
         MoveJobs();
+        Profiler.EndSample();
+        Profiler.BeginSample("UpdateLifetime");
         UpdateLifeTimes();
+        Profiler.EndSample();
+        
 
         //getPlantLifeTimeJobHandle().Complete();
         //getPreyLifeTimeJobHandle().Complete();
