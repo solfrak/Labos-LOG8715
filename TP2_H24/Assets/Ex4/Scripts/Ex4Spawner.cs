@@ -47,9 +47,9 @@ public class Ex4Spawner : MonoBehaviour
     }
     void GetPositions()
     {
-        plantPositions = new NativeArray<Vector3>(PlantTransforms.Length, Allocator.Persistent);
-        predatorPositions = new NativeArray<Vector3>(PredatorTransforms.Length, Allocator.Persistent);
-        preyPositions = new NativeArray<Vector3>(PreyTransforms.Length, Allocator.Persistent);
+        plantPositions = new NativeArray<Vector3>(PlantTransforms.Length, Allocator.TempJob);
+        predatorPositions = new NativeArray<Vector3>(PredatorTransforms.Length, Allocator.TempJob);
+        preyPositions = new NativeArray<Vector3>(PreyTransforms.Length, Allocator.TempJob);
 
         //TODO make those 3 for loop parallel
         for (int i = 0; i < PlantTransforms.Length; i++)
@@ -102,15 +102,16 @@ public class Ex4Spawner : MonoBehaviour
 
     private void Update()
     {
-        preyVelocities = new NativeArray<Vector3>(PreyTransforms.Length, Allocator.Persistent);
-        predatorVelocities = new NativeArray<Vector3>(PredatorTransforms.Length, Allocator.Persistent);
+        preyVelocities = new NativeArray<Vector3>(PreyTransforms.Length, Allocator.TempJob);
+        predatorVelocities = new NativeArray<Vector3>(PredatorTransforms.Length, Allocator.TempJob);
 
-        preyDecreasingFactors = new NativeArray<float>(PreyLifetimes.Length, Allocator.Persistent);
-        predatorDecreasingFactors = new NativeArray<float>(PredatorLifetimes.Length, Allocator.Persistent);
-        plantDecreasingFactors = new NativeArray<float>(PlantLifetimes.Length, Allocator.Persistent);
+        preyDecreasingFactors = new NativeArray<float>(PreyLifetimes.Length, Allocator.TempJob);
+        predatorDecreasingFactors = new NativeArray<float>(PredatorLifetimes.Length, Allocator.TempJob);
+        plantDecreasingFactors = new NativeArray<float>(PlantLifetimes.Length, Allocator.TempJob);
 
-        preyReproduced = new NativeArray<bool>(PreyLifetimes.Length, Allocator.Persistent);
-        predatorReproduced = new NativeArray<bool>(PredatorLifetimes.Length, Allocator.Persistent);
+        preyReproduced = new NativeArray<bool>(PreyLifetimes.Length, Allocator.TempJob);
+        predatorReproduced = new NativeArray<bool>(PredatorLifetimes.Length, Allocator.TempJob);
+
         Profiler.BeginSample("GetPosition");
         GetPositions();
         Profiler.EndSample();
@@ -122,6 +123,21 @@ public class Ex4Spawner : MonoBehaviour
         UpdateLifeTimes();
         Profiler.EndSample();
 
+        plantPositions.Dispose();
+        predatorPositions.Dispose();
+        preyPositions.Dispose();
+        Destroy();
+    }
+
+    private void Destroy()
+    {
+        preyVelocities.Dispose();
+        predatorVelocities.Dispose();
+        preyDecreasingFactors.Dispose();
+        predatorDecreasingFactors.Dispose();
+        plantDecreasingFactors.Dispose();
+        preyReproduced.Dispose();
+        predatorReproduced.Dispose();
     }
 
     private void UpdateLifeTimes()
