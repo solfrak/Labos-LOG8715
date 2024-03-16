@@ -104,18 +104,37 @@ public class Ex4Spawner : MonoBehaviour
     {
         preyVelocities = new NativeArray<Vector3>(PreyTransforms.Length, Allocator.Persistent);
         predatorVelocities = new NativeArray<Vector3>(PredatorTransforms.Length, Allocator.Persistent);
+
         preyDecreasingFactors = new NativeArray<float>(PreyLifetimes.Length, Allocator.Persistent);
         predatorDecreasingFactors = new NativeArray<float>(PredatorLifetimes.Length, Allocator.Persistent);
+        plantDecreasingFactors = new NativeArray<float>(PlantLifetimes.Length, Allocator.Persistent);
+
         preyReproduced = new NativeArray<bool>(PreyLifetimes.Length, Allocator.Persistent);
         predatorReproduced = new NativeArray<bool>(PredatorLifetimes.Length, Allocator.Persistent);
-        plantDecreasingFactors = new NativeArray<float>(PlantLifetimes.Length, Allocator.Persistent);
         GetPositions();
-        //MovePredatorToPrey();
-        //MovePreyToPlant();
+        //MovePredatorToPrey().Complete();
+        //MovePreyToPlant().Complete();
+
         MoveJobs();
-        getPlantLifeTimeJobHandle();
-        getPreyLifeTimeJobHandle();
-        getPredatorLifeTimeJobHandle();
+        UpdateLifeTimes();
+
+        //getPlantLifeTimeJobHandle().Complete();
+        //getPreyLifeTimeJobHandle().Complete();
+        //getPredatorLifeTimeJobHandle().Complete();
+        //for (int i = 0; i < PlantLifetimes.Length; i++)
+        //{
+        //    PlantLifetimes[i].decreasingFactor = plantDecreasingFactors[i];
+        //}
+        //for (int i = 0; i < PreyLifetimes.Length; i++)
+        //{
+        //    PreyLifetimes[i].decreasingFactor = preyDecreasingFactors[i];
+        //    PreyLifetimes[i].reproduced = preyReproduced[i];
+        //}
+        //for (int i = 0; i < PredatorLifetimes.Length; i++)
+        //{
+        //    PredatorLifetimes[i].decreasingFactor = predatorDecreasingFactors[i];
+        //    PredatorLifetimes[i].reproduced = predatorReproduced[i];
+        //}
         //predatorPositions.Dispose();
         //preyPositions.Dispose();
         //plantPositions.Dispose();
@@ -125,7 +144,6 @@ public class Ex4Spawner : MonoBehaviour
         //predatorDecreasingFactors.Dispose();
         //preyReproduced.Dispose();
         //predatorReproduced.Dispose();
-
 
     }
 
@@ -158,20 +176,19 @@ public class Ex4Spawner : MonoBehaviour
             plantDecreasingFactors[i] = PlantLifetimes[i].decreasingFactor;
         }
 
-
         JobPlantLifeTime plantLifeTimeJob = new JobPlantLifeTime
         {
             preyPositions = preyPositions,
             plantPositions = plantPositions,
             decreasingFactors = plantDecreasingFactors
         };
+
         JobHandle jobHandle = plantLifeTimeJob.Schedule(PlantLifetimes.Length, 60);
         return jobHandle;
     }
 
     private JobHandle getPreyLifeTimeJobHandle()
     {
-
         for (int i = 0; i < PreyLifetimes.Length; i++)
         {
             preyDecreasingFactors[i] = PreyLifetimes[i].decreasingFactor;
@@ -186,6 +203,7 @@ public class Ex4Spawner : MonoBehaviour
             decreasingFactors = preyDecreasingFactors,
             reproduced = preyReproduced,
         };
+
         JobHandle jobHandle = preyLifeTimeJob.Schedule(PreyLifetimes.Length, 60);
         return jobHandle;
 
@@ -215,8 +233,6 @@ public class Ex4Spawner : MonoBehaviour
 
     private JobHandle MovePredatorToPrey()
     {
-        //NativeArray<Vector3> velocities = new NativeArray<Vector3>(PredatorTransforms.Length, Allocator.TempJob);
-
         MoveJob moveJob = new MoveJob
         {
             goToPositions = preyPositions,
@@ -225,15 +241,7 @@ public class Ex4Spawner : MonoBehaviour
             speed = Ex4Config.PredatorSpeed,
         };
         JobHandle jobHandle = moveJob.Schedule(PredatorTransforms.Length, 60);
-        //jobHandle.Complete();
         return jobHandle;
-        //for (int i = 0; i < PredatorTransforms.Length; i++)
-        //{
-        //    PredatorTransforms[i].localPosition += velocities[i] * Time.deltaTime;
-        //}
-
-        //velocities.Dispose();
-
     }
     private JobHandle MovePreyToPlant()
     {
@@ -246,14 +254,6 @@ public class Ex4Spawner : MonoBehaviour
         };
         JobHandle jobHandle = moveJob.Schedule(PreyTransforms.Length, 60);
         return jobHandle;
-        /*
-        jobHandle.Complete();
-        for (int i = 0; i < PreyTransforms.Length; i++)
-        {
-            PreyTransforms[i].localPosition += preyVelocities[i] * Time.deltaTime;
-        }
-        preyVelocities.Dispose();
-        */
     }
     private void MoveJobs()
     {
@@ -263,9 +263,6 @@ public class Ex4Spawner : MonoBehaviour
         for (int i = 0; i < PreyTransforms.Length; i++)
         {
             PreyTransforms[i].localPosition += preyVelocities[i] * Time.deltaTime;
-        }
-        for (int i = 0; i < PreyLifetimes.Length; i++)
-        {
             PreyLifetimes[i].decreasingFactor = preyDecreasingFactors[i];
             PreyLifetimes[i].reproduced = preyReproduced[i];
         }
@@ -274,9 +271,6 @@ public class Ex4Spawner : MonoBehaviour
         for (int i = 0; i < PredatorTransforms.Length; i++)
         {
             PredatorTransforms[i].localPosition += predatorVelocities[i] * Time.deltaTime;
-        }
-        for (int i = 0; i < PredatorLifetimes.Length; i++)
-        {
             PredatorLifetimes[i].decreasingFactor = predatorDecreasingFactors[i];
             PredatorLifetimes[i].reproduced = predatorReproduced[i];
         }

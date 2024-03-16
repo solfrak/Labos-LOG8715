@@ -18,18 +18,25 @@ public struct JobPredatorLifeTime : IJobParallelFor
     public void Execute(int index)
     {
         decreasingFactors[index] = 1.0f;
+        Vector3 predatorPosition = predatorPositions[index];
+        float touchingDistanceSq = Ex4Config.TouchingDistance * Ex4Config.TouchingDistance;
+
         for (int i = 0; i < predatorPositions.Length; i++)
         {
-            if (Vector3.Distance(predatorPositions[i], predatorPositions[index]) < Ex4Config.TouchingDistance)
+            if (i == index) continue; // Skip self
+
+            float distanceSq = (predatorPositions[i] - predatorPosition).sqrMagnitude;
+            if (distanceSq < touchingDistanceSq)
             {
                 reproduced[index] = true;
                 break;
             }
         }
-        
+
         for (int i = 0; i < preyPositions.Length; i++)
         {
-            if (Vector3.Distance(preyPositions[i], predatorPositions[index]) < Ex4Config.TouchingDistance)
+            float distanceSq = (preyPositions[i] - predatorPosition).sqrMagnitude;
+            if (distanceSq < touchingDistanceSq)
             {
                 decreasingFactors[index] /= 2;
             }

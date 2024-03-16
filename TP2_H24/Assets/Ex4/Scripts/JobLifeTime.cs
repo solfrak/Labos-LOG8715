@@ -18,7 +18,7 @@ public struct JobLifeTime : IJobParallelFor
     {
         for (int i = 0; i < positions.Length; i++)
         {
-            if (Vector3.Distance(positions[i], positions[index]) < Ex4Config.TouchingDistance)
+            if ((positions[i] - positions[index]).sqrMagnitude < Ex4Config.TouchingDistance)
             {
                decreasingFactor *= factor;
             }

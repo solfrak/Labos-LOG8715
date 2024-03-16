@@ -23,7 +23,7 @@ public struct JobPreyLifeTime : IJobParallelFor
         decreasingFactors[index] = 1.0f;
         for (int i = 0; i < plantPositions.Length; i++)
         {
-            if (Vector3.Distance(plantPositions[i], preyPositions[index]) < Ex4Config.TouchingDistance)
+            if ((plantPositions[i]- preyPositions[index]).sqrMagnitude < Ex4Config.TouchingDistance)
             {
                 decreasingFactors[index] /= 2;
                 break;
@@ -32,7 +32,7 @@ public struct JobPreyLifeTime : IJobParallelFor
 
         for (int i = 0; i < predatorPositions.Length; i++)
         {
-            if (Vector3.Distance(predatorPositions[i], preyPositions[index]) < Ex4Config.TouchingDistance)
+            if ((predatorPositions[i]- preyPositions[index]).sqrMagnitude < Ex4Config.TouchingDistance)
             {
                 decreasingFactors[index] *= 2f;
                 break;
@@ -41,7 +41,7 @@ public struct JobPreyLifeTime : IJobParallelFor
 
         for (int i = 0; i < preyPositions.Length; i++)
         {
-            var dist = Vector3.Distance(preyPositions[i], preyPositions[index]);
+            var dist = (preyPositions[i] - preyPositions[index]).sqrMagnitude;
             if (dist < Ex4Config.TouchingDistance)
             {
                 reproduced[index] = true;

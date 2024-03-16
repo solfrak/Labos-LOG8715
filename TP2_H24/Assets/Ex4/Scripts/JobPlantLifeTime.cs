@@ -19,7 +19,8 @@ public struct JobPlantLifeTime : IJobParallelFor
 
         for (int i = 0; i < preyPositions.Length; i++)
         {
-            if (Vector3.Distance(preyPositions[i], plantPositions[index]) < Ex4Config.TouchingDistance)
+            float distanceSq = (preyPositions[i] - plantPositions[index]).sqrMagnitude;
+            if (distanceSq < Ex4Config.TouchingDistance * Ex4Config.TouchingDistance)
             {
                 decreasingFactors[index] *= 2;
                 break;

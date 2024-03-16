@@ -25,7 +25,7 @@ public struct MoveJob : IJobParallelFor
             // Skip if the current position is the predator's own position
             if (i == index) continue;
 
-            float distanceSq = Vector3.SqrMagnitude(goToPositions[i] - ourPositions[index]);
+            float distanceSq = (goToPositions[i] - ourPositions[index]).sqrMagnitude;
             if (distanceSq < closestDistanceSq)
             {
                 closestDistanceSq = distanceSq;
