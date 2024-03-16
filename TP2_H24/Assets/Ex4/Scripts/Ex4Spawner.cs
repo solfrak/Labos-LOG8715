@@ -1,8 +1,6 @@
 using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine.Profiling;
@@ -116,8 +114,6 @@ public class Ex4Spawner : MonoBehaviour
         Profiler.BeginSample("GetPosition");
         GetPositions();
         Profiler.EndSample();
-        //MovePredatorToPrey().Complete();
-        //MovePreyToPlant().Complete();
 
         Profiler.BeginSample("MoveJobs");
         MoveJobs();
@@ -125,34 +121,6 @@ public class Ex4Spawner : MonoBehaviour
         Profiler.BeginSample("UpdateLifetime");
         UpdateLifeTimes();
         Profiler.EndSample();
-        
-
-        //getPlantLifeTimeJobHandle().Complete();
-        //getPreyLifeTimeJobHandle().Complete();
-        //getPredatorLifeTimeJobHandle().Complete();
-        //for (int i = 0; i < PlantLifetimes.Length; i++)
-        //{
-        //    PlantLifetimes[i].decreasingFactor = plantDecreasingFactors[i];
-        //}
-        //for (int i = 0; i < PreyLifetimes.Length; i++)
-        //{
-        //    PreyLifetimes[i].decreasingFactor = preyDecreasingFactors[i];
-        //    PreyLifetimes[i].reproduced = preyReproduced[i];
-        //}
-        //for (int i = 0; i < PredatorLifetimes.Length; i++)
-        //{
-        //    PredatorLifetimes[i].decreasingFactor = predatorDecreasingFactors[i];
-        //    PredatorLifetimes[i].reproduced = predatorReproduced[i];
-        //}
-        //predatorPositions.Dispose();
-        //preyPositions.Dispose();
-        //plantPositions.Dispose();
-        //preyVelocities.Dispose();
-        //predatorVelocities.Dispose();
-        //preyDecreasingFactors.Dispose();
-        //predatorDecreasingFactors.Dispose();
-        //preyReproduced.Dispose();
-        //predatorReproduced.Dispose();
 
     }
 
@@ -220,8 +188,6 @@ public class Ex4Spawner : MonoBehaviour
 
     private JobHandle getPredatorLifeTimeJobHandle()
     {
-        NativeArray<float> decreasingFactors = new NativeArray<float>(PredatorLifetimes.Length, Allocator.TempJob);
-        NativeArray<bool> reproduced = new NativeArray<bool>(PredatorLifetimes.Length, Allocator.TempJob);
         for (int i = 0; i < PredatorLifetimes.Length; i++)
         {
             predatorDecreasingFactors[i] = PredatorLifetimes[i].decreasingFactor;
