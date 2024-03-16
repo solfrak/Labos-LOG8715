@@ -7,7 +7,7 @@ using UnityEngine;
 using Unity.Burst;
 
 [BurstCompile]
-public struct PredatorLifeTimeJob : IJobParallelFor
+public struct JobPredatorLifeTime : IJobParallelFor
 {
     [ReadOnly] public NativeArray<Vector3> predatorPositions;
 
