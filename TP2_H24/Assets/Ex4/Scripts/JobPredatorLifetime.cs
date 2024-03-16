@@ -13,7 +13,7 @@ public struct PredatorLifeTimeJob : IJobParallelFor
 
     [ReadOnly] public NativeArray<Vector3> preyPositions;
     public NativeArray<float> decreasingFactors;
-    public bool reproduced;
+    public NativeArray<bool> reproduced;
 
     public void Execute(int index)
     {
@@ -22,7 +22,7 @@ public struct PredatorLifeTimeJob : IJobParallelFor
         {
             if (Vector3.Distance(predatorPositions[i], predatorPositions[index]) < Ex4Config.TouchingDistance)
             {
-                reproduced = true;
+                reproduced[index] = true;
                 break;
             }
         }

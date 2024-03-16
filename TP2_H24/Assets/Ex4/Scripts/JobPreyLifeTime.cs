@@ -15,7 +15,7 @@ public struct JobPreyLifeTime : IJobParallelFor
     [ReadOnly] public NativeArray<Vector3> plantPositions;
     [ReadOnly] public NativeArray<Vector3> preyPositions;
     public NativeArray<float> decreasingFactors;
-    public bool reproduced;
+    public NativeArray<bool> reproduced;
     [ReadOnly] public float factor;
 
     public void Execute(int index)
@@ -42,9 +42,9 @@ public struct JobPreyLifeTime : IJobParallelFor
         for (int i = 0; i < preyPositions.Length; i++)
         {
             var dist = Vector3.Distance(preyPositions[i], preyPositions[index]);
-            if (dist < Ex4Config.TouchingDistance && dist != 0)
+            if (dist < Ex4Config.TouchingDistance)
             {
-                reproduced = true;
+                reproduced[index] = true;
                 break;
             }
         }
