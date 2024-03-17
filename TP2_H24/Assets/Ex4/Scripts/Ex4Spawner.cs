@@ -5,7 +5,7 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine.Profiling;
 using Unity.Entities;
-
+using Unity.Mathematics;
 public class Ex4Spawner : MonoBehaviour
 {
     public static Transform[] PlantTransforms;
@@ -21,15 +21,9 @@ public class Ex4Spawner : MonoBehaviour
     public GameObject preyPrefab;
     public GameObject plantPrefab;
     NativeArray<Vector3> plantPositions;
-    NativeArray<float> plantDecreasingFactors;
     NativeArray<Vector3> predatorPositions;
     NativeArray<Vector3> preyPositions;
-    NativeArray<Vector3> preyVelocities;
-    NativeArray<Vector3> predatorVelocities;
-    NativeArray<float> preyDecreasingFactors;
-    NativeArray<float> predatorDecreasingFactors;
-    NativeArray<bool> preyReproduced;
-    NativeArray<bool> predatorReproduced;
+
     private int _height;
     private int _width;
 
@@ -75,49 +69,40 @@ public class Ex4Spawner : MonoBehaviour
         _height = (int)Math.Round(Math.Sqrt(size / ratio));
         _width = (int)Math.Round(size / _height);
 
-        
-        PlantTransforms = new Transform[config.plantCount];
-        PlantLifetimes = new Lifetime[config.plantCount];
-        for (var i = 0; i < config.plantCount; i++)
-        {
-            var go = Create(plantPrefab);
-            PlantTransforms[i] = go.transform;
-            PlantLifetimes[i] = go.GetComponent<Lifetime>();
-        }
 
-        PreyTransforms = new Transform[config.preyCount];
-        PreyLifetimes = new Lifetime[config.preyCount];
-        for (var i = 0; i < config.preyCount; i++)
-        {
-            var go = Create(preyPrefab);
-            PreyTransforms[i] = go.transform;
-            PreyLifetimes[i] = go.GetComponent<Lifetime>();
-        }
+        //PlantTransforms = new Transform[config.plantCount];
+        //PlantLifetimes = new Lifetime[config.plantCount];
+        //for (var i = 0; i < config.plantCount; i++)
+        //{
+        //    var go = Create(plantPrefab);
+        //    PlantTransforms[i] = go.transform;
+        //    PlantLifetimes[i] = go.GetComponent<Lifetime>();
+        //}
 
-        PredatorTransforms = new Transform[config.predatorCount];
-        PredatorLifetimes = new Lifetime[config.predatorCount];
-        for (var i = 0; i < config.predatorCount; i++)
-        {
-            var go = Create(predatorPrefab);
-            PredatorTransforms[i] = go.transform;
-            PredatorLifetimes[i] = go.GetComponent<Lifetime>();
-        }
+        //PreyTransforms = new Transform[config.preyCount];
+        //PreyLifetimes = new Lifetime[config.preyCount];
+        //for (var i = 0; i < config.preyCount; i++)
+        //{
+        //    var go = Create(preyPrefab);
+        //    PreyTransforms[i] = go.transform;
+        //    PreyLifetimes[i] = go.GetComponent<Lifetime>();
+        //}
+
+        //PredatorTransforms = new Transform[config.predatorCount];
+        //PredatorLifetimes = new Lifetime[config.predatorCount];
+        //for (var i = 0; i < config.predatorCount; i++)
+        //{
+        //    var go = Create(predatorPrefab);
+        //    PredatorTransforms[i] = go.transform;
+        //    PredatorLifetimes[i] = go.GetComponent<Lifetime>();
+        //}
     }
 
     private void Update()
     {
-        preyVelocities = new NativeArray<Vector3>(PreyTransforms.Length, Allocator.TempJob);
-        predatorVelocities = new NativeArray<Vector3>(PredatorTransforms.Length, Allocator.TempJob);
-
-        preyDecreasingFactors = new NativeArray<float>(PreyLifetimes.Length, Allocator.TempJob);
-        predatorDecreasingFactors = new NativeArray<float>(PredatorLifetimes.Length, Allocator.TempJob);
-        plantDecreasingFactors = new NativeArray<float>(PlantLifetimes.Length, Allocator.TempJob);
-
-        preyReproduced = new NativeArray<bool>(PreyLifetimes.Length, Allocator.TempJob);
-        predatorReproduced = new NativeArray<bool>(PredatorLifetimes.Length, Allocator.TempJob);
-
+   
         Profiler.BeginSample("GetPosition");
-        GetPositions();
+        //GetPositions();
         Profiler.EndSample();
 
         plantPositions.Dispose();
@@ -128,19 +113,13 @@ public class Ex4Spawner : MonoBehaviour
 
     private void Destroy()
     {
-        preyVelocities.Dispose();
-        predatorVelocities.Dispose();
-        preyDecreasingFactors.Dispose();
-        predatorDecreasingFactors.Dispose();
-        plantDecreasingFactors.Dispose();
-        preyReproduced.Dispose();
-        predatorReproduced.Dispose();
+
     }
 
-    private GameObject Create(GameObject prefab)
-    {
-        var go = Instantiate(prefab);
-        Respawn(go.transform);
-        return go;
-    }
+    //private GameObject Create(GameObject prefab)
+    //{
+    //    var go = Instantiate(prefab);
+    //    Respawn(go.transform);
+    //    return go;
+    //}
 }

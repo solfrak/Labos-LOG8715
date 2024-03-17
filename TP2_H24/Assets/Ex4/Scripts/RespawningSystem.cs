@@ -30,6 +30,7 @@ public partial struct RespawningSystem : Unity.Entities.ISystem
             ComponentType.ReadWrite<ReproductionComponent>(), ComponentType.ReadWrite<RespawnComponentTag>(), ComponentType.ReadOnly<PlantComponentTag>());
 
         state.RequireAnyForUpdate(predatorQuery, preyQuery, plantQuery);
+        //state.RequireForUpdate<SpawnerConfig>();
     }
 
     public void OnDestroy(ref SystemState state) { }
@@ -40,7 +41,7 @@ public partial struct RespawningSystem : Unity.Entities.ISystem
         var plantEntities = plantQuery.ToEntityArray(AllocatorManager.Temp);
         var predatorEntities = predatorQuery.ToEntityArray(AllocatorManager.Temp);
         var preyEntities = preyQuery.ToEntityArray(AllocatorManager.Temp);
-
+        //SpawnerConfig config = SystemAPI.GetSingleton<SpawnerConfig>();
 
         int halfWidth = Ex4Spawner.Instance.Width / 2;
         int halfHeight = Ex4Spawner.Instance.Height / 2;
