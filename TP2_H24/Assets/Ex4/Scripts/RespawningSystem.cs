@@ -30,28 +30,27 @@ public partial struct RespawningSystem : Unity.Entities.ISystem
             ComponentType.ReadWrite<ReproductionComponent>(), ComponentType.ReadWrite<RespawnComponentTag>(), ComponentType.ReadOnly<PlantComponentTag>());
 
         state.RequireAnyForUpdate(predatorQuery, preyQuery, plantQuery);
-        //state.RequireForUpdate<SpawnerConfig>();
+        state.RequireForUpdate<SpawnerConfig>();
     }
 
     public void OnDestroy(ref SystemState state) { }
 
-
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         var plantEntities = plantQuery.ToEntityArray(AllocatorManager.Temp);
         var predatorEntities = predatorQuery.ToEntityArray(AllocatorManager.Temp);
         var preyEntities = preyQuery.ToEntityArray(AllocatorManager.Temp);
-        //SpawnerConfig config = SystemAPI.GetSingleton<SpawnerConfig>();
+        SpawnerConfig config = SystemAPI.GetSingleton<SpawnerConfig>();
 
-        int halfWidth = Ex4Spawner.Instance.Width / 2;
-        int halfHeight = Ex4Spawner.Instance.Height / 2;
+        int halfWidth =config.width / 2;
+        int halfHeight = config.height / 2;
 
         foreach(var entity in preyEntities)
         {
             // Initialize the random position
             var positionComponent = SystemAPI.GetComponentRW<PositionComponentData>(entity);
             positionComponent.ValueRW.Position = new float2(Random.Range(-halfWidth, halfWidth), Random.Range(-halfHeight, halfHeight));
-
             // Initialize starting life
             var lifetimeComponent = SystemAPI.GetComponentRW<LifetimeComponent>(entity);
             lifetimeComponent.ValueRW.StartingLifetime = Random.Range(StartingLifetimeLowerBound, StartingLifetimeUpperBound);
@@ -100,6 +99,14 @@ public partial struct RespawningSystem : Unity.Entities.ISystem
             // All plants reproduce
             var reproductionComponent = SystemAPI.GetComponentRW<ReproductionComponent>(entity);
             reproductionComponent.ValueRW.Reproduces = true;
+            SystemAPI.SetComponent(entity, positionComponent.ValueRO);
+            SystemAPI.SetComponent(entity, lifetimeComponent.ValueRO);
+            SystemAPI.SetComponent(entity, sizeComponent.ValueRO);
+            var localTransform = new LocalTransform
+            {
+                Position = new float3(positionComponent.ValueRO.Position.x, positionComponent.ValueRO.Position.y, 0)
+            };
+            SystemAPI.SetComponent(entity, localTransform);
 
             state.EntityManager.RemoveComponent<RespawnComponentTag>(entity);
         }
