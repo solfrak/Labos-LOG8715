@@ -1,22 +1,26 @@
 
 using Unity.Collections;
+using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 
 struct JobReproduce : IJobParallelFor
 {
-    public NativeArray<float3> positions;
-    public float decreasingFactor;
-    public bool reproduced;
+    [ReadOnly] public NativeArray<float2> positions;
+    public NativeArray<RefRW<ReproductionComponent>> reproduced;
+    public float touchingDistance;
 
     public void Execute(int index)
     {
         for (int i = 0; i < positions.Length; i++)
         {
-            if (Vector3.Distance(positions[i], positions[index]) < Ex4Config.TouchingDistance)
+            if(i == index)
+                continue; // Skip self
+
+            if(Vector2.Distance(positions[i], positions[index]) < touchingDistance)
             {
-                reproduced = true;
+                reproduced[index].ValueRW.Reproduces = true;
                 break;
             }
         }
