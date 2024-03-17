@@ -75,6 +75,18 @@ public class Ex4Spawner : MonoBehaviour
         _height = (int)Math.Round(Math.Sqrt(size / ratio));
         _width = (int)Math.Round(size / _height);
 
+        EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+        Entity configEntity = entityManager.CreateSingleton<ConfigWrapperComponent>("ConfigComponent");
+        ConfigWrapperComponent configComponent = entityManager.GetComponentData<ConfigWrapperComponent>(configEntity);
+        configComponent.Height = _height;
+        configComponent.Width = _width;
+        configComponent.NbPlants = config.plantCount;
+        configComponent.NbPredators = config.predatorCount;
+        configComponent.NbPreys = config.preyCount;
+        configComponent.TouchingDistance = Ex4Config.TouchingDistance;
+        configComponent.PredatorSpeed = Ex4Config.PredatorSpeed;
+        configComponent.PreySpeed = Ex4Config.PreySpeed;
+        entityManager.SetComponentData(configEntity, configComponent);
         
         PlantTransforms = new Transform[config.plantCount];
         PlantLifetimes = new Lifetime[config.plantCount];

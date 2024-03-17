@@ -19,6 +19,8 @@ public partial struct RespawningSystem : Unity.Entities.ISystem
     EntityQuery plantQuery;
     EntityQuery preyQuery;
     EntityQuery predatorQuery;
+    EntityQuery configQuery;
+
 
     public void OnCreate(ref SystemState state)
     {
@@ -29,21 +31,24 @@ public partial struct RespawningSystem : Unity.Entities.ISystem
         plantQuery = state.GetEntityQuery(ComponentType.ReadWrite<LifetimeComponent>(), ComponentType.ReadWrite<PositionComponentData>(),
             ComponentType.ReadWrite<ReproductionComponent>(), ComponentType.ReadWrite<RespawnComponentTag>(), ComponentType.ReadOnly<PlantComponentTag>());
 
+        configQuery = SystemAPI.QueryBuilder().WithAll<ConfigWrapperComponent>().Build();
+
+        state.RequireForUpdate(configQuery);
         state.RequireAnyForUpdate(predatorQuery, preyQuery, plantQuery);
     }
 
     public void OnDestroy(ref SystemState state) { }
 
-
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         var plantEntities = plantQuery.ToEntityArray(AllocatorManager.Temp);
         var predatorEntities = predatorQuery.ToEntityArray(AllocatorManager.Temp);
         var preyEntities = preyQuery.ToEntityArray(AllocatorManager.Temp);
 
-
-        int halfWidth = Ex4Spawner.Instance.Width / 2;
-        int halfHeight = Ex4Spawner.Instance.Height / 2;
+        ConfigWrapperComponent config = configQuery.GetSingleton<ConfigWrapperComponent>();
+        int halfWidth = config.Width / 2;
+        int halfHeight = config.Height / 2;
 
         foreach(var entity in preyEntities)
         {

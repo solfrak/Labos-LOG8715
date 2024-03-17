@@ -5,10 +5,13 @@ using Unity.Mathematics;
 
 public partial struct InitializingSystem : Unity.Entities.ISystem
 {
+    EntityQuery configQuery;
 
     public void OnCreate(ref SystemState state)
     {
+        configQuery = SystemAPI.QueryBuilder().WithAll<ConfigWrapperComponent>().Build();
 
+        state.RequireForUpdate(configQuery);
     }
 
     public void OnUpdate(ref SystemState state) 
@@ -17,7 +20,7 @@ public partial struct InitializingSystem : Unity.Entities.ISystem
          
         // If there are no entities, create them
         bool areEntitiesInitialized = !entitiesQuery.IsEmpty;
-        Ex4Config config = Ex4Spawner.Instance.config;
+        ConfigWrapperComponent config = configQuery.GetSingleton<ConfigWrapperComponent>();
 
         if(!areEntitiesInitialized)
         {
@@ -59,9 +62,9 @@ public partial struct InitializingSystem : Unity.Entities.ISystem
             EntityArchetype preyArchetype = entityManager.CreateArchetype(preyComponentTypes);
             EntityArchetype predatorArchetype = entityManager.CreateArchetype(predatorComponentTypes);
 
-            entityManager.CreateEntity(plantArchetype, config.plantCount);
-            entityManager.CreateEntity(preyArchetype, config.preyCount);
-            entityManager.CreateEntity(predatorArchetype, config.predatorCount);
+            entityManager.CreateEntity(plantArchetype, config.NbPlants);
+            entityManager.CreateEntity(preyArchetype, config.NbPreys);
+            entityManager.CreateEntity(predatorArchetype, config.NbPredators);
         }
     }
 }
