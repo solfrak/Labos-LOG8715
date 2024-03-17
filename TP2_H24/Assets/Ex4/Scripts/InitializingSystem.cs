@@ -30,6 +30,7 @@ public partial struct InitializingSystem : Unity.Entities.ISystem
             // Create all entities
             ComponentType[] plantComponentTypes = new ComponentType[]
             {
+                ComponentType.ReadWrite<LocalTransform>(),
                 ComponentType.ReadWrite<LifetimeComponent>(),
                 ComponentType.ReadWrite<PositionComponentData>(),
                 ComponentType.ReadWrite<SizeComponentData>(),
@@ -66,7 +67,12 @@ public partial struct InitializingSystem : Unity.Entities.ISystem
             var plantEntities = entityManager.Instantiate(plantPrefabEntity, config.plantCount, Allocator.Temp);
             var preyEntities = entityManager.Instantiate(preyPrefabEntity, config.preyCount, Allocator.Temp);
             var predatorEntities = entityManager.Instantiate(predatorPrefabEntity, config.predatorCount, Allocator.Temp);
+            //Entity entity = state.EntityManager.Instantiate(config.PreyPrefab);
+            ////var transform = state.EntityManager.GetComponentData<LocalTransform>(entity);
 
+            //transform.Position.x = Random.Range(-config.width / 2, config.width / 2);
+            //transform.Position.y = Random.Range(-config.height / 2, config.height / 2);
+            //state.EntityManager.SetComponentData(entity, transform);
             EntityArchetype plantArchetype = entityManager.CreateArchetype(plantComponentTypes);
             EntityArchetype preyArchetype = entityManager.CreateArchetype(preyComponentTypes);
             EntityArchetype predatorArchetype = entityManager.CreateArchetype(predatorComponentTypes);
@@ -74,52 +80,29 @@ public partial struct InitializingSystem : Unity.Entities.ISystem
 
             for (int i = 0; i < config.plantCount; i++)
             {
-            foreach(var componentType in plantComponentTypes)
-            {
-                    entityManager.AddComponent(plantEntities[i], componentType);
-            }
-                entityManager.SetArchetype(plantEntities[i], plantArchetype);
-                entityManager.SetComponentData(plantEntities[i],
-                                      new LocalTransform
-                                      {
-                                          Position = new float3(Random.Range(-halfWidth, halfWidth), Random.Range(-halfHeight, halfHeight), 0)
-                    ,
-                                          Rotation = quaternion.identity,
-                                          Scale = 1f
-                                      }
-
-                    );
+                var transform = state.EntityManager.GetComponentData<LocalTransform>(plantEntities[i]);
+                transform.Position.x = Random.Range(-config.width / 2, config.width / 2);
+                transform.Position.y = Random.Range(-config.height / 2, config.height / 2);
+                state.EntityManager.SetComponentData(plantEntities[i], transform);
             }
 
             for (int i = 0; i < config.preyCount; i++)
             {
-                entityManager.SetArchetype(preyEntities[i], preyArchetype);
-
-                entityManager.SetComponentData(preyEntities[i],
-                    new LocalTransform
-                    {
-                        Position = new float3(Random.Range(-halfWidth, halfWidth), Random.Range(-halfHeight, halfHeight), 0)
-                    ,
-                        Rotation = quaternion.identity,
-                        Scale = 1f
-                    }
-
-                    );
+                var transform = state.EntityManager.GetComponentData<LocalTransform>(plantEntities[i]);
+                transform.Position.x = Random.Range(-config.width / 2, config.width / 2);
+                transform.Position.y = Random.Range(-config.height / 2, config.height / 2);
+                state.EntityManager.SetComponentData(preyEntities[i], transform);
             }
 
             for (int i = 0; i < config.predatorCount; i++)
             {
-                entityManager.SetArchetype(predatorEntities[i], predatorArchetype);
-                entityManager.SetComponentData(predatorEntities[i], new LocalTransform
-                {
-                    Position = new float3(Random.Range(-halfWidth, halfWidth), Random.Range(-halfHeight, halfHeight), 0)
-                    ,
-                    Rotation = quaternion.identity,
-                    Scale = 1f
-                }
-
-                    );
+                var transform = state.EntityManager.GetComponentData<LocalTransform>(plantEntities[i]);
+                transform.Position.x = Random.Range(-config.width / 2, config.width / 2);
+                transform.Position.y = Random.Range(-config.height / 2, config.height / 2);
+                state.EntityManager.SetComponentData(predatorEntities[i], transform);
             }
+
+
 
             //entityManager.SetArchetype(plantEntity, plantArchetype);
             //entityManager.SetArchetype(predatorEntity, predatorArchetype);
