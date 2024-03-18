@@ -3,7 +3,11 @@ guid: 2bf157781c78a0e43b202d7291a5e2da
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - config: {fileID: 11400000, guid: 986766f3a8e27bf429443b800a420fae, type: 2}
+  - predatorPrefab: {instanceID: 0}
+  - preyPrefab: {instanceID: 0}
+  - plantPrefab: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
