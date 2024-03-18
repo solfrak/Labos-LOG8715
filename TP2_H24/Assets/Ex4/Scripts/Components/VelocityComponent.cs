@@ -3,5 +3,5 @@ using Unity.Mathematics;
 
 public struct VelocityComponent : IComponentData
 {
-    public float2 Velocity;
+    public float3 Velocity;
 }

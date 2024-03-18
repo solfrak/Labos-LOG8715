@@ -7,7 +7,7 @@ using UnityEngine;
 
 struct JobReproduce : IJobParallelFor
 {
-    [ReadOnly] public NativeArray<float2> positions;
+    [ReadOnly] public NativeArray<float3> positions;
     public NativeArray<RefRW<ReproductionComponent>> reproduced;
     public float touchingDistance;
 
@@ -18,7 +18,7 @@ struct JobReproduce : IJobParallelFor
             if(i == index)
                 continue; // Skip self
 
-            if(Vector2.Distance(positions[i], positions[index]) < touchingDistance)
+            if(math.distance(positions[i], positions[index]) < touchingDistance)
             {
                 reproduced[index].ValueRW.Reproduces = true;
                 break;

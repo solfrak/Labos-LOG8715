@@ -9,8 +9,8 @@ using Unity.Entities;
 [BurstCompile]
 public struct JobPlantLifeTime : IJobParallelFor
 {
-    [ReadOnly]public NativeArray<float2> plantPositions;
-    [ReadOnly] public NativeArray<float2> preyPositions;
+    [ReadOnly]public NativeArray<float3> plantPositions;
+    [ReadOnly] public NativeArray<float3> preyPositions;
     public NativeArray<RefRW<LifetimeComponent>> decreasingFactors;
     public float touchingDistance;
 
@@ -18,11 +18,11 @@ public struct JobPlantLifeTime : IJobParallelFor
     {
         decreasingFactors[index].ValueRW.DecreasingFactor = 1.0f;
 
-        float2 plantPosition = plantPositions[index];
+        float3 plantPosition = plantPositions[index];
 
         for(int i = 0; i < preyPositions.Length; i++)
         {
-            if(Vector2.Distance(preyPositions[i], plantPosition) < touchingDistance)
+            if(math.distance(preyPositions[i], plantPosition) < touchingDistance)
             {
                 decreasingFactors[index].ValueRW.DecreasingFactor *= 2;
                 break;

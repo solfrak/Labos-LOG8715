@@ -13,6 +13,7 @@ public partial struct InitializingSystem : Unity.Entities.ISystem
         state.RequireForUpdate<SpawnerConfig>();
     }
 
+
     public void OnUpdate(ref SystemState state)
     {
         SpawnerConfig config = SystemAPI.GetSingleton<SpawnerConfig>();
@@ -30,35 +31,34 @@ public partial struct InitializingSystem : Unity.Entities.ISystem
             // Create all entities
             ComponentType[] plantComponentTypes = new ComponentType[]
             {
-                ComponentType.ReadWrite<LocalTransform>(),
                 ComponentType.ReadWrite<LifetimeComponent>(),
-                ComponentType.ReadWrite<PositionComponentData>(),
-                ComponentType.ReadWrite<SizeComponentData>(),
                 ComponentType.ReadWrite<ReproductionComponent>(),
                 ComponentType.ReadOnly<PlantComponentTag>(),
                 ComponentType.ReadOnly<RespawnComponentTag>(),
 
             };
+            ComponentTypeSet plantComponentTypeSet = new ComponentTypeSet(plantComponentTypes);
 
             ComponentType[] preyComponentTypes = new ComponentType[]
             {
                 ComponentType.ReadWrite<LifetimeComponent>(),
-                ComponentType.ReadWrite<PositionComponentData>(),
                 ComponentType.ReadWrite<VelocityComponent>(),
                 ComponentType.ReadWrite<ReproductionComponent>(),
                 ComponentType.ReadOnly<PreyComponentTag>(),
                 ComponentType.ReadOnly<RespawnComponentTag>(),
             };
+            ComponentTypeSet preyComponentTypeSet = new ComponentTypeSet(preyComponentTypes);
 
             ComponentType[] predatorComponentTypes = new ComponentType[]
             {
                 ComponentType.ReadWrite<LifetimeComponent>(),
-                ComponentType.ReadWrite<PositionComponentData>(),
                 ComponentType.ReadWrite<VelocityComponent>(),
                 ComponentType.ReadWrite<ReproductionComponent>(),
                 ComponentType.ReadOnly<PredatorComponentTag>(),
                 ComponentType.ReadOnly<RespawnComponentTag>(),
             };
+            ComponentTypeSet predatorComponentTypeSet = new ComponentTypeSet(predatorComponentTypes);
+
 
             var plantPrefabEntity = config.plantPrefabEntity;
             var preyPrefabEntity = config.preyPrefabEntity;
@@ -78,29 +78,32 @@ public partial struct InitializingSystem : Unity.Entities.ISystem
             EntityArchetype predatorArchetype = entityManager.CreateArchetype(predatorComponentTypes);
 
 
-            for (int i = 0; i < config.plantCount; i++)
-            {
-                var transform = state.EntityManager.GetComponentData<LocalTransform>(plantEntities[i]);
-                transform.Position.x = Random.Range(-config.width / 2, config.width / 2);
-                transform.Position.y = Random.Range(-config.height / 2, config.height / 2);
-                state.EntityManager.SetComponentData(plantEntities[i], transform);
-            }
+            state.EntityManager.AddComponent(plantEntities, plantComponentTypeSet);
+            state.EntityManager.AddComponent(preyEntities, preyComponentTypeSet);
+            state.EntityManager.AddComponent(predatorEntities, predatorComponentTypeSet);
+            //for (int i = 0; i < config.plantCount; i++)
+            //{
+            //    var transform = state.EntityManager.GetComponentData<LocalTransform>(plantEntities[i]);
+            //    transform.Position.x = Random.Range(-config.width / 2, config.width / 2);
+            //    transform.Position.y = Random.Range(-config.height / 2, config.height / 2);
+            //    state.EntityManager.SetComponentData(plantEntities[i], transform);
+            //}
 
-            for (int i = 0; i < config.preyCount; i++)
-            {
-                var transform = state.EntityManager.GetComponentData<LocalTransform>(plantEntities[i]);
-                transform.Position.x = Random.Range(-config.width / 2, config.width / 2);
-                transform.Position.y = Random.Range(-config.height / 2, config.height / 2);
-                state.EntityManager.SetComponentData(preyEntities[i], transform);
-            }
+            //for (int i = 0; i < config.preyCount; i++)
+            //{
+            //    var transform = state.EntityManager.GetComponentData<LocalTransform>(plantEntities[i]);
+            //    transform.Position.x = Random.Range(-config.width / 2, config.width / 2);
+            //    transform.Position.y = Random.Range(-config.height / 2, config.height / 2);
+            //    state.EntityManager.SetComponentData(preyEntities[i], transform);
+            //}
 
-            for (int i = 0; i < config.predatorCount; i++)
-            {
-                var transform = state.EntityManager.GetComponentData<LocalTransform>(plantEntities[i]);
-                transform.Position.x = Random.Range(-config.width / 2, config.width / 2);
-                transform.Position.y = Random.Range(-config.height / 2, config.height / 2);
-                state.EntityManager.SetComponentData(predatorEntities[i], transform);
-            }
+            //for (int i = 0; i < config.predatorCount; i++)
+            //{
+            //    var transform = state.EntityManager.GetComponentData<LocalTransform>(plantEntities[i]);
+            //    transform.Position.x = Random.Range(-config.width / 2, config.width / 2);
+            //    transform.Position.y = Random.Range(-config.height / 2, config.height / 2);
+            //    state.EntityManager.SetComponentData(predatorEntities[i], transform);
+            //}
 
 
 

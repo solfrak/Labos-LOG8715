@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6760378060956306890}
   - component: {fileID: 6711532428850162044}
-  - component: {fileID: 6786424639042118746}
   m_Layer: 0
   m_Name: Predator
   m_TagString: Untagged
@@ -85,18 +84,3 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &6786424639042118746
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4733791367640433400}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b731facc9b12444098d9cc94fe9b251, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  decreasingFactor: 1
-  alwaysReproduce: 0
-  reproduced: 0

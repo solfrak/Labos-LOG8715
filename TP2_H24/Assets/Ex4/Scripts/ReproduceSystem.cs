@@ -17,8 +17,8 @@ public partial struct ReproduceSystem : Unity.Entities.ISystem
 
     public void OnCreate(ref SystemState state)
     {
-        preyQuery = state.GetEntityQuery(ComponentType.ReadWrite<ReproductionComponent>(), ComponentType.ReadOnly<PositionComponentData>(), ComponentType.ReadOnly<PreyComponentTag>());
-        predatorQuery = state.GetEntityQuery(ComponentType.ReadWrite<ReproductionComponent>(), ComponentType.ReadOnly<PositionComponentData>(), ComponentType.ReadOnly<PredatorComponentTag>());
+        preyQuery = state.GetEntityQuery(ComponentType.ReadWrite<ReproductionComponent>(), ComponentType.ReadOnly<LocalTransform>(), ComponentType.ReadOnly<PreyComponentTag>());
+        predatorQuery = state.GetEntityQuery(ComponentType.ReadWrite<ReproductionComponent>(), ComponentType.ReadOnly<LocalTransform>(), ComponentType.ReadOnly<PredatorComponentTag>());
         state.RequireAnyForUpdate(preyQuery, predatorQuery);
     }
 
@@ -31,20 +31,20 @@ public partial struct ReproduceSystem : Unity.Entities.ISystem
         var preyEntities = preyQuery.ToEntityArray(AllocatorManager.Temp);
         var predatorEntities = predatorQuery.ToEntityArray(AllocatorManager.Temp);
 
-        var predatorPositions = new NativeArray<float2>(predatorEntities.Length, Allocator.TempJob);
-        var preyPositions = new NativeArray<float2>(preyEntities.Length, Allocator.TempJob);
+        var predatorPositions = new NativeArray<float3>(predatorEntities.Length, Allocator.TempJob);
+        var preyPositions = new NativeArray<float3>(preyEntities.Length, Allocator.TempJob);
 
         var preyReproduces = new NativeArray<RefRW<ReproductionComponent>>(preyEntities.Length, Allocator.TempJob);
         var predatorReproduces = new NativeArray<RefRW<ReproductionComponent>>(predatorEntities.Length, Allocator.TempJob);
 
         for(int i = 0; i < predatorEntities.Length; i++)
         {
-            predatorPositions[i] = SystemAPI.GetComponentRW<PositionComponentData>(predatorEntities[i]).ValueRO.Position;
+            predatorPositions[i] = SystemAPI.GetComponentRW<LocalTransform>(predatorEntities[i]).ValueRO.Position;
             predatorReproduces[i] = SystemAPI.GetComponentRW<ReproductionComponent>(predatorEntities[i]);
         }
         for(int i = 0; i < preyEntities.Length; i++)
         {
-            preyPositions[i] = SystemAPI.GetComponentRW<PositionComponentData>(preyEntities[i]).ValueRO.Position;
+            preyPositions[i] = SystemAPI.GetComponentRW<LocalTransform>(preyEntities[i]).ValueRO.Position;
             preyReproduces[i] = SystemAPI.GetComponentRW<ReproductionComponent>(preyEntities[i]);
         }
 
