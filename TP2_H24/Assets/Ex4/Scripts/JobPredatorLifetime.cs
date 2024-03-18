@@ -19,9 +19,10 @@ public struct JobPredatorLifeTime : IJobParallelFor
         decreasingFactors[index].ValueRW.DecreasingFactor = 1.0f;
         float3 predatorPosition = predatorPositions[index];
 
+        float touchingDistanceSq = touchingDistance * touchingDistance;
         for (int i = 0; i < preyPositions.Length; i++)
         {
-            if (math.distance(preyPositions[i], predatorPosition) < touchingDistance)
+            if (math.distancesq(preyPositions[i], predatorPosition) < touchingDistanceSq)
             {
                 decreasingFactors[index].ValueRW.DecreasingFactor /= 2;
             }

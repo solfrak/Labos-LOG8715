@@ -19,11 +19,11 @@ public struct JobPreyLifeTime : IJobParallelFor
     {
         decreasingFactorsPreys[index].ValueRW.DecreasingFactor = 1.0f;
         float3 preyPosition = preyPositions[index];
-
+        float touchingDistanceSq = touchingDistance * touchingDistance;
 
         for (int i = 0; i < plantPositions.Length; i++)
         {
-            if (math.distance(plantPositions[i], preyPosition) < touchingDistance)
+            if (math.distancesq(plantPositions[i], preyPosition) < touchingDistanceSq)
             {
                 decreasingFactorsPreys[index].ValueRW.DecreasingFactor /= 2;
                 break;
@@ -32,7 +32,7 @@ public struct JobPreyLifeTime : IJobParallelFor
 
         for (int i = 0; i < predatorPositions.Length; i++)
         {
-            if (math.distance(predatorPositions[i], preyPosition) < touchingDistance)
+            if (math.distancesq(predatorPositions[i], preyPosition) < touchingDistanceSq)
             {
                 decreasingFactorsPreys[index].ValueRW.DecreasingFactor *= 2f;
                 break;

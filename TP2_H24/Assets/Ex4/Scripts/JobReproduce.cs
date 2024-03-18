@@ -16,12 +16,13 @@ struct JobReproduce : IJobParallelFor
         if(reproduced[index].ValueRO.Reproduces)
             return;
 
+        float touchingDistanceSq = touchingDistance * touchingDistance;
         for (int i = 0; i < positions.Length; i++)
         {
             if(i == index)
                 continue; // Skip self
 
-            if(math.distance(positions[i], positions[index]) < touchingDistance)
+            if(math.distancesq(positions[i], positions[index]) < touchingDistanceSq)
             {
                 reproduced[index].ValueRW.Reproduces = true;
                 break;
