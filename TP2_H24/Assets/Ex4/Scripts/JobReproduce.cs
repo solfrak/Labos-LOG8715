@@ -1,10 +1,12 @@
 
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 
+[BurstCompile]
 struct JobReproduce : IJobParallelFor
 {
     [ReadOnly] public NativeArray<float3> positions;
