@@ -13,6 +13,9 @@ struct JobReproduce : IJobParallelFor
 
     public void Execute(int index)
     {
+        if(reproduced[index].ValueRO.Reproduces)
+            return;
+
         for (int i = 0; i < positions.Length; i++)
         {
             if(i == index)

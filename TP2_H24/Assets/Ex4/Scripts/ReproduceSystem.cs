@@ -39,12 +39,12 @@ public partial struct ReproduceSystem : Unity.Entities.ISystem
 
         for(int i = 0; i < predatorEntities.Length; i++)
         {
-            predatorPositions[i] = SystemAPI.GetComponentRW<LocalTransform>(predatorEntities[i]).ValueRO.Position;
+            predatorPositions[i] = SystemAPI.GetComponentRO<LocalTransform>(predatorEntities[i]).ValueRO.Position;
             predatorReproduces[i] = SystemAPI.GetComponentRW<ReproductionComponent>(predatorEntities[i]);
         }
         for(int i = 0; i < preyEntities.Length; i++)
         {
-            preyPositions[i] = SystemAPI.GetComponentRW<LocalTransform>(preyEntities[i]).ValueRO.Position;
+            preyPositions[i] = SystemAPI.GetComponentRO<LocalTransform>(preyEntities[i]).ValueRO.Position;
             preyReproduces[i] = SystemAPI.GetComponentRW<ReproductionComponent>(preyEntities[i]);
         }
 

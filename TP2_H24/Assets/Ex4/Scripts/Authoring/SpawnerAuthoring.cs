@@ -16,11 +16,12 @@ public class SpawnerAuthoring : MonoBehaviour
     {
         public override void Bake(SpawnerAuthoring authoring)
         {
+            float ratio = 16f/9f;
             var size = (float)authoring.config.gridSize;
-            var ratio = Camera.main!.aspect;
-            var _height = (int)Math.Round(Math.Sqrt(size / ratio));
-            var _width = (int)Math.Round(size / _height);
+            int _height = (int)Math.Round(Math.Sqrt(size / ratio));
+            int _width = (int)Math.Round(size / _height);
             var entity = GetEntity(TransformUsageFlags.None);
+
             AddComponent(entity, new SpawnerConfig
             {
                 plantPrefabEntity = GetEntity(authoring.plantPrefab, TransformUsageFlags.Dynamic),
