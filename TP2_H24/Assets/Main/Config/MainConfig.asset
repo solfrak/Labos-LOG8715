@@ -13,8 +13,6 @@ MonoBehaviour:
   m_Name: MainConfig
   m_EditorClassIdentifier: 
   scenesToLoad:
-<<<<<<< HEAD
+  - Ex2
   - Ex3
-=======
   - Ex4
->>>>>>> exo-4
