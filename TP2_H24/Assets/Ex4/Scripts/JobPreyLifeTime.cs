@@ -9,21 +9,21 @@ using Unity.Entities;
 [BurstCompile]
 public struct JobPreyLifeTime : IJobParallelFor
 {
-    [ReadOnly] public NativeArray<float2> predatorPositions;
-    [ReadOnly] public NativeArray<float2> plantPositions;
-    [ReadOnly] public NativeArray<float2> preyPositions;
+    [ReadOnly] public NativeArray<float3> predatorPositions;
+    [ReadOnly] public NativeArray<float3> plantPositions;
+    [ReadOnly] public NativeArray<float3> preyPositions;
     public NativeArray<RefRW<LifetimeComponent>> decreasingFactorsPreys;
     public float touchingDistance;
 
     public void Execute(int index)
     {
         decreasingFactorsPreys[index].ValueRW.DecreasingFactor = 1.0f;
-        float2 preyPosition = preyPositions[index];
+        float3 preyPosition = preyPositions[index];
 
 
         for (int i = 0; i < plantPositions.Length; i++)
         {
-            if (Vector2.Distance(plantPositions[i], preyPosition) < touchingDistance)
+            if (math.distance(plantPositions[i], preyPosition) < touchingDistance)
             {
                 decreasingFactorsPreys[index].ValueRW.DecreasingFactor /= 2;
                 break;
@@ -32,7 +32,7 @@ public struct JobPreyLifeTime : IJobParallelFor
 
         for (int i = 0; i < predatorPositions.Length; i++)
         {
-            if (Vector2.Distance(predatorPositions[i], preyPosition) < touchingDistance)
+            if (math.distance(predatorPositions[i], preyPosition) < touchingDistance)
             {
                 decreasingFactorsPreys[index].ValueRW.DecreasingFactor *= 2f;
                 break;

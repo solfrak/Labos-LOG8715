@@ -1,0 +1,633 @@
+Mono path[0] = 'C:/Users/FLX/Downloads/SEMESTRE8/LOG8715/Labos-LOG8715/build/TP2_Data/Managed'
+Mono config path = 'C:/Users/FLX/Downloads/SEMESTRE8/LOG8715/Labos-LOG8715/build/MonoBleedingEdge/etc'
+Initialize engine version: 2022.3.6f1 (b9e6e7e9fa2d)
+[Subsystems] Discovering subsystems at path C:/Users/FLX/Downloads/SEMESTRE8/LOG8715/Labos-LOG8715/build/TP2_Data/UnitySubsystems
+Forcing GfxDevice: Null
+GfxDevice: creating device client; threaded=0; jobified=0
+NullGfxDevice:
+    Version:  NULL 1.0 [1.0]
+    Renderer: Null Device
+    Vendor:   Unity Technologies
+Begin MonoManager ReloadAssembly
+- Loaded All Assemblies, in  0.181 seconds
+- Finished resetting the current domain, in  0.002 seconds
+ERROR: Shader Sprites/Default shader is not supported on this GPU (none of subshaders/fallbacks are suitable)
+Microsoft Media Foundation video decoding to texture disabled: graphics device is Null, only Direct3D 11 and Direct3D 12 (only on desktop) are supported for hardware-accelerated video decoding.
+ERROR: Shader Sprites/Mask shader is not supported on this GPU (none of subshaders/fallbacks are suitable)
+UnloadTime: 1.329700 ms
+No SRP present, no compute shader support, or running with -nographics. Mesh Deformation Systems disabled.
+No SRP present, no compute shader support, or running with -nographics. Mesh Deformation Systems disabled.
+No SRP present, no compute shader support, or running with -nographics. Mesh Deformation Systems disabled.
+Warning: No Graphics Device found. Deformation systems will not run.
+No SRP present, no compute shader support, or running with -nographics. Mesh Deformation Systems disabled.
+No SRP present, no compute shader support, or running with -nographics. Entities Graphics package disabled
+Chargement de la scene: Ex2
+Unloading 4 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.151500 ms
+Unloading 3 unused Assets to reduce memory usage. Loaded Objects now: 1208.
+Total: 1.854300 ms (FindLiveObjects: 0.056100 ms CreateObjectMapping: 0.026600 ms MarkObjects: 1.764800 ms  DeleteObjects: 0.006600 ms)
+
+ FPS: 7315
+ FPS: 155
+ FPS: 159
+ FPS: 154
+ FPS: 146
+ FPS: 138
+ FPS: 139
+ FPS: 145
+ FPS: 148
+ FPS: 138
+ FPS: 156
+ FPS: 131
+ FPS: 146
+ FPS: 146
+ FPS: 151
+Chargement de la scene: Ex3
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+ERROR: Shader UI/Default shader is not supported on this GPU (none of subshaders/fallbacks are suitable)
+ERROR: Shader GUI/Text Shader shader is not supported on this GPU (none of subshaders/fallbacks are suitable)
+UnloadTime: 173.299700 ms
+Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 1208.
+Total: 2.145600 ms (FindLiveObjects: 0.049000 ms CreateObjectMapping: 0.024100 ms MarkObjects: 2.049600 ms  DeleteObjects: 0.022500 ms)
+
+ FPS: 134
+ FPS: 6
+ FPS: 9
+ FPS: 8
+ FPS: 8
+ FPS: 9
+ FPS: 9
+ FPS: 10
+ FPS: 10
+ FPS: 10
+ FPS: 9
+ FPS: 9
+ FPS: 10
+ FPS: 10
+ FPS: 10
+Chargement de la scene: Ex4
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 4.374300 ms
+ FPS: 10
+Unloading 4 unused Assets to reduce memory usage. Loaded Objects now: 1206.
+Total: 2.708300 ms (FindLiveObjects: 0.051200 ms CreateObjectMapping: 0.025100 ms MarkObjects: 2.618200 ms  DeleteObjects: 0.013500 ms)
+
+Streamed scene with   27ms latency from C:/Users/FLX/Downloads/SEMESTRE8/LOG8715/Labos-LOG8715/build/TP2_Data/StreamingAssets/EntityScenes/6608161a82c442d4d881f8eba9247152.0.entities
+ FPS: 27581
+ FPS: 26292
+ FPS: 31346
+ FPS: 24789
+ FPS: 31352
+ FPS: 29146
+ FPS: 30718
+ FPS: 27276
+ FPS: 30805
+ FPS: 24373
+ FPS: 27278
+ FPS: 27291
+ FPS: 30333
+ FPS: 26417
+Chargement de la scene: Ex2
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 5.472500 ms
+Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 41232.
+Total: 5.667100 ms (FindLiveObjects: 2.295700 ms CreateObjectMapping: 0.577300 ms MarkObjects: 2.764100 ms  DeleteObjects: 0.029700 ms)
+
+ FPS: 27567
+ FPS: 146
+ FPS: 156
+ FPS: 152
+ FPS: 156
+ FPS: 155
+ FPS: 110
+ FPS: 136
+ FPS: 124
+ FPS: 122
+ FPS: 158
+ FPS: 138
+ FPS: 138
+ FPS: 131
+ FPS: 99
+Chargement de la scene: Ex3
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 23.540500 ms
+Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 1224.
+Total: 2.189000 ms (FindLiveObjects: 0.069000 ms CreateObjectMapping: 0.029500 ms MarkObjects: 2.070000 ms  DeleteObjects: 0.020400 ms)
+
+ FPS: 150
+ FPS: 8
+ FPS: 8
+ FPS: 8
+ FPS: 8
+ FPS: 9
+ FPS: 10
+ FPS: 10
+ FPS: 10
+ FPS: 10
+ FPS: 8
+ FPS: 9
+ FPS: 9
+ FPS: 9
+ FPS: 9
+Chargement de la scene: Ex4
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.221200 ms
+Unloading 4 unused Assets to reduce memory usage. Loaded Objects now: 1206.
+Total: 2.139800 ms (FindLiveObjects: 0.050700 ms CreateObjectMapping: 0.029600 ms MarkObjects: 2.045900 ms  DeleteObjects: 0.013600 ms)
+
+Streamed scene with    1ms latency from C:/Users/FLX/Downloads/SEMESTRE8/LOG8715/Labos-LOG8715/build/TP2_Data/StreamingAssets/EntityScenes/6608161a82c442d4d881f8eba9247152.0.entities
+ FPS: 30905
+ FPS: 29658
+ FPS: 30925
+ FPS: 23426
+ FPS: 30350
+ FPS: 29665
+ FPS: 30749
+ FPS: 30643
+ FPS: 31223
+ FPS: 30360
+ FPS: 27330
+ FPS: 30714
+ FPS: 30357
+ FPS: 23847
+ FPS: 31149
+Chargement de la scene: Ex2
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.187300 ms
+Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 1232.
+Total: 2.632600 ms (FindLiveObjects: 0.047600 ms CreateObjectMapping: 0.025000 ms MarkObjects: 2.554500 ms  DeleteObjects: 0.005400 ms)
+
+ FPS: 27971
+ FPS: 156
+ FPS: 145
+ FPS: 155
+ FPS: 155
+ FPS: 157
+ FPS: 98
+ FPS: 152
+ FPS: 152
+ FPS: 160
+ FPS: 146
+ FPS: 155
+ FPS: 155
+ FPS: 153
+ FPS: 128
+Chargement de la scene: Ex3
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 23.210200 ms
+Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 1224.
+Total: 2.962700 ms (FindLiveObjects: 0.049600 ms CreateObjectMapping: 0.025500 ms MarkObjects: 2.864300 ms  DeleteObjects: 0.023100 ms)
+
+ FPS: 156
+ FPS: 10
+ FPS: 10
+ FPS: 10
+ FPS: 10
+ FPS: 10
+ FPS: 10
+ FPS: 10
+ FPS: 10
+ FPS: 10
+ FPS: 10
+ FPS: 10
+ FPS: 10
+ FPS: 10
+ FPS: 9
+Chargement de la scene: Ex4
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.211700 ms
+Unloading 4 unused Assets to reduce memory usage. Loaded Objects now: 1206.
+Total: 2.244800 ms (FindLiveObjects: 0.049000 ms CreateObjectMapping: 0.023400 ms MarkObjects: 2.158900 ms  DeleteObjects: 0.013400 ms)
+
+Streamed scene with    0ms latency from C:/Users/FLX/Downloads/SEMESTRE8/LOG8715/Labos-LOG8715/build/TP2_Data/StreamingAssets/EntityScenes/6608161a82c442d4d881f8eba9247152.0.entities
+ FPS: 26688
+ FPS: 29488
+ FPS: 27841
+ FPS: 30283
+ FPS: 30849
+ FPS: 27642
+ FPS: 30569
+ FPS: 30041
+ FPS: 27121
+ FPS: 26225
+ FPS: 30649
+ FPS: 29437
+ FPS: 26677
+ FPS: 26431
+ FPS: 30467
+Chargement de la scene: Ex2
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.238700 ms
+Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 1232.
+Total: 2.788000 ms (FindLiveObjects: 0.046400 ms CreateObjectMapping: 0.025900 ms MarkObjects: 2.709500 ms  DeleteObjects: 0.006200 ms)
+
+ FPS: 26030
+ FPS: 133
+ FPS: 116
+ FPS: 141
+ FPS: 142
+ FPS: 136
+ FPS: 150
+ FPS: 126
+ FPS: 144
+ FPS: 138
+ FPS: 134
+ FPS: 154
+ FPS: 150
+ FPS: 150
+ FPS: 153
+Chargement de la scene: Ex3
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 23.975400 ms
+Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 1224.
+Total: 2.127900 ms (FindLiveObjects: 0.049300 ms CreateObjectMapping: 0.022600 ms MarkObjects: 2.032100 ms  DeleteObjects: 0.023700 ms)
+
+ FPS: 147
+ FPS: 10
+ FPS: 9
+ FPS: 10
+ FPS: 10
+ FPS: 10
+ FPS: 10
+ FPS: 6
+ FPS: 4
+ FPS: 4
+ FPS: 4
+ FPS: 5
+ FPS: 9
+ FPS: 10
+ FPS: 10
+Chargement de la scene: Ex4
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.216700 ms
+Unloading 4 unused Assets to reduce memory usage. Loaded Objects now: 1206.
+Total: 1.999000 ms (FindLiveObjects: 0.047500 ms CreateObjectMapping: 0.025200 ms MarkObjects: 1.914400 ms  DeleteObjects: 0.011700 ms)
+
+Streamed scene with    0ms latency from C:/Users/FLX/Downloads/SEMESTRE8/LOG8715/Labos-LOG8715/build/TP2_Data/StreamingAssets/EntityScenes/6608161a82c442d4d881f8eba9247152.0.entities
+ FPS: 30378
+ FPS: 29677
+ FPS: 31395
+ FPS: 28844
+ FPS: 27103
+ FPS: 30698
+ FPS: 30316
+ FPS: 30771
+ FPS: 30309
+ FPS: 27144
+ FPS: 30510
+ FPS: 30118
+ FPS: 27425
+ FPS: 30498
+ FPS: 30725
+Chargement de la scene: Ex2
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.197800 ms
+Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 1232.
+Total: 2.245400 ms (FindLiveObjects: 0.046700 ms CreateObjectMapping: 0.024000 ms MarkObjects: 2.168000 ms  DeleteObjects: 0.006500 ms)
+
+ FPS: 21411
+ FPS: 158
+ FPS: 155
+ FPS: 158
+ FPS: 153
+ FPS: 152
+ FPS: 143
+ FPS: 151
+ FPS: 156
+ FPS: 152
+ FPS: 144
+ FPS: 124
+ FPS: 149
+ FPS: 155
+ FPS: 137
+Chargement de la scene: Ex3
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 24.756800 ms
+Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 1224.
+Total: 2.024800 ms (FindLiveObjects: 0.050100 ms CreateObjectMapping: 0.025000 ms MarkObjects: 1.930400 ms  DeleteObjects: 0.019200 ms)
+
+ FPS: 111
+ FPS: 11
+ FPS: 8
+ FPS: 9
+ FPS: 10
+ FPS: 10
+ FPS: 10
+ FPS: 9
+ FPS: 9
+ FPS: 9
+ FPS: 10
+ FPS: 8
+ FPS: 8
+ FPS: 8
+ FPS: 8
+Chargement de la scene: Ex4
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.219000 ms
+Unloading 4 unused Assets to reduce memory usage. Loaded Objects now: 1206.
+Total: 2.105200 ms (FindLiveObjects: 0.068400 ms CreateObjectMapping: 0.027700 ms MarkObjects: 1.997900 ms  DeleteObjects: 0.011000 ms)
+
+Streamed scene with    0ms latency from C:/Users/FLX/Downloads/SEMESTRE8/LOG8715/Labos-LOG8715/build/TP2_Data/StreamingAssets/EntityScenes/6608161a82c442d4d881f8eba9247152.0.entities
+ FPS: 16153
+ FPS: 98
+ FPS: 18629
+ FPS: 14236
+ FPS: 13037
+ FPS: 13463
+ FPS: 11974
+ FPS: 5646
+ FPS: 30589
+ FPS: 27581
+ FPS: 26497
+ FPS: 17152
+ FPS: 27358
+ FPS: 26925
+ FPS: 29995
+Chargement de la scene: Ex2
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.182600 ms
+Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 1232.
+Total: 2.208000 ms (FindLiveObjects: 0.050100 ms CreateObjectMapping: 0.024600 ms MarkObjects: 2.127600 ms  DeleteObjects: 0.005600 ms)
+
+ FPS: 26794
+ FPS: 154
+ FPS: 150
+ FPS: 143
+ FPS: 147
+ FPS: 146
+ FPS: 153
+ FPS: 153
+ FPS: 151
+ FPS: 157
+ FPS: 155
+ FPS: 149
+ FPS: 156
+ FPS: 158
+ FPS: 128
+Chargement de la scene: Ex3
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 24.294000 ms
+Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 1224.
+Total: 2.138000 ms (FindLiveObjects: 0.049100 ms CreateObjectMapping: 0.025500 ms MarkObjects: 2.044200 ms  DeleteObjects: 0.019100 ms)
+
+ FPS: 140
+ FPS: 7
+ FPS: 6
+ FPS: 5
+ FPS: 6
+ FPS: 6
+ FPS: 6
+ FPS: 7
+ FPS: 9
+ FPS: 9
+ FPS: 9
+ FPS: 9
+ FPS: 5
+ FPS: 4
+ FPS: 5
+Chargement de la scene: Ex4
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.247900 ms
+Unloading 4 unused Assets to reduce memory usage. Loaded Objects now: 1206.
+Total: 3.007300 ms (FindLiveObjects: 0.065800 ms CreateObjectMapping: 0.034900 ms MarkObjects: 2.893500 ms  DeleteObjects: 0.012900 ms)
+
+Streamed scene with    0ms latency from C:/Users/FLX/Downloads/SEMESTRE8/LOG8715/Labos-LOG8715/build/TP2_Data/StreamingAssets/EntityScenes/6608161a82c442d4d881f8eba9247152.0.entities
+ FPS: 12544
+ FPS: 18231
+ FPS: 20526
+ FPS: 8905
+ FPS: 22129
+ FPS: 21803
+ FPS: 21996
+ FPS: 25918
+ FPS: 26887
+ FPS: 29036
+ FPS: 31057
+ FPS: 31511
+ FPS: 30900
+ FPS: 29354
+ FPS: 28387
+Chargement de la scene: Ex2
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.224200 ms
+Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 1232.
+Total: 2.225500 ms (FindLiveObjects: 0.047000 ms CreateObjectMapping: 0.026000 ms MarkObjects: 2.146400 ms  DeleteObjects: 0.005800 ms)
+
+ FPS: 24557
+ FPS: 146
+ FPS: 147
+ FPS: 154
+ FPS: 133
+ FPS: 127
+ FPS: 146
+ FPS: 152
+ FPS: 137
+ FPS: 151
+ FPS: 144
+ FPS: 105
+ FPS: 139
+ FPS: 142
+low Count 0
+    [ALLOC_TEMP_Job.worker 3]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 1.0 KB
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.worker 13]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.worker 5]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_AssetGarbageCollectorHelper] x 11
+      Initial Block Size 64.0 KB
+      Current Block Size 64.0 KB
+      Peak Allocated Bytes 138 B
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.worker 15]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Job.worker 2]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 2.0 KB
+      Overflow Count 0
+    [ALLOC_TEMP_Job.worker 10]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Job.worker 7]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 1.5 KB
+      Overflow Count 0
+    [ALLOC_TEMP_Job.worker 9]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 0 B
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.worker 0]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Job.worker 6]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 3.0 KB
+      Overflow Count 0
+    [ALLOC_TEMP_Job.worker 8]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 1.5 KB
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.worker 14]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Loading.AsyncRead]
+      Initial Block Size 64.0 KB
+      Current Block Size 64.0 KB
+      Peak Allocated Bytes 435 B
+      Overflow Count 0
+    [ALLOC_TEMP_BatchDeleteObjects]
+      Initial Block Size 64.0 KB
+      Current Block Size 64.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+[ALLOC_DEFAULT] Dual Thread Allocator
+  Peak main deferred allocation count 26960
+    [ALLOC_BUCKET]
+      Large Block size 4.0 MB
+      Used Block count 1
+      Peak Allocated bytes 3.9 MB
+      Failed Allocations. Bucket layout:
+        16B: 26 Subsections = 26624 buckets. Failed count: 0
+        32B: 38 Subsections = 19456 buckets. Failed count: 14458
+        48B: 15 Subsections = 5120 buckets. Failed count: 27205
+        64B: 48 Subsections = 12288 buckets. Failed count: 1606
+        80B: 14 Subsections = 2867 buckets. Failed count: 0
+        96B: 49 Subsections = 8362 buckets. Failed count: 128
+        112B: 2 Subsections = 292 buckets. Failed count: 0
+        128B: 64 Subsections = 8192 buckets. Failed count: 1927
+    [ALLOC_DEFAULT_MAIN]
+      Peak usage frame count: [32.0 MB-64.0 MB]: 308 frames, [64.0 MB-128.0 MB]: 860481 frames
+      Requested Block Size 16.0 MB
+      Peak Block count 7
+      Peak Allocated memory 117.8 MB
+      Peak Large allocation bytes 16.0 MB
+    [ALLOC_DEFAULT_THREAD]
+      Peak usage frame count: [4.0 MB-8.0 MB]: 860789 frames
+      Requested Block Size 16.0 MB
+      Peak Block count 1
+      Peak Allocated memory 7.4 MB
+      Peak Large allocation bytes 0 B
+[ALLOC_TEMP_JOB_1_FRAME]
+  Initial Block Size 2.0 MB
+  Used Block Count 0
+  Overflow Count (too large) 0
+  Overflow Count (full) 0
+[ALLOC_TEMP_JOB_2_FRAMES]
+  Initial Block Size 2.0 MB
+  Used Block Count 0
+  Overflow Count (too large) 0
+  Overflow Count (full) 0
+[ALLOC_TEMP_JOB_4_FRAMES (JobTemp)]
+  Initial Block Size 2.0 MB
+  Used Block Count 1
+  Overflow Count (too large) 0
+  Overflow Count (full) 0
+[ALLOC_TEMP_JOB_ASYNC (Background)]
+  Initial Block Size 1.0 MB
+  Used Block Count 1
+  Overflow Count (too large) 0
+  Overflow Count (full) 0
+[ALLOC_GFX] Dual Thread Allocator
+  Peak main deferred allocation count 0
+    [ALLOC_BUCKET]
+      Large Block size 4.0 MB
+      Used Block count 1
+      Peak Allocated bytes 3.9 MB
+      Failed Allocations. Bucket layout:
+        16B: 26 Subsections = 26624 buckets. Failed count: 0
+        32B: 38 Subsections = 19456 buckets. Failed count: 14458
+        48B: 15 Subsections = 5120 buckets. Failed count: 27205
+        64B: 48 Subsections = 12288 buckets. Failed count: 1606
+        80B: 14 Subsections = 2867 buckets. Failed count: 0
+        96B: 49 Subsections = 8362 buckets. Failed count: 128
+        112B: 2 Subsections = 292 buckets. Failed count: 0
+        128B: 64 Subsections = 8192 buckets. Failed count: 1927
+    [ALLOC_GFX_MAIN]
+      Peak usage frame count: [32.0 KB-64.0 KB]: 860787 frames, [64.0 KB-128.0 KB]: 2 frames
+      Requested Block Size 16.0 MB
+      Peak Block count 1
+      Peak Allocated memory 108.8 KB
+      Peak Large allocation bytes 0 B
+    [ALLOC_GFX_THREAD]
+      Peak usage frame count: [0-1.0 KB]: 860789 frames
+      Requested Block Size 16.0 MB
+      Peak Block count 1
+      Peak Allocated memory 0.9 KB
+      Peak Large allocation bytes 0 B
+[ALLOC_CACHEOBJECTS] Dual Thread Allocator
+  Peak main deferred allocation count 26
+    [ALLOC_BUCKET]
+      Large Block size 4.0 MB
+      Used Block count 1
+      Peak Allocated bytes 3.9 MB
+      Failed Allocations. Bucket layout:
+        16B: 26 Subsections = 26624 buckets. Failed count: 0
+        32B: 38 Subsections = 19456 buckets. Failed count: 14458
+        48B: 15 Subsections = 5120 buckets. Failed count: 27205
+        64B: 48 Subsections = 12288 buckets. Failed count: 1606
+        80B: 14 Subsections = 2867 buckets. Failed count: 0
+        96B: 49 Subsections = 8362 buckets. Failed count: 128
+        112B: 2 Subsections = 292 buckets. Failed count: 0
+        128B: 64 Subsections = 8192 buckets. Failed count: 1927
+    [ALLOC_CACHEOBJECTS_MAIN]
+      Peak usage frame count: [0.5 MB-1.0 MB]: 859592 frames, [1.0 MB-2.0 MB]: 1197 frames
+      Requested Block Size 4.0 MB
+      Peak Block count 1
+      Peak Allocated memory 1.5 MB
+      Peak Large allocation bytes 0 B
+    [ALLOC_CACHEOBJECTS_THREAD]
+      Peak usage frame count: [32.0 KB-64.0 KB]: 5127 frames, [64.0 KB-128.0 KB]: 6 frames, [128.0 KB-256.0 KB]: 855621 frames, [256.0 KB-0.5 MB]: 35 frames
+      Requested Block Size 4.0 MB
+      Peak Block count 1
+      Peak Allocated memory 370.2 KB
+      Peak Large allocation bytes 0 B
+[ALLOC_TYPETREE] Dual Thread Allocator
+  Peak main deferred allocation count 0
+    [ALLOC_BUCKET]
+      Large Block size 4.0 MB
+      Used Block count 1
+      Peak Allocated bytes 3.9 MB
+      Failed Allocations. Bucket layout:
+        16B: 26 Subsections = 26624 buckets. Failed count: 0
+        32B: 38 Subsections = 19456 buckets. Failed count: 14458
+        48B: 15 Subsections = 5120 buckets. Failed count: 27205
+        64B: 48 Subsections = 12288 buckets. Failed count: 1606
+        80B: 14 Subsections = 2867 buckets. Failed count: 0
+        96B: 49 Subsections = 8362 buckets. Failed count: 128
+        112B: 2 Subsections = 292 buckets. Failed count: 0
+        128B: 64 Subsections = 8192 buckets. Failed count: 1927
+    [ALLOC_TYPETREE_MAIN]
+      Peak usage frame count: [4.0 KB-8.0 KB]: 860789 frames
+      Requested Block Size 2.0 MB
+      Peak Block count 1
+      Peak Allocated memory 4.1 KB
+      Peak Large allocation bytes 0 B
+    [ALLOC_TYPETREE_THREAD]
+      Peak usage frame count: [0-1.0 KB]: 4736 frames, [1.0 KB-2.0 KB]: 404 frames, [2.0 KB-4.0 KB]: 2 frames, [64.0 KB-128.0 KB]: 42 frames, [128.0 KB-256.0 KB]: 855524 frames, [256.0 KB-0.5 MB]: 81 frames
+      Requested Block Size 2.0 MB
+      Peak Block count 1
+      Peak Allocated memory 327.1 KB
+      Peak Large allocation bytes 0 B

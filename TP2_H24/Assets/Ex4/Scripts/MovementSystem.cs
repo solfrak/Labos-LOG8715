@@ -6,6 +6,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
 [BurstCompile]
@@ -14,7 +15,7 @@ public partial struct MovementSystem : Unity.Entities.ISystem
     EntityQuery query;
     public void OnCreate(ref SystemState state)
     {
-        query = state.GetEntityQuery(ComponentType.ReadOnly<VelocityComponent>(), ComponentType.ReadWrite<PositionComponentData>());
+        query = state.GetEntityQuery(ComponentType.ReadOnly<VelocityComponent>(), ComponentType.ReadWrite<LocalTransform>());
         state.RequireForUpdate(query);
     }
 
@@ -30,11 +31,11 @@ public partial struct MovementSystem : Unity.Entities.ISystem
         float deltaTime = SystemAPI.Time.DeltaTime;
         var entities = query.ToEntityArray(AllocatorManager.Temp);
 
-        for(int i = 0; i < entities.Length; i++)
+        for (int i = 0; i < entities.Length; i++)
         {
-            var positionComponent = SystemAPI.GetComponentRW<PositionComponentData>(entities[i]);
             var velocityComponent = SystemAPI.GetComponentRO<VelocityComponent>(entities[i]);
-            positionComponent.ValueRW.Position = positionComponent.ValueRW.Position + deltaTime * velocityComponent.ValueRO.Velocity;
+            var localTransform = SystemAPI.GetComponentRW<LocalTransform>(entities[i]);
+            localTransform.ValueRW.Position = localTransform.ValueRW.Position + deltaTime * velocityComponent.ValueRO.Velocity;
         }
 
         entities.Dispose();

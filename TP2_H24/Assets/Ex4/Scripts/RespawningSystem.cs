@@ -22,35 +22,35 @@ public partial struct RespawningSystem : Unity.Entities.ISystem
 
     public void OnCreate(ref SystemState state)
     {
-        predatorQuery = state.GetEntityQuery(ComponentType.ReadWrite<LifetimeComponent>(), ComponentType.ReadWrite<PositionComponentData>(),
+        predatorQuery = state.GetEntityQuery(ComponentType.ReadWrite<LifetimeComponent>(), ComponentType.ReadWrite<LocalTransform>(),
                     ComponentType.ReadWrite<ReproductionComponent>(), ComponentType.ReadWrite<RespawnComponentTag>(), ComponentType.ReadOnly<PredatorComponentTag>());
-        preyQuery = state.GetEntityQuery(ComponentType.ReadWrite<LifetimeComponent>(), ComponentType.ReadWrite<PositionComponentData>(),
+        preyQuery = state.GetEntityQuery(ComponentType.ReadWrite<LifetimeComponent>(), ComponentType.ReadWrite<LocalTransform>(),
             ComponentType.ReadWrite<ReproductionComponent>(), ComponentType.ReadWrite<RespawnComponentTag>(), ComponentType.ReadOnly<PreyComponentTag>());
-        plantQuery = state.GetEntityQuery(ComponentType.ReadWrite<LifetimeComponent>(), ComponentType.ReadWrite<PositionComponentData>(),
+        plantQuery = state.GetEntityQuery(ComponentType.ReadWrite<LifetimeComponent>(), ComponentType.ReadWrite<LocalTransform>(),
             ComponentType.ReadWrite<ReproductionComponent>(), ComponentType.ReadWrite<RespawnComponentTag>(), ComponentType.ReadOnly<PlantComponentTag>());
 
         state.RequireAnyForUpdate(predatorQuery, preyQuery, plantQuery);
+        state.RequireForUpdate<SpawnerConfig>();
     }
 
     public void OnDestroy(ref SystemState state) { }
 
-
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         var plantEntities = plantQuery.ToEntityArray(AllocatorManager.Temp);
         var predatorEntities = predatorQuery.ToEntityArray(AllocatorManager.Temp);
         var preyEntities = preyQuery.ToEntityArray(AllocatorManager.Temp);
+        SpawnerConfig config = SystemAPI.GetSingleton<SpawnerConfig>();
 
-
-        int halfWidth = Ex4Spawner.Instance.Width / 2;
-        int halfHeight = Ex4Spawner.Instance.Height / 2;
+        int halfWidth = config.width / 2;
+        int halfHeight = config.height / 2;
 
         foreach(var entity in preyEntities)
         {
             // Initialize the random position
-            var positionComponent = SystemAPI.GetComponentRW<PositionComponentData>(entity);
-            positionComponent.ValueRW.Position = new float2(Random.Range(-halfWidth, halfWidth), Random.Range(-halfHeight, halfHeight));
-
+            var positionComponent = SystemAPI.GetComponentRW<LocalTransform>(entity);
+            positionComponent.ValueRW.Position = new float3(Random.Range(-halfWidth, halfWidth), Random.Range(-halfHeight, halfHeight), 0);
             // Initialize starting life
             var lifetimeComponent = SystemAPI.GetComponentRW<LifetimeComponent>(entity);
             lifetimeComponent.ValueRW.StartingLifetime = Random.Range(StartingLifetimeLowerBound, StartingLifetimeUpperBound);
@@ -65,8 +65,8 @@ public partial struct RespawningSystem : Unity.Entities.ISystem
         foreach(var entity in predatorEntities)
         {
             // Initialize the random position
-            var positionComponent = SystemAPI.GetComponentRW<PositionComponentData>(entity);
-            positionComponent.ValueRW.Position = new float2(Random.Range(-halfWidth, halfWidth), Random.Range(-halfHeight, halfHeight));
+            var positionComponent = SystemAPI.GetComponentRW<LocalTransform>(entity);
+            positionComponent.ValueRW.Position = new float3(Random.Range(-halfWidth, halfWidth), Random.Range(-halfHeight, halfHeight), 0);
 
             // Initialize starting life
             var lifetimeComponent = SystemAPI.GetComponentRW<LifetimeComponent>(entity);
@@ -83,18 +83,15 @@ public partial struct RespawningSystem : Unity.Entities.ISystem
         foreach(var entity in plantEntities)
         {
             // Initialize the random position
-            var positionComponent = SystemAPI.GetComponentRW<PositionComponentData>(entity);
-            positionComponent.ValueRW.Position = new float2(Random.Range(-halfWidth, halfWidth), Random.Range(-halfHeight, halfHeight));
+            var localTransform = SystemAPI.GetComponentRW<LocalTransform>(entity);
+            localTransform.ValueRW.Position = new float3(Random.Range(-halfWidth, halfWidth), Random.Range(-halfHeight, halfHeight), 0);
+            localTransform.ValueRW.Scale = StartingSize;
 
             // Initialize starting life
             var lifetimeComponent = SystemAPI.GetComponentRW<LifetimeComponent>(entity);
             lifetimeComponent.ValueRW.StartingLifetime = Random.Range(StartingLifetimeLowerBound, StartingLifetimeUpperBound);
             lifetimeComponent.ValueRW.TimeRemaining = lifetimeComponent.ValueRO.StartingLifetime;
             lifetimeComponent.ValueRW.DecreasingFactor = StartingDecreasingFactor;
-
-            // Initialize Size
-            var sizeComponent = SystemAPI.GetComponentRW<SizeComponentData>(entity);
-            sizeComponent.ValueRW.Size = StartingSize;
 
             // All plants reproduce
             var reproductionComponent = SystemAPI.GetComponentRW<ReproductionComponent>(entity);

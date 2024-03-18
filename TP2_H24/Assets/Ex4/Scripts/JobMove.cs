@@ -12,20 +12,20 @@ public struct MoveJob : IJobParallelFor
 {
     [ReadOnly] public float speed;
     public NativeArray<RefRW<VelocityComponent>> velocities;
-    [ReadOnly] public NativeArray<float2> goToPositions;
-    [ReadOnly] public NativeArray<float2> ourPositions;
+    [ReadOnly] public NativeArray<float3> goToPositions;
+    [ReadOnly] public NativeArray<float3> ourPositions;
 
     public void Execute(int index)
     {
         float closestDistanceSq = float.MaxValue;
-        float2 closestPosition = float2.zero;
+        float3 closestPosition = float3.zero;
 
         for (int i = 0; i < goToPositions.Length; i++)
         {
             // Skip if the current position is the predator's own position
             if (i == index) continue;
 
-            float2 difference = (goToPositions[i] - ourPositions[index]);
+            float3 difference = (goToPositions[i] - ourPositions[index]);
             float distanceSq = difference.x * difference.x + difference.y * difference.y;
             if (distanceSq < closestDistanceSq)
             {
@@ -34,7 +34,7 @@ public struct MoveJob : IJobParallelFor
             }
         }
 
-        float2 direction = (closestPosition - ourPositions[index]);
+        float3 direction = (closestPosition - ourPositions[index]);
         velocities[index].ValueRW.Velocity = math.normalizesafe(direction) * speed;
     }
 }

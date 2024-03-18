@@ -18,11 +18,11 @@ public partial struct LifetimeFactorSystem : Unity.Entities.ISystem
 
     public void OnCreate(ref SystemState state)
     {
-        predatorQuery = state.GetEntityQuery(ComponentType.ReadWrite<LifetimeComponent>(), ComponentType.ReadOnly<PositionComponentData>(),
+        predatorQuery = state.GetEntityQuery(ComponentType.ReadWrite<LifetimeComponent>(), ComponentType.ReadOnly<LocalTransform>(),
              ComponentType.ReadOnly<PredatorComponentTag>());
-        preyQuery = state.GetEntityQuery(ComponentType.ReadWrite<LifetimeComponent>(), ComponentType.ReadOnly<PositionComponentData>(),
+        preyQuery = state.GetEntityQuery(ComponentType.ReadWrite<LifetimeComponent>(), ComponentType.ReadOnly<LocalTransform>(),
             ComponentType.ReadOnly<PreyComponentTag>());
-        plantQuery = state.GetEntityQuery(ComponentType.ReadWrite<LifetimeComponent>(), ComponentType.ReadOnly<PositionComponentData>(), 
+        plantQuery = state.GetEntityQuery(ComponentType.ReadWrite<LifetimeComponent>(), ComponentType.ReadOnly<LocalTransform>(), 
             ComponentType.ReadOnly<PlantComponentTag>());
 
         state.RequireAnyForUpdate(predatorQuery, preyQuery, plantQuery);
@@ -38,9 +38,9 @@ public partial struct LifetimeFactorSystem : Unity.Entities.ISystem
         var predatorEntities = predatorQuery.ToEntityArray(AllocatorManager.Temp);
         var preyEntities = preyQuery.ToEntityArray(AllocatorManager.Temp);
 
-        var plantPositions = new NativeArray<float2>(plantEntities.Length, Allocator.TempJob);
-        var predatorPositions = new NativeArray<float2>(predatorEntities.Length, Allocator.TempJob);
-        var preyPositions = new NativeArray<float2>(preyEntities.Length, Allocator.TempJob);
+        var plantPositions = new NativeArray<float3>(plantEntities.Length, Allocator.TempJob);
+        var predatorPositions = new NativeArray<float3>(predatorEntities.Length, Allocator.TempJob);
+        var preyPositions = new NativeArray<float3>(preyEntities.Length, Allocator.TempJob);
 
         var preyLifetimes = new NativeArray<RefRW<LifetimeComponent>>(preyEntities.Length, Allocator.TempJob);
         var predatorLifetimes = new NativeArray<RefRW<LifetimeComponent>>(predatorEntities.Length, Allocator.TempJob);
@@ -48,17 +48,17 @@ public partial struct LifetimeFactorSystem : Unity.Entities.ISystem
 
         for(int i = 0; i < predatorEntities.Length; i++)
         {
-            predatorPositions[i] = SystemAPI.GetComponentRW<PositionComponentData>(predatorEntities[i]).ValueRO.Position;
+            predatorPositions[i] = SystemAPI.GetComponentRW<LocalTransform>(predatorEntities[i]).ValueRO.Position;
             predatorLifetimes[i] = SystemAPI.GetComponentRW<LifetimeComponent>(predatorEntities[i]);
         }
         for(int i = 0; i < preyEntities.Length; i++)
         {
-            preyPositions[i] = SystemAPI.GetComponentRW<PositionComponentData>(preyEntities[i]).ValueRO.Position;
+            preyPositions[i] = SystemAPI.GetComponentRW<LocalTransform>(preyEntities[i]).ValueRO.Position;
             preyLifetimes[i] = SystemAPI.GetComponentRW<LifetimeComponent>(preyEntities[i]);
         }
         for(int i = 0; i < plantEntities.Length; i++)
         {
-            plantPositions[i] = SystemAPI.GetComponentRW<PositionComponentData>(plantEntities[i]).ValueRO.Position;
+            plantPositions[i] = SystemAPI.GetComponentRW<LocalTransform>(plantEntities[i]).ValueRO.Position;
             plantLifetimes[i] = SystemAPI.GetComponentRW<LifetimeComponent>(plantEntities[i]);
         }
 
