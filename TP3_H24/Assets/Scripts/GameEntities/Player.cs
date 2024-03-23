@@ -15,6 +15,8 @@ public class Player : NetworkBehaviour
 
     private GameState m_GameState;
 
+    private int previousTick = 0;
+
     // GameState peut etre nul si l'entite joueur est instanciee avant de charger MainScene
     private GameState GameState
     {
@@ -41,74 +43,85 @@ public class Player : NetworkBehaviour
             serializer.SerializeValue(ref tick);
         }
     }
+
+   
+    private NetworkVariable<PositionPayload> m_Position = new NetworkVariable<PositionPayload>();
+
+    public Vector2 Position => m_Position.Value.pos;
+
+    private Queue<(Vector2, int)> m_InputQueue = new Queue<(Vector2, int)>();
     
-    private NetworkVariable<Vector2> m_Position = new NetworkVariable<Vector2>();
-    private NetworkVariable<PositionPayload> m_Position2 = new NetworkVariable<PositionPayload>();
-
-    public Vector2 Position => m_Position2.Value.pos;
-
-    private Queue<Vector2> m_InputQueue = new Queue<Vector2>();
 
     private void Awake()
     {
-        m_InputBuffer = new CircleBuffer<Vector2>(2 * (int)NetworkUtility.GetLocalTickRate());
-        m_PositionBuffer = new CircleBuffer<Vector2>(2 * (int)NetworkUtility.GetLocalTickRate());
-        m_Position2.Value = new PositionPayload();
+        //TODO IDK what buffer size is required
+        m_InputBuffer = new CircleBuffer<Vector2>(10 * (int)NetworkUtility.GetLocalTickRate());
+        m_PositionBuffer = new CircleBuffer<Vector2>(10 * (int)NetworkUtility.GetLocalTickRate());
+        m_Position.Value = new PositionPayload();
     }
 
     private void FixedUpdate()
     {
-        // Si le stun est active, rien n'est mis a jour.
-        if (GameState == null || GameState.IsStunned)
+        int currentTick = NetworkUtility.GetLocalTick();
+        if (previousTick < currentTick) 
         {
-            return;
-        }
+            // Si le stun est active, rien n'est mis a jour.
+            if (GameState == null || GameState.IsStunned)
+            {
+                return;
+            }
 
-        // Seul le serveur met à jour la position de l'entite.
-        if (IsServer)
-        {
-            UpdatePositionServer();
-        }
+            // Seul le serveur met à jour la position de l'entite.
+            if (IsServer)
+            {
+                UpdatePositionServer();
+            }
 
-        // Seul le client qui possede cette entite peut envoyer ses inputs. 
-        if (IsClient && IsOwner)
-        {
-            UpdateInputClient();
-            UpdatePositionClient();
-            CheckServerPosition();
+            // Seul le client qui possede cette entite peut envoyer ses inputs. 
+            if (IsClient && IsOwner)
+            {
+                CheckServerPosition(currentTick);
+                UpdateInputClient();
+                UpdatePositionClient(currentTick);
+            }
+
+            previousTick = currentTick;
         }
     }
 
-    private void CheckServerPosition()
+    private void CheckServerPosition(int currentTick)
     {
-        var position = m_Position2.Value.pos;
-        var tick = m_Position2.Value.tick;
+        var position = m_Position.Value.pos;
+        var tick = m_Position.Value.tick;
         
         var cachedPosition = m_PositionBuffer.Get(tick);
         
         if (!PositionEqualWithTolerance(position, cachedPosition))
         {
-            //TODO make some position correction 
-            Debug.LogWarning("Position are not the same at tick: " + tick );
-            Debug.LogWarning(position + " " + cachedPosition);
+            
+            Debug.LogWarning(position +" " + cachedPosition + " tick: " + tick);
+            //TODO maybe we'll need to change this
             transform.position = position;
+            while (tick <= currentTick)
+            {
+                UpdatePositionClient(tick);
+                tick++;
+            }
         }
     }
 
     private bool PositionEqualWithTolerance(Vector2 pos1, Vector2 pos2)
     {
-        //TODO make a better implementation
         if (Math.Abs(pos1.x - pos2.x) < 0.5f && Math.Abs(pos1.y - pos2.y) < 0.5f)
         {
             return true;
         }
-
         return false;
     }
 
-    private void UpdatePositionClient()
+    private void UpdatePositionClient(int tick)
     {
-        var input = m_InputBuffer.Get(NetworkUtility.GetLocalTick());
+        var input = m_InputBuffer.Get(tick);
         if (input != null)
         {
             transform.position = new Vector3(transform.position.x + input.x * m_Velocity * Time.deltaTime,
@@ -133,9 +146,9 @@ public class Player : NetworkBehaviour
             {
                 transform.position= new Vector2(transform.position.x, -size.y + m_Size);
             }
-        } 
-        
-        m_PositionBuffer.Put(transform.position, NetworkUtility.GetLocalTick());
+        }
+
+        m_PositionBuffer.Put(transform.position, tick);
     }
 
     private void UpdatePositionServer()
@@ -143,8 +156,10 @@ public class Player : NetworkBehaviour
         // Mise a jour de la position selon dernier input reçu, puis consommation de l'input
         if (m_InputQueue.Count > 0)
         {
-            var input = m_InputQueue.Dequeue();
-            var pos = m_Position2.Value.pos;
+            var data = m_InputQueue.Dequeue();
+            var input = data.Item1;
+            var tick = data.Item2;
+            var pos = m_Position.Value.pos;
             pos += input * (m_Velocity * Time.deltaTime);
 
             // Gestion des collisions avec l'exterieur de la zone de simulation
@@ -166,7 +181,7 @@ public class Player : NetworkBehaviour
             {
                 pos = new Vector2(pos.x, -size.y + m_Size);
             }
-            m_Position2.Value = new PositionPayload { pos = pos, tick = NetworkUtility.GetLocalTick() };
+            m_Position.Value = new PositionPayload { pos = pos, tick = tick };
         }
     }
 
@@ -190,16 +205,16 @@ public class Player : NetworkBehaviour
             inputDirection += Vector2.right;
         }
         
-        m_InputBuffer.Put(inputDirection, NetworkUtility.GetLocalTick());
-        SendInputServerRpc(inputDirection.normalized);
+        m_InputBuffer.Put(inputDirection.normalized, NetworkUtility.GetLocalTick());
+        SendInputServerRpc(inputDirection.normalized, NetworkUtility.GetLocalTick());
     }
 
 
     [ServerRpc]
-    private void SendInputServerRpc(Vector2 input)
+    private void SendInputServerRpc(Vector2 input, int tick)
     {
         // On utilise une file pour les inputs pour les cas ou on en recoit plusieurs en meme temps.
-        m_InputQueue.Enqueue(input);
+        m_InputQueue.Enqueue((input, tick));
     }
 
 
