@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using DataStruct;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -26,15 +28,32 @@ public class Player : NetworkBehaviour
         }
     }
 
-    private NetworkVariable<Vector2> m_Position = new NetworkVariable<Vector2>();
+    private CircleBuffer<Vector2> m_InputBuffer;
+    private CircleBuffer<Vector2> m_PositionBuffer;
 
-    public Vector2 Position => m_Position.Value;
+    private class PositionPayload : INetworkSerializable
+    {
+        public Vector2 pos;
+        public int tick;
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref pos);
+            serializer.SerializeValue(ref tick);
+        }
+    }
+    
+    private NetworkVariable<Vector2> m_Position = new NetworkVariable<Vector2>();
+    private NetworkVariable<PositionPayload> m_Position2 = new NetworkVariable<PositionPayload>();
+
+    public Vector2 Position => m_Position2.Value.pos;
 
     private Queue<Vector2> m_InputQueue = new Queue<Vector2>();
 
     private void Awake()
     {
-        m_GameState = FindObjectOfType<GameState>();
+        m_InputBuffer = new CircleBuffer<Vector2>(2 * (int)NetworkUtility.GetLocalTickRate());
+        m_PositionBuffer = new CircleBuffer<Vector2>(2 * (int)NetworkUtility.GetLocalTickRate());
+        m_Position2.Value = new PositionPayload();
     }
 
     private void FixedUpdate()
@@ -55,7 +74,68 @@ public class Player : NetworkBehaviour
         if (IsClient && IsOwner)
         {
             UpdateInputClient();
+            UpdatePositionClient();
+            CheckServerPosition();
         }
+    }
+
+    private void CheckServerPosition()
+    {
+        var position = m_Position2.Value.pos;
+        var tick = m_Position2.Value.tick;
+        
+        var cachedPosition = m_PositionBuffer.Get(tick);
+        
+        if (!PositionEqualWithTolerance(position, cachedPosition))
+        {
+            //TODO make some position correction 
+            Debug.LogWarning("Position are not the same at tick: " + tick );
+            Debug.LogWarning(position + " " + cachedPosition);
+            transform.position = position;
+        }
+    }
+
+    private bool PositionEqualWithTolerance(Vector2 pos1, Vector2 pos2)
+    {
+        //TODO make a better implementation
+        if (Math.Abs(pos1.x - pos2.x) < 0.5f && Math.Abs(pos1.y - pos2.y) < 0.5f)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void UpdatePositionClient()
+    {
+        var input = m_InputBuffer.Get(NetworkUtility.GetLocalTick());
+        if (input != null)
+        {
+            transform.position = new Vector3(transform.position.x + input.x * m_Velocity * Time.deltaTime,
+                transform.position.y + input.y * m_Velocity * Time.deltaTime, 0);
+
+            // Gestion des collisions avec l'exterieur de la zone de simulation
+            var size = GameState.GameSize;
+            if (this.transform.position.x - m_Size < -size.x)
+            {
+                transform.position= new Vector2(-size.x + m_Size, transform.position.y);
+            }
+            else if (transform.position.x + m_Size > size.x)
+            {
+                transform.position = new Vector2(size.x - m_Size, transform.position.y);
+            }
+
+            if (transform.position.y + m_Size > size.y)
+            {
+                transform.position = new Vector2(transform.position.x, size.y - m_Size);
+            }
+            else if (transform.position.y - m_Size < -size.y)
+            {
+                transform.position= new Vector2(transform.position.x, -size.y + m_Size);
+            }
+        } 
+        
+        m_PositionBuffer.Put(transform.position, NetworkUtility.GetLocalTick());
     }
 
     private void UpdatePositionServer()
@@ -64,27 +144,29 @@ public class Player : NetworkBehaviour
         if (m_InputQueue.Count > 0)
         {
             var input = m_InputQueue.Dequeue();
-            m_Position.Value += input * m_Velocity * Time.deltaTime;
+            var pos = m_Position2.Value.pos;
+            pos += input * (m_Velocity * Time.deltaTime);
 
             // Gestion des collisions avec l'exterieur de la zone de simulation
             var size = GameState.GameSize;
-            if (m_Position.Value.x - m_Size < -size.x)
+            if (pos.x - m_Size < -size.x)
             {
-                m_Position.Value = new Vector2(-size.x + m_Size, m_Position.Value.y);
+                pos = new Vector2(-size.x + m_Size, pos.y);
             }
-            else if (m_Position.Value.x + m_Size > size.x)
+            else if (pos.x + m_Size > size.x)
             {
-                m_Position.Value = new Vector2(size.x - m_Size, m_Position.Value.y);
+                pos = new Vector2(size.x - m_Size, pos.y);
             }
 
-            if (m_Position.Value.y + m_Size > size.y)
+            if (pos.y + m_Size > size.y)
             {
-                m_Position.Value = new Vector2(m_Position.Value.x, size.y - m_Size);
+                pos = new Vector2(pos.x, size.y - m_Size);
             }
-            else if (m_Position.Value.y - m_Size < -size.y)
+            else if (pos.y - m_Size < -size.y)
             {
-                m_Position.Value = new Vector2(m_Position.Value.x, -size.y + m_Size);
+                pos = new Vector2(pos.x, -size.y + m_Size);
             }
+            m_Position2.Value = new PositionPayload { pos = pos, tick = NetworkUtility.GetLocalTick() };
         }
     }
 
@@ -107,6 +189,8 @@ public class Player : NetworkBehaviour
         {
             inputDirection += Vector2.right;
         }
+        
+        m_InputBuffer.Put(inputDirection, NetworkUtility.GetLocalTick());
         SendInputServerRpc(inputDirection.normalized);
     }
 
