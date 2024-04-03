@@ -7,6 +7,28 @@ using UnityEngine;
 
 public class Player : NetworkBehaviour
 {
+    private class PositionPayload : INetworkSerializable
+    {
+        public Vector2 pos;
+        public int tick;
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref pos);
+            serializer.SerializeValue(ref tick);
+        }
+    }
+
+    private class InputPayload : INetworkSerializable
+    {
+        public Vector2 input;
+        public int tick;
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref input);
+            serializer.SerializeValue(ref tick);
+        }
+    }
+
     [SerializeField]
     private float m_Velocity;
 
@@ -31,29 +53,26 @@ public class Player : NetworkBehaviour
     private CircleBuffer<Vector2> m_InputBuffer;
     private CircleBuffer<Vector2> m_PositionBuffer;
 
-    private class PositionPayload : INetworkSerializable
-    {
-        public Vector2 pos;
-        public int tick;
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-        {
-            serializer.SerializeValue(ref pos);
-            serializer.SerializeValue(ref tick);
-        }
-    }
-    
     private NetworkVariable<Vector2> m_Position = new NetworkVariable<Vector2>();
     private NetworkVariable<PositionPayload> m_Position2 = new NetworkVariable<PositionPayload>();
+    private bool m_Position2Verified = true;
 
     public Vector2 Position => m_Position2.Value.pos;
 
-    private Queue<Vector2> m_InputQueue = new Queue<Vector2>();
+    private Queue<InputPayload> m_InputQueue = new Queue<InputPayload>();
 
     private void Awake()
     {
-        m_InputBuffer = new CircleBuffer<Vector2>(2 * (int)NetworkUtility.GetLocalTickRate());
-        m_PositionBuffer = new CircleBuffer<Vector2>(2 * (int)NetworkUtility.GetLocalTickRate());
+        m_InputBuffer = new CircleBuffer<Vector2>(8 * (int)NetworkUtility.GetLocalTickRate());
+        m_PositionBuffer = new CircleBuffer<Vector2>(8 * (int)NetworkUtility.GetLocalTickRate());
         m_Position2.Value = new PositionPayload();
+
+        m_Position2.OnValueChanged += (previous, current) =>
+        {
+            print(m_Position2.Value.tick + ": " + m_Position2.Value.pos + " | " + m_PositionBuffer.Get(m_Position2.Value.tick));
+            m_Position2Verified = false;
+        };
+        m_Position2Verified = true;
     }
 
     private void FixedUpdate()
@@ -73,26 +92,40 @@ public class Player : NetworkBehaviour
         // Seul le client qui possede cette entite peut envoyer ses inputs. 
         if (IsClient && IsOwner)
         {
-            UpdateInputClient();
-            UpdatePositionClient();
+            int tick = NetworkUtility.GetLocalTick();
             CheckServerPosition();
+            UpdateInputClient();
+            UpdatePositionClient(tick);
         }
     }
 
     private void CheckServerPosition()
     {
+        if(m_Position2Verified)
+        {
+            return;
+        }
+
         var position = m_Position2.Value.pos;
         var tick = m_Position2.Value.tick;
-        
+
         var cachedPosition = m_PositionBuffer.Get(tick);
         
         if (!PositionEqualWithTolerance(position, cachedPosition))
         {
-            //TODO make some position correction 
             Debug.LogWarning("Position are not the same at tick: " + tick );
             Debug.LogWarning(position + " " + cachedPosition);
+
+            // Set the position to the server's position
             transform.position = position;
+
+            while(tick < NetworkUtility.GetLocalTick())
+            {
+                UpdatePositionClient(tick++);
+            }
         }
+
+        m_Position2Verified = true;
     }
 
     private bool PositionEqualWithTolerance(Vector2 pos1, Vector2 pos2)
@@ -106,68 +139,71 @@ public class Player : NetworkBehaviour
         return false;
     }
 
-    private void UpdatePositionClient()
+    private void UpdatePositionClient(int tick)
     {
-        var input = m_InputBuffer.Get(NetworkUtility.GetLocalTick());
+        if(!IsClient)
+        {
+            return;
+        }
+
+        var input = m_InputBuffer.Get(tick);
         if (input != null)
         {
-            transform.position = new Vector3(transform.position.x + input.x * m_Velocity * Time.deltaTime,
-                transform.position.y + input.y * m_Velocity * Time.deltaTime, 0);
-
-            // Gestion des collisions avec l'exterieur de la zone de simulation
-            var size = GameState.GameSize;
-            if (this.transform.position.x - m_Size < -size.x)
-            {
-                transform.position= new Vector2(-size.x + m_Size, transform.position.y);
-            }
-            else if (transform.position.x + m_Size > size.x)
-            {
-                transform.position = new Vector2(size.x - m_Size, transform.position.y);
-            }
-
-            if (transform.position.y + m_Size > size.y)
-            {
-                transform.position = new Vector2(transform.position.x, size.y - m_Size);
-            }
-            else if (transform.position.y - m_Size < -size.y)
-            {
-                transform.position= new Vector2(transform.position.x, -size.y + m_Size);
-            }
+            Vector2 movedPosition = ApplyMove(transform.position, input);
+            transform.position = movedPosition;
         } 
         
-        m_PositionBuffer.Put(transform.position, NetworkUtility.GetLocalTick());
+        m_PositionBuffer.Put(transform.position, tick);
     }
 
     private void UpdatePositionServer()
     {
-        // Mise a jour de la position selon dernier input reçu, puis consommation de l'input
-        if (m_InputQueue.Count > 0)
+        if(!IsServer)
         {
-            var input = m_InputQueue.Dequeue();
-            var pos = m_Position2.Value.pos;
-            pos += input * (m_Velocity * Time.deltaTime);
+            return;
+        }
+        // Mise a jour de la position selon dernier input reçu, puis consommation de l'input
+        var pos = m_Position2.Value.pos;
+        bool changed = false;
+        while (m_InputQueue.Count > 0)
+        {
+            changed = true;
+            var inputPayload = m_InputQueue.Dequeue();
+            pos = ApplyMove(pos, inputPayload.input);
+            m_PositionBuffer.Put(pos, inputPayload.tick);
+        }
 
-            // Gestion des collisions avec l'exterieur de la zone de simulation
-            var size = GameState.GameSize;
-            if (pos.x - m_Size < -size.x)
-            {
-                pos = new Vector2(-size.x + m_Size, pos.y);
-            }
-            else if (pos.x + m_Size > size.x)
-            {
-                pos = new Vector2(size.x - m_Size, pos.y);
-            }
-
-            if (pos.y + m_Size > size.y)
-            {
-                pos = new Vector2(pos.x, size.y - m_Size);
-            }
-            else if (pos.y - m_Size < -size.y)
-            {
-                pos = new Vector2(pos.x, -size.y + m_Size);
-            }
+        if(changed)
+        {
             m_Position2.Value = new PositionPayload { pos = pos, tick = NetworkUtility.GetLocalTick() };
         }
+    }
+
+    private Vector2 ApplyMove(Vector2 pos, Vector2 input)
+    {
+        pos += input * (m_Velocity * Time.deltaTime);
+
+        // Gestion des collisions avec l'exterieur de la zone de simulation
+        var size = GameState.GameSize;
+        if(pos.x - m_Size < -size.x)
+        {
+            pos = new Vector2(-size.x + m_Size, pos.y);
+        }
+        else if(pos.x + m_Size > size.x)
+        {
+            pos = new Vector2(size.x - m_Size, pos.y);
+        }
+
+        if(pos.y + m_Size > size.y)
+        {
+            pos = new Vector2(pos.x, size.y - m_Size);
+        }
+        else if(pos.y - m_Size < -size.y)
+        {
+            pos = new Vector2(pos.x, -size.y + m_Size);
+        }
+
+        return pos;
     }
 
     private void UpdateInputClient()
@@ -189,19 +225,19 @@ public class Player : NetworkBehaviour
         {
             inputDirection += Vector2.right;
         }
-        
+
+        inputDirection = inputDirection.normalized;
         m_InputBuffer.Put(inputDirection, NetworkUtility.GetLocalTick());
-        SendInputServerRpc(inputDirection.normalized);
+        InputPayload inputPayload = new InputPayload() { input = inputDirection.normalized, tick = NetworkUtility.GetLocalTick() };
+        SendInputServerRpc(inputPayload);
     }
 
 
     [ServerRpc]
-    private void SendInputServerRpc(Vector2 input)
+    private void SendInputServerRpc(InputPayload input)
     {
         // On utilise une file pour les inputs pour les cas ou on en recoit plusieurs en meme temps.
         m_InputQueue.Enqueue(input);
     }
-
-
 
 }
