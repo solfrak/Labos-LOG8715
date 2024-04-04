@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using DataStruct;
 using Unity.Netcode;
@@ -33,21 +32,12 @@ public class Player : NetworkBehaviour
     private CircleBuffer<Vector2> m_InputBuffer;
     private CircleBuffer<Vector2> m_PositionBuffer;
 
-    private class PositionPayload : INetworkSerializable
-    {
-        public Vector2 pos;
-        public int tick;
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-        {
-            serializer.SerializeValue(ref pos);
-            serializer.SerializeValue(ref tick);
-        }
-    }
+    
 
    
-    private NetworkVariable<PositionPayload> m_Position = new NetworkVariable<PositionPayload>();
+    private NetworkVariable<Vector2Payload> m_Position = new NetworkVariable<Vector2Payload>();
 
-    public Vector2 Position => m_Position.Value.pos;
+    public Vector2 Position => m_Position.Value.Vector;
 
     private Queue<(Vector2, int)> m_InputQueue = new Queue<(Vector2, int)>();
     
@@ -57,7 +47,7 @@ public class Player : NetworkBehaviour
         //TODO IDK what buffer size is required
         m_InputBuffer = new CircleBuffer<Vector2>(10 * (int)NetworkUtility.GetLocalTickRate());
         m_PositionBuffer = new CircleBuffer<Vector2>(10 * (int)NetworkUtility.GetLocalTickRate());
-        m_Position.Value = new PositionPayload();
+        m_Position.Value = new Vector2Payload();
     }
 
     private void FixedUpdate()
@@ -91,8 +81,8 @@ public class Player : NetworkBehaviour
 
     private void CheckServerPosition(int currentTick)
     {
-        var position = m_Position.Value.pos;
-        var tick = m_Position.Value.tick;
+        var position = m_Position.Value.Vector;
+        var tick = m_Position.Value.Tick;
         
         var cachedPosition = m_PositionBuffer.Get(tick);
         
@@ -159,7 +149,7 @@ public class Player : NetworkBehaviour
             var data = m_InputQueue.Dequeue();
             var input = data.Item1;
             var tick = data.Item2;
-            var pos = m_Position.Value.pos;
+            var pos = m_Position.Value.Vector;
             pos += input * (m_Velocity * Time.deltaTime);
 
             // Gestion des collisions avec l'exterieur de la zone de simulation
@@ -181,7 +171,7 @@ public class Player : NetworkBehaviour
             {
                 pos = new Vector2(pos.x, -size.y + m_Size);
             }
-            m_Position.Value = new PositionPayload { pos = pos, tick = tick };
+            m_Position.Value = new Vector2Payload { Vector = pos, Tick = tick };
         }
     }
 
