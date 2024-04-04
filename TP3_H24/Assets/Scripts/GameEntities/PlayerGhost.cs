@@ -21,13 +21,13 @@ public class PlayerGhost : NetworkBehaviour
 
     private void Update()
     {
-        if (IsServer)
+        if (IsOwner)
         {
-            transform.position = m_Player.Position;
+            transform.position = m_Player.transform.position;
         }
         else
         {
-            transform.position = m_Player.transform.position;
+            transform.position = m_Player.Position;
         }
     }
 }
