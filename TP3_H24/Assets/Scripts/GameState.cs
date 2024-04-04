@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DataStruct;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -20,7 +21,21 @@ public class GameState : NetworkBehaviour
 
     private NetworkVariable<bool> m_IsStunned = new NetworkVariable<bool>();
 
-    public bool IsStunned { get => m_IsStunned.Value; }
+    private bool m_ClientIsStunned;
+
+    private CircleBuffer<bool> m_StateBuffer;
+
+    public bool IsStunned
+    {
+        get
+        {
+            if (IsClient)
+            {
+                return m_ClientIsStunned;
+            }
+            return m_IsStunned.Value;
+        }
+    }
 
     private Coroutine m_StunCoroutine;
 
@@ -33,6 +48,12 @@ public class GameState : NetworkBehaviour
     private void Start()
     {
         m_GameArea.transform.localScale = new Vector3(m_GameSize.x * 2, m_GameSize.y * 2, 1);
+    }
+
+
+    private void Awake()
+    {
+        m_StateBuffer = new CircleBuffer<bool>(2 * (int)NetworkUtility.GetLocalTick());
     }
 
     private void FixedUpdate()
@@ -77,6 +98,11 @@ public class GameState : NetworkBehaviour
         {
             m_StunCoroutine = StartCoroutine(StunCoroutine());
         }
+        if (IsClient)
+        {
+            Debug.Log("Activating coroutine");
+            m_StunCoroutine = StartCoroutine(LocalStunCoroutine());
+        }
     }
 
     private IEnumerator StunCoroutine()
@@ -84,5 +110,11 @@ public class GameState : NetworkBehaviour
         m_IsStunned.Value = true;
         yield return new WaitForSeconds(m_StunDuration);
         m_IsStunned.Value = false;
+    }
+    private IEnumerator LocalStunCoroutine()
+    {
+        m_ClientIsStunned = true;
+        yield return new WaitForSeconds(m_StunDuration);
+        m_ClientIsStunned = false;
     }
 }

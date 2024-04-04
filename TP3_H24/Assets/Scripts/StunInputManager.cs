@@ -15,10 +15,13 @@ public class StunInputManager : NetworkBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
+                Debug.Log("Freeze");
+                m_GameState.Stun();
                 ActivateStunServerRpc();
             }
         }
     }
+    
 
     [ServerRpc (RequireOwnership = false)]
     private void ActivateStunServerRpc()

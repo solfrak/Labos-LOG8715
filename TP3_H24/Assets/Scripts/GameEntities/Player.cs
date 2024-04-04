@@ -44,10 +44,17 @@ public class Player : NetworkBehaviour
 
     private void Awake()
     {
-        //TODO IDK what buffer size is required
         m_InputBuffer = new CircleBuffer<Vector2>(10 * (int)NetworkUtility.GetLocalTickRate());
         m_PositionBuffer = new CircleBuffer<Vector2>(10 * (int)NetworkUtility.GetLocalTickRate());
-        m_Position.Value = new Vector2Payload();
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if (IsServer)
+        {
+            m_Position.Value = new Vector2Payload();
+        }
+        base.OnNetworkSpawn();
     }
 
     private void FixedUpdate()
