@@ -157,38 +157,54 @@ public class MovingCircle : NetworkBehaviour
 
     private void MoveClient()
     {
-        m_ClientPosition += m_ClientVelocity * Time.deltaTime;
-                    
+        var latency = NetworkUtility.GetCurrentRtt(OwnerClientId)/1000000f;
+        //m_Position += m_Velocity * (Time.deltaTime + latency );
+        Vector2 pos = m_Position.Value.Vector;
+        Vector2 vel = m_Velocity.Value.Vector;
+        vel = interpolatedVelocity(vel,latency);
+        pos += vel * Time.fixedDeltaTime;
+
+        Debug.Log("Latency: " + latency);
+        Debug.Log("Delta Time" + Time.fixedDeltaTime);
+
         // Gestion des collisions avec l'exterieur de la zone de simulation
         var size = m_GameState.GameSize;
-        if (m_ClientPosition.x - m_Radius < -size.x)
+        if (pos.x - m_Radius < -size.x)
         {
-            m_ClientPosition = new Vector2(-size.x + m_Radius, m_ClientPosition.y);
-            m_ClientVelocity *= new Vector2(-1, 1);
+            pos = new Vector2(-size.x + m_Radius, pos.y);
+            vel *= new Vector2(-1, 1);
         }
-        else if (m_ClientPosition.x + m_Radius > size.x)
+        else if (pos.x + m_Radius > size.x)
         {
-            m_ClientPosition = new Vector2(size.x - m_Radius, m_ClientPosition.y);
-            m_ClientVelocity *= new Vector2(-1, 1);
+            pos = new Vector2(size.x - m_Radius, pos.y);
+            vel *= new Vector2(-1, 1);
         }
-                    
-        if (m_ClientPosition.y + m_Radius > size.y)
+
+        if (pos.y + m_Radius > size.y)
         {
-            m_ClientPosition = new Vector2(m_ClientPosition.x, size.y - m_Radius);
-            m_ClientVelocity *= new Vector2(1, -1);
+            pos = new Vector2(pos.x, size.y - m_Radius);
+            vel *= new Vector2(1, -1);
         }
-        else if (m_ClientPosition.y - m_Radius < -size.y)
+        else if (pos.y - m_Radius < -size.y)
         {
-            m_ClientPosition = new Vector2(m_ClientPosition.x, -size.y + m_Radius);
-            m_ClientVelocity *= new Vector2(1, -1);
+            pos = new Vector2(pos.x, -size.y + m_Radius);
+            vel *= new Vector2(1, -1);
         }
-                    
-        m_PositionBuffer.Put(m_ClientPosition, NetworkUtility.GetLocalTick());
+        m_ClientPosition = pos;
+        m_ClientVelocity = vel;
+
+        m_PositionBuffer.Put(pos, NetworkUtility.GetLocalTick());
         
          if (DebugPrint)
          {
              Debug.Log("Client tick: " + NetworkUtility.GetLocalTick() + " Client Pos: " + m_ClientPosition);
          }
-        m_VelocityBuffer.Put(m_ClientVelocity, NetworkUtility.GetLocalTick());
+        m_VelocityBuffer.Put(vel, NetworkUtility.GetLocalTick());
+    }
+
+    private Vector2 interpolatedVelocity(Vector2 velocity,float latency)
+    {
+        var factor = 1.5f;
+        return velocity*(Time.fixedDeltaTime+latency*factor);
     }
 }
