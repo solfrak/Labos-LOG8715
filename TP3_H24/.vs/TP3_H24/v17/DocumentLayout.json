@@ -3,20 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\assets\\scripts\\gamestate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gamestate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\assets\\scripts\\gameentities\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gameentities\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|c:\\users\\flx\\downloads\\semestre8\\log8715\\labos-log8715\\tp3_h24\\assets\\scripts\\gameentities\\movingcircle.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gameentities\\movingcircle.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\assets\\scripts\\networkutility.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\networkutility.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|c:\\users\\flx\\downloads\\semestre8\\log8715\\labos-log8715\\tp3_h24\\assets\\scripts\\gameentities\\playerghost.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gameentities\\playerghost.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\assets\\scripts\\gameentities\\movingcircle.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gameentities\\movingcircle.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\assets\\scripts\\stuninputmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -30,11 +30,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
+              "Title": "PlayerGhost.cs",
+              "DocumentMoniker": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\GameEntities\\PlayerGhost.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\GameEntities\\PlayerGhost.cs",
+              "ToolTip": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\GameEntities\\PlayerGhost.cs",
+              "RelativeToolTip": "Assets\\Scripts\\GameEntities\\PlayerGhost.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABcAAAAIAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-12T18:27:22.811Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "NetworkUtility.cs",
               "DocumentMoniker": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\NetworkUtility.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\NetworkUtility.cs",
@@ -42,45 +55,33 @@
               "RelativeToolTip": "Assets\\Scripts\\NetworkUtility.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAABHAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-12T07:31:44.783Z"
+              "WhenOpened": "2024-04-12T07:31:44.783Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Player.cs",
               "DocumentMoniker": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\GameEntities\\Player.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\GameEntities\\Player.cs",
               "ToolTip": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\GameEntities\\Player.cs",
               "RelativeToolTip": "Assets\\Scripts\\GameEntities\\Player.cs",
-              "ViewState": "AQIAABoAAAAAAAAAAAAawDgAAAAYAAAA",
+              "ViewState": "AQIAAJoAAAAAAAAAAAAlwLgAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-04-12T01:08:23.767Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "MovingCircle.cs",
               "DocumentMoniker": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\GameEntities\\MovingCircle.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\GameEntities\\MovingCircle.cs",
               "ToolTip": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\GameEntities\\MovingCircle.cs",
               "RelativeToolTip": "Assets\\Scripts\\GameEntities\\MovingCircle.cs",
-              "ViewState": "AQIAAEMAAAAAAAAAAADwv08AAAAJAAAA",
+              "ViewState": "AQIAAHYAAAAAAAAAAAAowAEAAAARAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-04-12T00:38:11.889Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "GameState.cs",
-              "DocumentMoniker": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\GameState.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\GameState.cs",
-              "ToolTip": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\GameState.cs",
-              "RelativeToolTip": "Assets\\Scripts\\GameState.cs",
-              "ViewState": "AQIAADsAAAAAAAAAAAAYwEIAAABBAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-12T00:36:13.52Z",
               "EditorCaption": ""
             },
             {

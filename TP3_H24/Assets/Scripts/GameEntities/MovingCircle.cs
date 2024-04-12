@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using DataStruct;
 using Unity.Netcode;
 using UnityEngine;
@@ -106,7 +104,7 @@ public class MovingCircle : NetworkBehaviour
 
         if(!PositionEqualWithTolerance(state.Position, clientPos, 0.5f) && clientState.Tick == state.Tick)
         {
-            Debug.LogWarning($"newState: {state}\nclientState: {clientState}");
+            //Debug.LogWarning($"newState: {state}\nclientState: {clientState}");
 
             ReconcileState(state, m_LastBiggestClientTick);
         }
@@ -189,6 +187,6 @@ public class MovingCircle : NetworkBehaviour
 
     private bool PositionEqualWithTolerance(Vector2 pos1, Vector2 pos2, float tolerance)
     {
-        return Math.Abs(pos1.x - pos2.x) < tolerance && Math.Abs(pos1.y - pos2.y) < tolerance;
+        return Math.Abs(pos1.x - pos2.x) + Math.Abs(pos1.y - pos2.y) < tolerance;
     }
 }
