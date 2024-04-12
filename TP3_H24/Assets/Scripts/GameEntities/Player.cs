@@ -28,7 +28,7 @@ public class Player : NetworkBehaviour
             {
                 return m_Position;
             }
-            return m_ClientPosition.Value.Vector;
+            return m_ServerPosition.Value.Vector;
         }
     }
 
@@ -45,8 +45,10 @@ public class Player : NetworkBehaviour
         }
     }
 
+    // The input buffer can contain inputs which are added up from multiple different update frames
+    // So they are not always normalized
     private CircleBuffer<VectorTick> m_InputBuffer;
-    private CircleBuffer<VectorTick> m_PositionBuffer;
+    private CircleBuffer<List<VectorTick>> m_PositionBuffer;
 
     private NetworkVariable<Vector2Payload> m_ServerPosition = new NetworkVariable<Vector2Payload>();
     private Vector2 m_Position;
@@ -63,18 +65,24 @@ public class Player : NetworkBehaviour
 
         int bufferSize = 8 * (int) NetworkUtility.GetLocalTickRate();
         m_InputBuffer = new CircleBuffer<VectorTick>(bufferSize);
-        m_PositionBuffer = new CircleBuffer<VectorTick>(bufferSize);
+        m_PositionBuffer = new CircleBuffer<List<VectorTick>>(bufferSize);
     }
 
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-
-        m_ServerPosition = new NetworkVariable<Vector2Payload>();
-        m_ServerPosition.OnValueChanged += (previous, current) =>
+        if(IsServer)
         {
-            CheckServerPosition(current);
-        };
+            m_ServerPosition.Value = new Vector2Payload { Vector = Vector2.zero, Tick = 0 };
+        }
+        if(IsClient)
+        {
+            m_ServerPosition.OnValueChanged += (previous, current) =>
+            {
+                Debug.Log($"Tick: {current.Tick} New:{current.Vector} self: {PositionOfTick(current.Tick)}");
+                CheckServerPosition(current);
+            };
+        }
 
         m_BiggestClientTick = NetworkUtility.GetLocalTick();
     }
@@ -102,11 +110,12 @@ public class Player : NetworkBehaviour
         // Seul le client qui possede cette entite peut envoyer ses inputs. 
         if(IsClient && IsOwner)
         {
-            int tick = NetworkUtility.GetLocalTick();
+            int tick = m_BiggestClientTick;
             UpdateInputClient();
-            UpdatePositionClient(tick);
+            UpdatePositionClient(tick, GetInputDirection());
         }
 
+        // Remove this code block after testing
         if (IsOwner)
         {
             m_ClientPosition.Value = new Vector2Payload { Vector = m_Position, Tick = NetworkUtility.GetLocalTick() };
@@ -115,41 +124,68 @@ public class Player : NetworkBehaviour
 
     private void CheckServerPosition(Vector2Payload positionPayload)
     {
+        if(!IsClient)
+        {
+            return;
+        }
         var serverPosition = positionPayload.Vector;
         var serverTick = positionPayload.Tick;
-        var positionState = m_PositionBuffer.Get(serverTick);
+        var positionStates = m_PositionBuffer.Get(serverTick);
 
-        if(!PositionEqualWithTolerance(serverPosition, positionState.Vector, 0.5f) && positionState.Tick == serverTick)
+        if (positionStates == null || positionStates.Count == 0 || positionStates[0].Tick != serverTick)
         {
-            Debug.LogWarning($"PlayerPositionError serverTick: {serverTick} selfTick: {NetworkUtility.GetLocalTick()} biggestTick: {m_BiggestClientTick} serverPos: {serverPosition} selfPos: {positionState.Vector}");
+            return;
+        }
 
-            // Set the serverPosition to the server's serverPosition
-            m_Position = serverPosition;
-
-            int endTick = NetworkUtility.GetLocalTick();
-            while(serverTick < endTick)
+        bool isClientInSyncWithServer = false;
+        foreach(var positionState in positionStates)
+        {
+            if (PositionEqualWithTolerance(serverPosition, positionState.Vector, 0.5f))
             {
-                UpdatePositionClient(serverTick++);
+                isClientInSyncWithServer = true;
+                break;
             }
+        }
+
+        if(!isClientInSyncWithServer)
+        {
+            ReconciliateClient(serverPosition, serverTick);
         }
     }
 
-    private void UpdatePositionClient(int tick)
+    private void ReconciliateClient(Vector2 serverPosition, int serverTick)
+    {
+        Debug.LogWarning($"PlayerPositionError serverTick: {serverTick} selfTick: {NetworkUtility.GetLocalTick()} biggestTick: {m_BiggestClientTick} serverPos: {serverPosition} selfPos: {PositionOfTick(serverTick)}");
+
+        // Set the serverPosition to the server's serverPosition
+        m_Position = serverPosition;
+
+        int endTick = NetworkUtility.GetLocalTick();
+        serverTick++;
+        while(serverTick < endTick)
+        {
+            VectorTick inputState = m_InputBuffer.Get(serverTick);
+            if(inputState != null && inputState.Tick == serverTick)
+            {
+                m_Position = ApplyMove(m_Position, inputState.Vector, Time.deltaTime);
+                UpdatePositionBuffer(new VectorTick() { Vector = m_Position, Tick = serverTick });
+            }
+            serverTick++;
+        }
+    }
+
+    private void UpdatePositionClient(int tick, Vector2 inputDirection)
     {
         if(!IsClient)
         {
             return;
         }
 
-        var inputState = m_InputBuffer.Get(tick);
-        if(inputState != null && inputState.Tick == tick)
-        {
-            Vector2 movedPosition = ApplyMove(m_Position, inputState.Vector, Time.deltaTime);
-            m_Position = movedPosition;
-        }
+        Vector2 movedPosition = ApplyMove(m_Position, inputDirection, Time.deltaTime);
+        m_Position = movedPosition;
 
         var positionState = new VectorTick() { Tick = tick, Vector = m_Position };
-        m_PositionBuffer.Put(positionState, tick);
+        UpdatePositionBuffer(positionState);
     }
 
     private void UpdatePositionServer()
@@ -161,20 +197,18 @@ public class Player : NetworkBehaviour
 
         // Mise a jour de la serverPosition selon dernier inputState reçu, puis consommation de l'inputState
         Vector2 pos = m_ServerPosition.Value.Vector;
-        int tick = 0;
+        int tick = m_ServerPosition.Value.Tick;
         bool changed = false;
+
         while(m_InputQueue.Count > 0)
         {
             changed = true;
             var inputPayload = m_InputQueue.Dequeue();
-            if(!GameState.IsStunned)
-            {
-                pos = ApplyMove(pos, inputPayload.Vector, Time.deltaTime);
-            }
+            pos = ApplyMove(pos, inputPayload.Vector, Time.deltaTime);
             tick = inputPayload.Tick;
 
             var positionState = new VectorTick() { Tick = tick, Vector = pos };
-            m_PositionBuffer.Put(positionState, tick);
+            UpdatePositionBuffer(positionState);
         }
 
         if(changed)
@@ -193,12 +227,44 @@ public class Player : NetworkBehaviour
         Vector2 inputDirection = GetInputDirection();
         int tick = m_BiggestClientTick;
 
-        var inputState = new VectorTick() { Tick = tick, Vector = inputDirection };
+        VectorTick inputState = m_InputBuffer.Get(tick);
+        if(inputState != null && inputState.Tick == tick)
+        {
+            inputState.Vector += inputDirection;
+        }
+        else
+        {
+            inputState = new VectorTick() { Tick = tick, Vector = inputDirection };
+        }
+
         m_InputBuffer.Put(inputState, tick);
         Vector2Payload inputPayload = new Vector2Payload() { Vector = inputDirection.normalized, Tick = tick };
         SendInputServerRpc(inputPayload);
     }
 
+
+    private void UpdatePositionBuffer(VectorTick positionState)
+    {
+        if(positionState == null)
+            return;
+
+        var positionList = m_PositionBuffer.Get(positionState.Tick);
+        if(positionList == null || positionList.Count == 0 || positionList[0].Tick != positionState.Tick)
+        {
+            positionList = new List<VectorTick>();
+            m_PositionBuffer.Put(positionList, positionState.Tick);
+        }
+
+        positionList.Add(positionState);
+    }
+
+    private Vector2 PositionOfTick(int tick)
+    {
+        var posBuffer = m_PositionBuffer.Get(tick);
+        if(posBuffer == null || posBuffer.Count == 0 || posBuffer[0].Tick != tick)
+            return Vector2.zero;
+        return posBuffer[posBuffer.Count - 1].Vector;
+    }
 
     private Vector2 GetInputDirection()
     {
