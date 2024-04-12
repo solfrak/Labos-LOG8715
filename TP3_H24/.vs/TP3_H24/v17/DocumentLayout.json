@@ -1,0 +1,123 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\assets\\scripts\\gameentities\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gameentities\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|c:\\users\\flx\\downloads\\semestre8\\log8715\\labos-log8715\\tp3_h24\\assets\\scripts\\gameentities\\movingcircle.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gameentities\\movingcircle.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\assets\\scripts\\gameentities\\playerghost.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gameentities\\playerghost.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|c:\\users\\flx\\downloads\\semestre8\\log8715\\labos-log8715\\tp3_h24\\assets\\scripts\\gamestate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gamestate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\assets\\scripts\\gameentities\\circleghost.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gameentities\\circleghost.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\assets\\scripts\\datastruct\\circlebuffer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8CBB520A-E2A9-AF1D-5641-3F5A394F26AE}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\datastruct\\circlebuffer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MovingCircle.cs",
+              "DocumentMoniker": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\GameEntities\\MovingCircle.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\GameEntities\\MovingCircle.cs",
+              "ToolTip": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\GameEntities\\MovingCircle.cs",
+              "RelativeToolTip": "Assets\\Scripts\\GameEntities\\MovingCircle.cs",
+              "ViewState": "AQIAABYAAAAAAAAAAAAIwAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-11T23:49:55.356Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "CircleBuffer.cs",
+              "DocumentMoniker": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\DataStruct\\CircleBuffer.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\DataStruct\\CircleBuffer.cs",
+              "ToolTip": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\DataStruct\\CircleBuffer.cs",
+              "RelativeToolTip": "Assets\\Scripts\\DataStruct\\CircleBuffer.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABEAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-03T20:14:16.963Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "GameState.cs",
+              "DocumentMoniker": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\GameState.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\GameState.cs",
+              "ToolTip": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\GameState.cs",
+              "RelativeToolTip": "Assets\\Scripts\\GameState.cs",
+              "ViewState": "AQIAAA4AAAAAAAAAAAAgwDEAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-20T22:10:01.608Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "CircleGhost.cs",
+              "DocumentMoniker": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\GameEntities\\CircleGhost.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\GameEntities\\CircleGhost.cs",
+              "ToolTip": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\GameEntities\\CircleGhost.cs",
+              "RelativeToolTip": "Assets\\Scripts\\GameEntities\\CircleGhost.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAwAAAAsAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-20T21:25:22.606Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Player.cs",
+              "DocumentMoniker": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\GameEntities\\Player.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\GameEntities\\Player.cs",
+              "ToolTip": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\GameEntities\\Player.cs",
+              "RelativeToolTip": "Assets\\Scripts\\GameEntities\\Player.cs",
+              "ViewState": "AQIAAMYAAAAAAAAAAAAvwJ0AAAAlAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "OverriddenGroupName": "Assets\\Scripts\\GameEntities",
+              "WhenOpened": "2024-03-20T21:10:32.838Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PlayerGhost.cs",
+              "DocumentMoniker": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\GameEntities\\PlayerGhost.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\GameEntities\\PlayerGhost.cs",
+              "ToolTip": "C:\\Users\\FLX\\Downloads\\SEMESTRE8\\LOG8715\\Labos-LOG8715\\TP3_H24\\Assets\\Scripts\\GameEntities\\PlayerGhost.cs",
+              "RelativeToolTip": "Assets\\Scripts\\GameEntities\\PlayerGhost.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-20T21:25:34.45Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

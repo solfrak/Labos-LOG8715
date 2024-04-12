@@ -53,11 +53,10 @@ public class Player : NetworkBehaviour
     private CircleBuffer<Vector2> m_InputBuffer;
     private CircleBuffer<Vector2> m_PositionBuffer;
 
-    private NetworkVariable<Vector2> m_Position = new NetworkVariable<Vector2>();
-    private NetworkVariable<PositionPayload> m_Position2 = new NetworkVariable<PositionPayload>();
+    private NetworkVariable<PositionPayload> m_Position = new NetworkVariable<PositionPayload>();
     private bool m_Position2Verified = true;
 
-    public Vector2 Position => m_Position2.Value.pos;
+    public Vector2 Position => m_Position.Value.pos;
 
     private Queue<InputPayload> m_InputQueue = new Queue<InputPayload>();
 
@@ -65,11 +64,11 @@ public class Player : NetworkBehaviour
     {
         m_InputBuffer = new CircleBuffer<Vector2>(8 * (int)NetworkUtility.GetLocalTickRate());
         m_PositionBuffer = new CircleBuffer<Vector2>(8 * (int)NetworkUtility.GetLocalTickRate());
-        m_Position2.Value = new PositionPayload();
+        m_Position.Value = new PositionPayload();
 
-        m_Position2.OnValueChanged += (previous, current) =>
+        m_Position.OnValueChanged += (previous, current) =>
         {
-            print(m_Position2.Value.tick + ": " + m_Position2.Value.pos + " | " + m_PositionBuffer.Get(m_Position2.Value.tick));
+            print(m_Position.Value.tick + ": " + m_Position.Value.pos + " | " + m_PositionBuffer.Get(m_Position.Value.tick));
             m_Position2Verified = false;
         };
         m_Position2Verified = true;
@@ -106,8 +105,8 @@ public class Player : NetworkBehaviour
             return;
         }
 
-        var position = m_Position2.Value.pos;
-        var tick = m_Position2.Value.tick;
+        var position = m_Position.Value.pos;
+        var tick = m_Position.Value.tick;
 
         var cachedPosition = m_PositionBuffer.Get(tick);
         
@@ -163,7 +162,7 @@ public class Player : NetworkBehaviour
             return;
         }
         // Mise a jour de la position selon dernier input reçu, puis consommation de l'input
-        var pos = m_Position2.Value.pos;
+        var pos = m_Position.Value.pos;
         bool changed = false;
         while (m_InputQueue.Count > 0)
         {
@@ -175,7 +174,7 @@ public class Player : NetworkBehaviour
 
         if(changed)
         {
-            m_Position2.Value = new PositionPayload { pos = pos, tick = NetworkUtility.GetLocalTick() };
+            m_Position.Value = new PositionPayload { pos = pos, tick = NetworkUtility.GetLocalTick() };
         }
     }
 
