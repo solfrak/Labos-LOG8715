@@ -23,8 +23,6 @@ public class GameState : NetworkBehaviour
 
     private bool m_ClientIsStunned;
 
-    private CircleBuffer<bool> m_StateBuffer;
-
     public bool IsStunned
     {
         get
@@ -50,11 +48,6 @@ public class GameState : NetworkBehaviour
         m_GameArea.transform.localScale = new Vector3(m_GameSize.x * 2, m_GameSize.y * 2, 1);
     }
 
-
-    private void Awake()
-    {
-        m_StateBuffer = new CircleBuffer<bool>(2 * (int)NetworkUtility.GetLocalTick());
-    }
 
     private void FixedUpdate()
     {

@@ -7,204 +7,188 @@ using UnityEngine;
 
 public class MovingCircle : NetworkBehaviour
 {
-    [SerializeField]
-    private float m_Radius = 1;
-
-    [SerializeField]
-    private bool DebugPrint;
-
-    public Vector2 Position
+    public class StatePayload : INetworkSerializable
     {
-        get
-        {
-            if (IsClient)
-            {
-                return m_ClientPosition;
-            }
+        public State State;
 
-            return m_Position.Value.Vector;
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref State.Tick);
+            serializer.SerializeValue(ref State.Position);
+            serializer.SerializeValue(ref State.Velocity);
         }
     }
 
-    public Vector2 Velocity => m_Velocity.Value.Vector;
+    public struct State
+    {
+        public int Tick;
+        public Vector2 Position;
+        public Vector2 Velocity;
+
+        public State(int tick, Vector2 position, Vector2 velocity)
+        {
+            Tick = tick;
+            Position = position;
+            Velocity = velocity;
+        }
+
+        public override string ToString()
+        {
+            return $"Tick: {Tick} Position: {Position} Velocity: {Velocity}";
+        }
+    }
+
+    [SerializeField]
+    private float m_Radius = 1;
 
     public Vector2 InitialPosition;
     public Vector2 InitialVelocity;
 
-    private NetworkVariable<Vector2Payload> m_Position = new NetworkVariable<Vector2Payload>();
-    private NetworkVariable<Vector2Payload> m_Velocity = new NetworkVariable<Vector2Payload>();
+    public Vector2 Position { get => m_Position; }
 
-    private CircleBuffer<Vector2> m_PositionBuffer;
-    private CircleBuffer<Vector2> m_VelocityBuffer;
-    
-    private Vector2 m_ClientPosition;
-    private Vector2 m_ClientVelocity;
 
+    private NetworkVariable<StatePayload> m_ServerState = new NetworkVariable<StatePayload>();
+
+    private CircleBuffer<State> m_StateBuffer;
+
+    private Vector2 m_Position;
+    private Vector2 m_Velocity;
+
+    private int m_LastBiggestClientTick = 0;
     private GameState m_GameState;
 
     private void Awake()
     {
         m_GameState = FindObjectOfType<GameState>();
-        m_PositionBuffer = new CircleBuffer<Vector2>(2 * (int)NetworkUtility.GetLocalTickRate());
-        m_VelocityBuffer = new CircleBuffer<Vector2>(2 * (int)NetworkUtility.GetLocalTickRate());
+
+        int bufferSize = 8 * (int)NetworkUtility.GetLocalTickRate();
+        m_StateBuffer = new CircleBuffer<State>(bufferSize);
     }
 
     public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
+
         if (IsServer)
         {
-            m_Position.Value = new Vector2Payload(){ Vector = InitialPosition, Tick = 0};
-            m_Velocity.Value = new Vector2Payload() { Vector = InitialVelocity, Tick = 0 };
+            m_Position = InitialPosition;
+            m_Velocity = InitialVelocity;
+            m_ServerState.Value = new StatePayload() { State = new State(0, InitialPosition, InitialVelocity) };
         }
 
         if (IsClient)
         {
-            m_ClientPosition = m_Position.Value.Vector;
-            m_ClientVelocity = m_Velocity.Value.Vector;
+            int expectedEndOfInitTick = NetworkUtility.GetLocalTick() + (int) (NetworkUtility.GetCurrentRtt(OwnerClientId) / (1000.0f * NetworkUtility.GetLocalTickDeltaTime()));
+            ReconcileState(m_ServerState.Value.State, expectedEndOfInitTick);
+
+            m_ServerState.OnValueChanged += (StatePayload previousValue, StatePayload newValue) =>
+            {
+                VerifyWithState(newValue.State);
+            };
         }
+
     }
 
-    private int m_lastTick = 0;
+
     private void FixedUpdate()
     {
-        var currentTick = NetworkUtility.GetLocalTick();
-
-        if (m_lastTick == currentTick)
-        {
-            return;
-        }
         // Si le stun est active, rien n'est mis a jour.
-        if (m_GameState.IsStunned)
+        if (!m_GameState.IsStunned)
         {
-            return;
+            Move(Time.deltaTime);
         }
-
-        // Seul le serveur peut mettre a jour la position et la vitesse des cercles.
-        if (IsServer)
-        {
-            MoveServer();
-        }
-
-        if (IsClient)
-        {
-            MoveClient();
-            CheckServerPosition();
-        }
-
     }
 
-    private void CheckServerPosition()
+    private void VerifyWithState(State state)
     {
-        var serverPos = m_Position.Value.Vector;
-        var tick = m_Position.Value.Tick;
+        State clientState = m_StateBuffer.Get(state.Tick);
+        Vector2 clientPos = clientState.Position;
 
-        var clientPos = m_PositionBuffer.Get(tick);
-
-        if (!PositionEqualWithTolerance(serverPos, clientPos))
+        if(!PositionEqualWithTolerance(state.Position, clientPos, 0.5f) && clientState.Tick == state.Tick)
         {
-            //TODO make some reconciliation;
-            // Debug.Log("Server tick: " + tick + " Server Pos: " + serverPos + " Client pos: " +clientPos);
+            Debug.LogWarning($"newState: {state}\nclientState: {clientState}");
+
+            ReconcileState(state, m_LastBiggestClientTick);
         }
     }
     
-    private bool PositionEqualWithTolerance(Vector2 pos1, Vector2 pos2)
+    private void Move(float deltaTime)
     {
-        if (Math.Abs(pos1.x - pos2.x) < 0.5f && Math.Abs(pos1.y - pos2.y) < 0.5f)
+        // Gestion des collisions avec l'exterieur de la zone de simulation
+        ApplyMove(ref m_Position, ref m_Velocity, deltaTime);
+
+        int tick = NetworkUtility.GetLocalTick();
+        if(IsServer)
         {
-            return true;
+            m_ServerState.Value = new StatePayload() { State = new State(tick, m_Position, m_Velocity) };
         }
-        return false;
+
+        // With a high enough latency, the client's tick from its local time can be behing a previous tick
+        if(tick >= m_LastBiggestClientTick)
+        {
+            m_StateBuffer.Put(new State(tick, m_Position, m_Velocity), tick);
+            m_LastBiggestClientTick = tick;
+        }
+
+
+        if(tick < m_LastBiggestClientTick)
+        {
+            //Debug.LogError($"PreviousTick: {m_LastBiggestClientTick} CurrentTick {NetworkUtility.GetLocalTick()}\nState: {m_StateBuffer.Get(tick)} time: {NetworkManager.Singleton.NetworkTickSystem.LocalTime.Time}  selfTime: {Time.time}");
+        }
     }
 
-    private void MoveServer()
+    private void ReconcileState(State state, int endTick)
     {
-        Vector2 pos = m_Position.Value.Vector;
-        Vector2 vel = m_Velocity.Value.Vector;
-        pos += vel * Time.deltaTime;
- 
+        m_StateBuffer.Put(state, state.Tick);
+
+        int curTick = state.Tick;
+        Vector2 pos = state.Position;
+        Vector2 vel = state.Velocity;
+        float deltaTime = 1.0f / NetworkUtility.GetLocalTickRate();
+        while(curTick <= endTick)
+        {
+            curTick++;
+            ApplyMove(ref pos, ref vel, deltaTime);
+            m_StateBuffer.Put(new State(curTick, pos, vel), curTick);
+        }
+
+        m_Position = pos;
+        m_Velocity = vel;
+    }
+
+
+    private void ApplyMove(ref Vector2 pos, ref Vector2 vel, float deltaTime)
+    {
+        pos += vel * deltaTime;
+
         // Gestion des collisions avec l'exterieur de la zone de simulation
         var size = m_GameState.GameSize;
-        if (pos.x - m_Radius < -size.x)
+        if(pos.x - m_Radius < -size.x)
         {
             pos = new Vector2(-size.x + m_Radius, pos.y);
             vel *= new Vector2(-1, 1);
         }
-        else if (pos.x + m_Radius > size.x)
-        {
-            pos = new Vector2(size.x - m_Radius, pos.y);
-            vel *= new Vector2(-1, 1);
-        }
- 
-        if (pos.y + m_Radius > size.y)
-        {
-            pos = new Vector2(pos.x, size.y - m_Radius);
-            vel *= new Vector2(1, -1);
-        }
-        else if (pos.y - m_Radius < -size.y)
-        {
-            pos = new Vector2(pos.x, -size.y + m_Radius);
-            vel *= new Vector2(1, -1);
-        }
-
-        m_Position.Value = new Vector2Payload() { Vector = pos, Tick = NetworkUtility.GetLocalTick() };
-
-        if (DebugPrint)
-        {
-            Debug.Log("Server tick: " + NetworkUtility.GetLocalTick() + " Server Pos: " + pos);
-        }
-        m_Velocity.Value = new Vector2Payload() { Vector = vel, Tick = NetworkUtility.GetLocalTick() };
-    }
-
-    private void MoveClient()
-    {
-        var latency = NetworkUtility.GetCurrentRtt(OwnerClientId)/1000000f;
-        //m_Position += m_Velocity * (Time.deltaTime + latency );
-        Vector2 pos = m_Position.Value.Vector;
-        Vector2 vel = m_Velocity.Value.Vector;
-        vel = interpolatedVelocity(vel,latency);
-        pos += vel * Time.fixedDeltaTime;
-
-        Debug.Log("Latency: " + latency);
-        Debug.Log("Delta Time" + Time.fixedDeltaTime);
-
-        // Gestion des collisions avec l'exterieur de la zone de simulation
-        var size = m_GameState.GameSize;
-        if (pos.x - m_Radius < -size.x)
-        {
-            pos = new Vector2(-size.x + m_Radius, pos.y);
-            vel *= new Vector2(-1, 1);
-        }
-        else if (pos.x + m_Radius > size.x)
+        else if(pos.x + m_Radius > size.x)
         {
             pos = new Vector2(size.x - m_Radius, pos.y);
             vel *= new Vector2(-1, 1);
         }
 
-        if (pos.y + m_Radius > size.y)
+        if(pos.y + m_Radius > size.y)
         {
             pos = new Vector2(pos.x, size.y - m_Radius);
             vel *= new Vector2(1, -1);
         }
-        else if (pos.y - m_Radius < -size.y)
+        else if(pos.y - m_Radius < -size.y)
         {
             pos = new Vector2(pos.x, -size.y + m_Radius);
             vel *= new Vector2(1, -1);
         }
-        m_ClientPosition = pos;
-        m_ClientVelocity = vel;
-
-        m_PositionBuffer.Put(pos, NetworkUtility.GetLocalTick());
-        
-         if (DebugPrint)
-         {
-             Debug.Log("Client tick: " + NetworkUtility.GetLocalTick() + " Client Pos: " + m_ClientPosition);
-         }
-        m_VelocityBuffer.Put(vel, NetworkUtility.GetLocalTick());
     }
 
-    private Vector2 interpolatedVelocity(Vector2 velocity,float latency)
+
+    private bool PositionEqualWithTolerance(Vector2 pos1, Vector2 pos2, float tolerance)
     {
-        var factor = 1.5f;
-        return velocity*(Time.fixedDeltaTime+latency*factor);
+        return Math.Abs(pos1.x - pos2.x) < tolerance && Math.Abs(pos1.y - pos2.y) < tolerance;
     }
 }
