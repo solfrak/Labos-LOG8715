@@ -95,6 +95,8 @@ public class Player : NetworkBehaviour
         {
             UpdateInputClient(NetworkUtility.GetLocalTick());
             UpdatePositionClient(NetworkUtility.GetLocalTick());
+            
+            //TODO reconciliation
         }
     }
 
