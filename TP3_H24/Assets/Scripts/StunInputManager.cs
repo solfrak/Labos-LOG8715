@@ -15,14 +15,34 @@ public class StunInputManager : NetworkBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                ActivateStunServerRpc();
+                int currentTick = NetworkUtility.GetLocalTick();
+                int endTick = currentTick + (int)(m_GameState.StunDuration * NetworkUtility.GetLocalTickRate());
+                ActivateStunServerRpc(currentTick);
+                m_GameState.Stun(endTick);
             }
         }
     }
 
     [ServerRpc (RequireOwnership = false)]
-    private void ActivateStunServerRpc()
+    private void ActivateStunServerRpc(int startTick)
     {
-        m_GameState.Stun();
+        int endTick = startTick + (int)(m_GameState.StunDuration * NetworkUtility.GetLocalTickRate());
+        ActivatStunClientRpc(startTick, endTick);
+        m_GameState.Stun(endTick);
+        
+    }
+
+    [ClientRpc]
+    private void ActivatStunClientRpc(int startTick, int endTick)
+    {
+        m_GameState.Stun(endTick);
+
+        foreach (var player in FindObjectsOfType < Player>())
+        {
+            if (player.IsClient && player.IsOwner)
+            {
+                player.StunRollback(startTick, endTick);
+            }
+        }
     }
 }

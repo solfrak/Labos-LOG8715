@@ -47,8 +47,10 @@
   <ItemGroup>
     <Compile Include="Assets/Scripts/GameHUD.cs" />
     <Compile Include="Assets/Scripts/GameEntities/PlayerGhost.cs" />
+    <Compile Include="Assets/Scripts/DataStruct/Vector2Payload.cs" />
     <Compile Include="Assets/Scripts/GameEntities/CircleSpawner.cs" />
     <Compile Include="Assets/Scripts/NetworkManagerHUD.cs" />
+    <Compile Include="Assets/Scripts/DataStruct/CircleBuffer.cs" />
     <Compile Include="Assets/Scripts/GameEntities/CircleGhost.cs" />
     <Compile Include="Assets/Scripts/GameEntities/MovingCircle.cs" />
     <Compile Include="Assets/Scripts/StunInputManager.cs" />
