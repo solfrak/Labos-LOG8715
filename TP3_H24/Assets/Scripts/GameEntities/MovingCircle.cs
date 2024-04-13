@@ -77,7 +77,8 @@ public class MovingCircle : NetworkBehaviour
         if (IsClient)
         {
             int expectedEndOfInitTick = NetworkUtility.GetLocalTick() + (int) (NetworkUtility.GetCurrentRtt(OwnerClientId) / (1000.0f * NetworkUtility.GetLocalTickDeltaTime()));
-            ReconcileState(m_ServerState.Value.State, expectedEndOfInitTick);
+            m_StateBuffer.Put(m_ServerState.Value.State, m_ServerState.Value.State.Tick);
+            ReconcileState(m_ServerState.Value.State.Tick, expectedEndOfInitTick);
 
             m_ServerState.OnValueChanged += (StatePayload previousValue, StatePayload newValue) =>
             {
@@ -97,16 +98,49 @@ public class MovingCircle : NetworkBehaviour
         }
     }
 
+
+    public void ReconcileState(int startTick, int endTick)
+    {
+        // Get closestState
+        State state = GetClosestState(startTick);
+        if(state.Tick == 0)
+        {
+            return;
+        }
+
+        int curTick = state.Tick;
+        Vector2 pos = state.Position;
+        Vector2 vel = state.Velocity;
+        float deltaTime = NetworkUtility.GetLocalTickDeltaTime();
+
+        while(curTick <= endTick)
+        {
+            curTick++;
+            if(!m_GameState.IsStunnedAtTick(curTick))
+            {
+                ApplyMove(ref pos, ref vel, deltaTime);
+            }
+            m_StateBuffer.Put(new State(curTick, pos, vel), curTick);
+        }
+
+        m_Position = pos;
+        m_Velocity = vel;
+    }
+
     private void VerifyWithState(State state)
     {
+        if(m_GameState.IsStunnedAtTick(state.Tick))
+            return;
+
         State clientState = m_StateBuffer.Get(state.Tick);
         Vector2 clientPos = clientState.Position;
+
 
         if(!PositionEqualWithTolerance(state.Position, clientPos, 0.5f) && clientState.Tick == state.Tick)
         {
             //Debug.LogWarning($"newState: {state}\nclientState: {clientState}");
-
-            ReconcileState(state, m_LastBiggestClientTick);
+            m_StateBuffer.Put(state, state.Tick);
+            ReconcileState(state.Tick, m_LastBiggestClientTick);
         }
     }
     
@@ -135,25 +169,20 @@ public class MovingCircle : NetworkBehaviour
         }
     }
 
-    private void ReconcileState(State state, int endTick)
+
+    private State GetClosestState(int tick)
     {
-        m_StateBuffer.Put(state, state.Tick);
-
-        int curTick = state.Tick;
-        Vector2 pos = state.Position;
-        Vector2 vel = state.Velocity;
-        float deltaTime = 1.0f / NetworkUtility.GetLocalTickRate();
-        while(curTick <= endTick)
+        State state = new State();
+        for(int i = 0; i < 8; i++)
         {
-            curTick++;
-            ApplyMove(ref pos, ref vel, deltaTime);
-            m_StateBuffer.Put(new State(curTick, pos, vel), curTick);
+            state = m_StateBuffer.Get(tick - i);
+            if (state.Tick == tick)
+            {
+                return state;
+            }
         }
-
-        m_Position = pos;
-        m_Velocity = vel;
+        return state;
     }
-
 
     private void ApplyMove(ref Vector2 pos, ref Vector2 vel, float deltaTime)
     {

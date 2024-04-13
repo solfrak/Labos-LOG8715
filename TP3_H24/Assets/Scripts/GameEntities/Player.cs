@@ -79,7 +79,6 @@ public class Player : NetworkBehaviour
         {
             m_ServerPosition.OnValueChanged += (previous, current) =>
             {
-                Debug.Log($"Tick: {current.Tick} New:{current.Vector} self: {PositionOfTick(current.Tick)}");
                 CheckServerPosition(current);
             };
         }

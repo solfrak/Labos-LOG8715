@@ -19,21 +19,17 @@ public class GameState : NetworkBehaviour
 
     public Vector2 GameSize { get => m_GameSize; }
 
-    private NetworkVariable<bool> m_IsStunned = new NetworkVariable<bool>();
-
-    private bool m_ClientIsStunned;
+    private bool m_IsStunned = false;
 
     public bool IsStunned
     {
         get
         {
-            if (IsClient)
-            {
-                return m_ClientIsStunned;
-            }
-            return m_IsStunned.Value;
+            return m_IsStunned;
         }
     }
+
+    private CircleBuffer<BoolPayload> m_StunBuffer;
 
     private Coroutine m_StunCoroutine;
 
@@ -42,6 +38,13 @@ public class GameState : NetworkBehaviour
     public float CurrentRTT { get => m_CurrentRtt / 1000f; }
 
     public NetworkVariable<float> ServerTime;
+
+
+    private void Awake()
+    {
+        int bufferSize = 8 * (int) NetworkUtility.GetLocalTickRate();
+        m_StunBuffer = new CircleBuffer<BoolPayload>(bufferSize);
+    }
 
     private void Start()
     {
@@ -81,33 +84,76 @@ public class GameState : NetworkBehaviour
         }
     }
 
-    public void Stun()
+    public bool IsStunnedAtTick(int tick)
     {
+        if(tick == NetworkUtility.GetLocalTick())
+        {
+            return m_IsStunned;
+        }
+
+        var stunned = m_StunBuffer.Get(tick);
+        if (stunned == null || stunned.Tick != tick)
+        {
+            return false;
+        }
+        return stunned.Value;
+    }
+
+    public void Stun(int startTick)
+    {
+        if(IsStunnedAtTick(startTick))
+        {
+            return;
+        }
+
+        if(IsServer)
+        {
+            StunClientRpc(startTick);
+        }
+
         if (m_StunCoroutine != null)
         {
             StopCoroutine(m_StunCoroutine);
         }
-        if (IsServer)
+
+
+
+
+        int endTick = GetEndTickStun(startTick);
+
+        for (int tick = startTick; tick <= endTick; tick++)
         {
-            m_StunCoroutine = StartCoroutine(StunCoroutine());
+            m_StunBuffer.Put(new BoolPayload() { Tick = tick, Value = true }, tick);
         }
-        if (IsClient)
+        Debug.Log("Stun from " + startTick + " to " + endTick + " at tick " + NetworkUtility.GetLocalTick());
+
+        var circles = FindObjectsOfType<MovingCircle>();
+        foreach(var circle in circles)
         {
-            Debug.Log("Activating coroutine");
-            m_StunCoroutine = StartCoroutine(LocalStunCoroutine());
+            circle.ReconcileState(startTick, endTick);
         }
+        // TODO reconcialiate players
+        m_StunCoroutine = StartCoroutine(StunCoroutine(endTick));
     }
 
-    private IEnumerator StunCoroutine()
+    private IEnumerator StunCoroutine(int endTick)
     {
-        m_IsStunned.Value = true;
-        yield return new WaitForSeconds(m_StunDuration);
-        m_IsStunned.Value = false;
+        m_IsStunned = true;
+        while(NetworkUtility.GetLocalTick() <= endTick)
+        {
+            yield return null;
+        }
+        m_IsStunned = false;
     }
-    private IEnumerator LocalStunCoroutine()
+
+    [ClientRpc]
+    public void StunClientRpc(int startTick)
     {
-        m_ClientIsStunned = true;
-        yield return new WaitForSeconds(m_StunDuration);
-        m_ClientIsStunned = false;
+        Stun(startTick);
+    }
+
+    public int GetEndTickStun(int startTick)
+    {
+        return startTick + (int)(m_StunDuration / NetworkUtility.GetLocalTickDeltaTime());
     }
 }
