@@ -132,7 +132,11 @@ public class GameState : NetworkBehaviour
         {
             circle.ReconcileState(startTick, endTick);
         }
-        // TODO reconcialiate players
+        var players = FindObjectsOfType<Player>();
+        foreach(var player in players)
+        {
+            player.ReconciliateClient(startTick, endTick);
+        }
         m_StunCoroutine = StartCoroutine(StunCoroutine(endTick));
     }
 
